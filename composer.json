@@ -1,0 +1,36 @@
+{
+    "name": "finpar/inventory-module",
+    "description": "Inventory module",
+    "type": "laravel-module",
+    "license": "GNU GPLv3",
+    "authors": [
+        {
+            "name": "Hermann D. Schimpf",
+            "email": "hschimpf@hds-solutions.net"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.4|^8.0",
+        "finpar/backend-module": "dev-develop"
+    },
+    "autoload": {
+        "psr-4": {
+            "HDSSolutions\\Finpar\\": "src/",
+            "HDSSolutions\\Finpar\\Seeders\\": "database/seeders/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "HDSSolutions\\Finpar\\InventoryModuleServiceProvider"
+            ],
+            "aliases": {
+                "Inventory": "HDSSolutions\\Finpar\\Inventory\\Facade"
+            }
+        }
+    }
+}
