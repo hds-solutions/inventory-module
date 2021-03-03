@@ -2,13 +2,16 @@
 
 namespace HDSSolutions\Finpar;
 
-// use HDSSolutions\Finpar\Commands\Mix;
 use HDSSolutions\Laravel\Modules\ModuleServiceProvider;
 
 class InventoryModuleServiceProvider extends ModuleServiceProvider {
 
+    protected array $middlewares = [
+        \HDSSolutions\Finpar\Http\Middleware\InventoryMenu::class,
+    ];
+
     private $commands = [
-        // Mix::class,
+        // \HDSSolutions\Finpar\Commands\Mix::class,
     ];
 
     public function bootEnv():void {
@@ -35,7 +38,7 @@ class InventoryModuleServiceProvider extends ModuleServiceProvider {
         // register singleton
         app()->singleton('inventory', fn() => new Inventory);
         // register commands
-        // $this->commands( $this->commands );
+        $this->commands( $this->commands );
         // merge configuration
         $this->mergeConfigFrom( module_path('config/inventory.php'), 'inventory' );
     }
