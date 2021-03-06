@@ -1,5 +1,6 @@
 <?php
 
+use HDSSolutions\Finpar\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -9,8 +10,8 @@ Route::group([
     // name prefix
     $name_prefix = [ 'as' => 'backend' ];
 
-    // Route::resource('companies',    CompanyController::class,   $name_prefix)
-    //     ->parameters([ 'companies' => 'resource' ])
-    //     ->name('index', 'backend.companies');
+    Route::resource('warehouses',       WarehouseController::class,     $name_prefix)
+        ->parameters([ 'warehouses' => 'resource' ])
+        ->name('index', 'backend.warehouses');
 
 });

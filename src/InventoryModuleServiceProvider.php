@@ -24,6 +24,8 @@ class InventoryModuleServiceProvider extends ModuleServiceProvider {
         $this->loadRoutesFrom( module_path('routes/inventory.php') );
         // load views
         $this->loadViewsFrom( module_path('resources/views'), 'inventory' );
+        // load translations
+        $this->loadTranslationsFrom( module_path('resources/lang'), 'inventory' );
         // load migrations
         $this->loadMigrationsFrom( module_path('database/migrations') );
         // load seeders
