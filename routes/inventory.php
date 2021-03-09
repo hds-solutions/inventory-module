@@ -1,5 +1,6 @@
 <?php
 
+use HDSSolutions\Finpar\Http\Controllers\LocatorController;
 use HDSSolutions\Finpar\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,5 +14,9 @@ Route::group([
     Route::resource('warehouses',       WarehouseController::class,     $name_prefix)
         ->parameters([ 'warehouses' => 'resource' ])
         ->name('index', 'backend.warehouses');
+
+    Route::resource('locators',         LocatorController::class,       $name_prefix)
+        ->parameters([ 'locators' => 'resource' ])
+        ->name('index', 'backend.locators');
 
 });

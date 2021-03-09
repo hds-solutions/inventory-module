@@ -25,7 +25,7 @@ class WarehouseDataTable extends Base\DataTable {
                 ->hidden(),
 
             Column::make('branch.name')
-                ->title( __('backend::warehouse.branch_id.0') ),
+                ->title( __('inventory::warehouse.branch_id.0') ),
 
             Column::make('name')
                 ->title( __('inventory::warehouse.name.0') ),

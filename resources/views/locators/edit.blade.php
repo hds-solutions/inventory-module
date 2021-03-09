@@ -1,6 +1,6 @@
 @extends('backend::layouts.master')
 
-@section('page-name', __('inventory::warehouses.title'))
+@section('page-name', __('inventory::locators.title'))
 
 @section('content')
 
@@ -9,19 +9,19 @@
         <div class="row">
             <div class="col-6">
                 <i class="fas fa-company-plus"></i>
-                @lang('inventory::warehouses.edit')
+                @lang('inventory::locators.edit')
             </div>
             <div class="col-6 d-flex justify-content-end">
-                <a href="{{ route('backend.warehouses.create') }}"
-                    class="btn btn-sm btn-primary">@lang('inventory::warehouses.add')</a>
+                <a href="{{ route('backend.locators.create') }}"
+                    class="btn btn-sm btn-primary">@lang('inventory::locators.add')</a>
             </div>
         </div>
     </div>
     <div class="card-body">
-        <form method="POST" action="{{ route('backend.warehouses.update', $resource->id) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('backend.locators.update', $resource->id) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
-            @include('inventory::warehouses.form')
+            @include('inventory::locators.form')
         </form>
     </div>
 </div>

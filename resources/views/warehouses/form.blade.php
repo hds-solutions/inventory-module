@@ -14,7 +14,7 @@
 
 <div class="form-row">
     <div class="offset-0 offset-md-3 col-12 col-md-9">
-        <button type="submit" class="btn btn-success">@lang('backend::warehouses.save')</button>
-        <a href="{{ route('backend.warehouses') }}" class="btn btn-danger">@lang('backend::warehouses.cancel')</a>
+        <button type="submit" class="btn btn-success">@lang('inventory::warehouses.save')</button>
+        <a href="{{ route('backend.warehouses') }}" class="btn btn-danger">@lang('inventory::warehouses.cancel')</a>
     </div>
 </div>

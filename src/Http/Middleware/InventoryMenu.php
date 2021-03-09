@@ -23,6 +23,7 @@ class InventoryMenu {
         $this
             // append items to submenu
             ->warehouses($sub)
+            ->locators($sub)
             ->inventory($sub);
 
         // continue witn next middleware
@@ -34,6 +35,16 @@ class InventoryMenu {
             $menu->add(__('inventory::warehouses.nav'), [
                 'route'     => 'backend.warehouses',
                 'icon'      => 'warehouses'
+            ]);
+
+        return $this;
+    }
+
+    private function locators(&$menu) {
+        if (Route::has('backend.locators'))
+            $menu->add(__('inventory::locators.nav'), [
+                'route'     => 'backend.locators',
+                'icon'      => 'locators'
             ]);
 
         return $this;
