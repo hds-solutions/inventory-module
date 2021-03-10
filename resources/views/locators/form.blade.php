@@ -5,7 +5,7 @@
 
     label="{{ __('inventory::locator.warehouse_id.0') }}"
     placeholder="{{ __('inventory::locator.warehouse_id._') }}"
-    {{-- help="{{ __('inventory::locator.warehouse_id.?') }}" --}} />
+    {{-- helper="{{ __('inventory::locator.warehouse_id.?') }}" --}} />
 
 <div class="form-row form-group align-items-center">
     <label class="col-12 col-md-3 control-label mb-0">@lang('inventory::locator.x.0')</label>
