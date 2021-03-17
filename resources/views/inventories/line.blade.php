@@ -17,7 +17,7 @@
                                 <select name="lines[product_id][]" data-live-search="true" @if ($selected !== null) required @endif
                                     data-preview="#line_preview" data-preview-init="false"
                                     value="{{ isset($selected) && !old('product_id') ? $selected->product_id : old('product_id') }}"
-                                    class="form-control custom-select {{ $errors->has('product_id') ? 'is-danger' : '' }}"
+                                    class="form-control selectpicker {{ $errors->has('product_id') ? 'is-danger' : '' }}"
                                     placeholder="@lang('inventory::inventory.lines.product_id._')">
                                     <option value="" selected disabled hidden>@lang('inventory::inventory.lines.product_id.0')</option>
                                     @foreach($products as $product)
@@ -31,7 +31,7 @@
                                 <select name="lines[variant_id][]"
                                     data-filtered-by='[name="lines[product_id][]"]' data-filtered-using="product" data-filtered-init="false"
                                     value="{{ isset($selected) && !old('variant_id') ? $selected->variant_id : old('variant_id') }}"
-                                    class="form-control custom-select {{ $errors->has('variant_id') ? 'is-danger' : '' }}"
+                                    class="form-control selectpicker {{ $errors->has('variant_id') ? 'is-danger' : '' }}"
                                     placeholder="@lang('inventory::inventory.lines.variant_id._')">
                                     <option value="" selected disabled hidden>@lang('inventory::inventory.lines.variant_id.0')</option>
                                     @foreach($products->pluck('variants')->flatten() as $variant)
@@ -49,7 +49,7 @@
                                     <select name="lines[locator_id][]" @if ($selected !== null) required @endif
                                         data-filtered-by='[name="warehouse_id"]' data-filtered-using="warehouse" data-filtered-keep-id="true"
                                         value="{{ isset($selected) && !old('locator_id') ? $selected->locator_id : old('locator_id') }}"
-                                        class="form-control custom-select {{ $errors->has('locator_id') ? 'is-danger' : '' }}"
+                                        class="form-control selectpicker {{ $errors->has('locator_id') ? 'is-danger' : '' }}"
                                         placeholder="@lang('inventory::inventory.lines.locator_id._')">
                                         <option value="" selected disabled hidden>@lang('inventory::inventory.lines.locator_id.0')</option>
                                         @foreach($branches->pluck('warehouses')->flatten()->pluck('locators')->flatten() as $locator)
