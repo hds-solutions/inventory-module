@@ -1,5 +1,6 @@
 <?php
 
+use HDSSolutions\Finpar\Http\Controllers\InventoryController;
 use HDSSolutions\Finpar\Http\Controllers\LocatorController;
 use HDSSolutions\Finpar\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
@@ -18,5 +19,18 @@ Route::group([
     Route::resource('locators',         LocatorController::class,       $name_prefix)
         ->parameters([ 'locators' => 'resource' ])
         ->name('index', 'backend.locators');
+
+    Route::resource('inventories',      InventoryController::class,     $name_prefix)
+        ->parameters([ 'inventories' => 'resource' ])
+        ->name('index', 'backend.inventories');
+
+    Route::post('inventories/stock',                        [ InventoryController::class, 'stock' ])
+        ->name('backend.inventories.stock');
+    Route::get('inventories/{inventory}/import/{import}',   [ InventoryController::class, 'import'])
+        ->name('backend.inventories.import');
+    Route::post('inventories/{inventory}/import/{import}',  [ InventoryController::class, 'doImport' ])
+        ->name('backend.inventories.import');
+    Route::post('inventories/{inventory}/process',          [ InventoryController::class, 'processIt' ])
+        ->name('backend.inventories.process');
 
 });
