@@ -5,21 +5,16 @@ namespace HDSSolutions\Finpar\Http\Controllers;
 use App\Http\Controllers\Controller;
 use HDSSolutions\Finpar\DataTables\InventoryDataTable as DataTable;
 use HDSSolutions\Finpar\Http\Request;
+use HDSSolutions\Finpar\Models\Branch;
+use HDSSolutions\Finpar\Models\File;
 use HDSSolutions\Finpar\Models\Inventory as Resource;
-
-use App\Events\InventoryLinesImport;
-use App\Models\Branch;
-use App\Models\File;
-use App\Models\Inventory;
-use App\Models\InventoryLine;
-use App\Models\Locator;
-use App\Models\PriceChange;
-use App\Models\Product;
-use App\Models\Storage;
-use App\Models\Variant;
-use App\Models\Warehouse;
-use App\Traits\CanProcessDocument;
-use Illuminate\Http\Request;
+use HDSSolutions\Finpar\Models\InventoryLine;
+use HDSSolutions\Finpar\Models\Locator;
+use HDSSolutions\Finpar\Models\Product;
+use HDSSolutions\Finpar\Models\Storage;
+use HDSSolutions\Finpar\Models\Variant;
+use HDSSolutions\Finpar\Models\Warehouse;
+use HDSSolutions\Finpar\Traits\CanProcessDocument;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\HeadingRowImport;
@@ -42,11 +37,11 @@ class InventoryController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() {
-        // fetch all objects
-        $inventories = Resource::with([ 'warehouse.branch' ])->get();
-        // show a list of objects
-        return view('inventories.index', compact('inventories'));
+    public function index(Request $request, DataTable $dataTable) {
+        // load resources
+        if ($request->ajax()) return $dataTable->ajax();
+        // return view with dataTable
+        return $dataTable->render('inventory::inventories.index', [ 'count' => Resource::count() ]);
     }
 
     /**
@@ -60,7 +55,7 @@ class InventoryController extends Controller {
         // get products
         $products = Product::with([ 'images', 'variants' ])->get();
         // show create form
-        return view('inventories.create', compact('branches', 'products'));
+        return view('inventory::inventories.create', compact('branches', 'products'));
     }
 
     public function stock(Request $request) {
@@ -88,26 +83,22 @@ class InventoryController extends Controller {
         DB::beginTransaction();
 
         // create resource
-        $inventory = Inventory::create( $request->input() );
+        $resource = Resource::create( $request->input() );
+
         // check for errors
-        if (count($inventory->errors()) > 0)
+        if (count($resource->errors()) > 0)
             // redirect with errors
             return back()
                 ->withInput()
-                ->withErrors( $inventory->errors() );
+                ->withErrors( $resource->errors() );
 
         // sync inventory lines
-        if (($redirect = $this->syncLines($inventory, $request->get('lines'))) !== true)
+        if (($redirect = $this->syncLines($resource, $request->get('lines'))) !== true)
             // return redirection
             return $redirect;
 
         // check for file import
         if ($request->input('import') == true && ($spreadsheet = $request->file('inventory')) !== null) {
-            // // check max 5 inventories
-            // if (Inventory::count() > 5 || PriceChange::count() > 5)
-            //     return back()->withInput()
-            //         ->withErrors([ 'Se ha alcanzado el limite máximo de importación de Excel en modo prueba' ]);
-
             // save file to disk
             if (!($file = File::upload( $request, $spreadsheet, $this ))->save())
                 // redirect back with errors
@@ -119,7 +110,7 @@ class InventoryController extends Controller {
             DB::commit();
 
             // redirect to import headers configuration
-            return redirect()->route('backend.inventories.import', [ $inventory, 'import' => $file ]);
+            return redirect()->route('backend.inventories.import', [ $resource, 'import' => $file ]);
         }
 
         // confirm transaction
@@ -128,19 +119,19 @@ class InventoryController extends Controller {
         // check if import was specified
         return $request->input('import') == true ?
             // redirect to inventory
-            redirect()->route('backend.inventories.edit', $inventory) :
+            redirect()->route('backend.inventories.edit', $resource) :
             // redirect to list
             redirect()->route('backend.inventories');
     }
 
-    public function import(Request $request, Inventory $inventory, File $import) {
+    public function import(Request $request, Resource $resource, File $import) {
         // get excel headers
         $headers = (new HeadingRowImport)->toCollection( $import->file() )->flatten()->filter();
         // show view to match headers
-        return view('inventories.import', compact('inventory', 'import', 'headers'));
+        return view('inventory::inventories.import', compact('resource', 'import', 'headers'));
     }
 
-    public function doImport(Request $request, Inventory $inventory, File $import) {
+    public function doImport(Request $request, Resource $resource, File $import) {
         // check if selected headers are different from each other
         if (count( array_unique($request->input('headers')) ) !== count($request->input('headers')))
             // return back with errors
@@ -157,21 +148,21 @@ class InventoryController extends Controller {
             $matches->put($field, $headers->get($header));
 
         // register event to create inventory lines
-        InventoryLinesImport::dispatch($inventory, $matches, $import, $request->diff == 'true');
+        InventoryLinesImport::dispatch($resource, $matches, $import, $request->diff == 'true');
 
         // return to inventory
-        return redirect()->route('backend.inventories.show', $inventory);
+        return redirect()->route('backend.inventories.show', $resource);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Inventory  $inventory
+     * @param  \App\Models\Resource  $resource
      * @return \Illuminate\Http\Response
      */
-    public function show(Inventory $inventory) {
+    public function show(Resource $resource) {
         // load inventory data
-        $inventory->load([
+        $resource->load([
             'warehouse.branch',
             'lines.product.images',
             'lines.variant.images',
@@ -180,49 +171,49 @@ class InventoryController extends Controller {
             'lines.locator',
         ]);
         // redirect to list
-        return view('inventories.show', compact('inventory'));
+        return view('inventory::inventories.show', compact('resource'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Inventory  $inventory
+     * @param  \App\Models\Resource  $resource
      * @return \Illuminate\Http\Response
      */
-    public function edit(Inventory $inventory) {
+    public function edit(Resource $resource) {
         // check if inventory is already approved or completed
-        if ($inventory->isApproved() || $inventory->isCompleted())
+        if ($resource->isApproved() || $resource->isCompleted())
             // redirect to show route
-            return redirect()->route('backend.inventories.show', $inventory);
+            return redirect()->route('backend.inventories.show', $resource);
 
         // get branches with warehouses
         $branches = Branch::with([ 'warehouses.locators' ])->get();
         // get products
         $products = Product::with([ 'images', 'variants' ])->get();
         // load inventory lines
-        $inventory->load([
+        $resource->load([
             'warehouse.locators',
             'lines.product.images',
             'lines.variant.images',
         ]);
 
         // show edit form
-        return view('inventories.edit', compact('branches', 'products', 'inventory'));
+        return view('inventory::inventories.edit', compact('branches', 'products', 'resource'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Inventory  $inventory
+     * @param  \App\Models\Resource  $resource
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id) {
         // find resource
-        $inventory = Inventory::findOrFail($id);
+        $resource = Resource::findOrFail($id);
 
         // check if inventory is already approved or completed
-        if ($inventory->isApproved() || $inventory->isCompleted())
+        if ($resource->isApproved() || $resource->isCompleted())
             // return back with errors
             return back()
                 ->withInput()
@@ -232,14 +223,14 @@ class InventoryController extends Controller {
         DB::beginTransaction();
 
         // update resource
-        if (!$inventory->update( $request->input() ))
+        if (!$resource->update( $request->input() ))
             // redirect with errors
             return back()
                 ->withInput()
-                ->withErrors( $inventory->errors() );
+                ->withErrors( $resource->errors() );
 
         // sync inventory lines
-        if (($redirect = $this->syncLines($inventory, $request->get('lines'))) !== true)
+        if (($redirect = $this->syncLines($resource, $request->get('lines'))) !== true)
             // return redirection
             return $redirect;
 
@@ -256,7 +247,7 @@ class InventoryController extends Controller {
             DB::commit();
 
             // redirect to import headers configuration
-            return redirect()->route('backend.inventories.import', [ $inventory, 'import' => $file ]);
+            return redirect()->route('backend.inventories.import', [ $resource, 'import' => $file ]);
         }
 
         // confirm transaction
@@ -265,30 +256,30 @@ class InventoryController extends Controller {
         // check if import was specified
         return $request->input('import') == true ?
             // redirect to inventory
-            redirect()->route('backend.inventories.edit', $inventory) :
+            redirect()->route('backend.inventories.edit', $resource) :
             // redirect to list
-            redirect()->route('backend.inventories.show', $inventory);
+            redirect()->route('backend.inventories.show', $resource);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Inventory  $inventory
+     * @param  \App\Models\Resource  $resource
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Inventory $inventory) {
+    public function destroy(Resource $resource) {
         // delete resource
-        if (!$inventory->delete())
+        if (!$resource->delete())
             // redirect back with errors
             return back()
-                ->withErrors($inventory->errors()->any() ? $inventory->errors() : [ $inventory->getDocumentError() ]);
+                ->withErrors($resource->errors()->any() ? $resource->errors() : [ $resource->getDocumentError() ]);
         // redirect to list
         return redirect()->route('backend.inventories');
     }
 
-    private function syncLines(Inventory $inventory, array $lines) {
+    private function syncLines(Resource $resource, array $lines) {
         // load inventory lines
-        $inventory->load([ 'lines' ]);
+        $resource->load([ 'lines' ]);
 
         // foreach new/updated lines
         foreach (($lines = array_group( $lines )) as $line) {
@@ -302,13 +293,13 @@ class InventoryController extends Controller {
             $locator = Locator::find($line['locator_id']);
 
             // find existing line
-            $inventoryLine = $inventory->lines->first(function($iLine) use ($product, $variant, $locator) {
+            $inventoryLine = $resource->lines->first(function($iLine) use ($product, $variant, $locator) {
                 return $iLine->product_id == $product->id &&
                     $iLine->variant_id == ($variant->id ?? null) &&
                     $iLine->locator_id == $locator->id;
             // create a new line
             }) ?? InventoryLine::make([
-                'inventory_id'  => $inventory->id,
+                'inventory_id'  => $resource->id,
                 'product_id'    => $product->id,
                 'variant_id'    => $variant->id ?? null,
                 'locator_id'    => $locator->id,
@@ -328,7 +319,7 @@ class InventoryController extends Controller {
         }
 
         // find removed inventory lines
-        foreach ($inventory->lines as $line) {
+        foreach ($resource->lines as $line) {
             // deleted flag
             $deleted = true;
             // check against $request->lines

@@ -26,11 +26,11 @@ Route::group([
 
     Route::post('inventories/stock',                        [ InventoryController::class, 'stock' ])
         ->name('backend.inventories.stock');
-    Route::get('inventories/{inventory}/import/{import}',   [ InventoryController::class, 'import'])
+    Route::get('inventories/{resource}/import/{import}',    [ InventoryController::class, 'import'])
         ->name('backend.inventories.import');
-    Route::post('inventories/{inventory}/import/{import}',  [ InventoryController::class, 'doImport' ])
+    Route::post('inventories/{resource}/import/{import}',   [ InventoryController::class, 'doImport' ])
         ->name('backend.inventories.import');
-    Route::post('inventories/{inventory}/process',          [ InventoryController::class, 'processIt' ])
+    Route::post('inventories/{resource}/process',           [ InventoryController::class, 'processIt' ])
         ->name('backend.inventories.process');
 
 });

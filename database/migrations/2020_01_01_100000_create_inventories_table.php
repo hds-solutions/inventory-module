@@ -20,6 +20,7 @@ class CreateInventoriesTable extends Migration {
         // create table
         $schema->create('inventories', function(Blueprint $table) {
             $table->id();
+            $table->foreignTo('Company');
             $table->string('description');
             $table->foreignTo('Warehouse');
 

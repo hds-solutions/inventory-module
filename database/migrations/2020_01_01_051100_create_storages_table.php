@@ -4,7 +4,7 @@ use HDSSolutions\Finpar\Blueprints\BaseBlueprint as Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
-class CreateInventoryLinesTable extends Migration {
+class CreateStoragesTable extends Migration {
     /**
      * Run the migrations.
      *
@@ -18,15 +18,15 @@ class CreateInventoryLinesTable extends Migration {
         $schema->blueprintResolver(fn($table, $callback) => new Blueprint($table, $callback));
 
         // create table
-        $schema->create('inventory_lines', function(Blueprint $table) {
-            $table->id();
+        $schema->create('storages', function(Blueprint $table) {
             $table->foreignTo('Company');
-            $table->foreignTo('Inventory');
             $table->foreignTo('Locator');
             $table->foreignTo('Product');
             $table->foreignTo('Variant')->nullable();
-            $table->unsignedInteger('current');
-            $table->unsignedInteger('counted')->nullable();
+            $table->unique([ 'locator_id', 'product_id', 'variant_id' ]);
+            $table->unsignedInteger('onhand')->default(0);
+            $table->unsignedInteger('reserved')->default(0);
+            $table->dateTime('inventoried')->nullable();
             $table->dateTime('expire_at')->nullable();
         });
     }
@@ -37,6 +37,7 @@ class CreateInventoryLinesTable extends Migration {
      * @return void
      */
     public function down() {
-        Schema::dropIfExists('inventory_lines');
+        Schema::dropIfExists('storages');
     }
+
 }

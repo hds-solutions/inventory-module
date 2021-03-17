@@ -2,7 +2,9 @@
 
 namespace HDSSolutions\Finpar;
 
+use HDSSolutions\Finpar\Processes\DocumentEngine;
 use HDSSolutions\Laravel\Modules\ModuleServiceProvider;
+use Illuminate\Foundation\AliasLoader;
 
 class InventoryModuleServiceProvider extends ModuleServiceProvider {
 
@@ -43,6 +45,8 @@ class InventoryModuleServiceProvider extends ModuleServiceProvider {
         $this->commands( $this->commands );
         // merge configuration
         $this->mergeConfigFrom( module_path('config/inventory.php'), 'inventory' );
+        //
+        AliasLoader::getInstance()->alias('Document', DocumentEngine::class);
     }
 
 }
