@@ -16,11 +16,11 @@
     },
     "autoload": {
         "psr-4": {
-            "HDSSolutions\\Finpar\\": "src/",
+            "HDSSolutions\\Finpar\\": "app/",
             "HDSSolutions\\Finpar\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "src/helpers.php"
+            "app/helpers.php"
         ]
     },
     "extra": {
