@@ -1,7 +1,5 @@
 <?php return [
 
-    'nav'           => 'Inventory',
-
     'details'       => [
         'Details'
     ],

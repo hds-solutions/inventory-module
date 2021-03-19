@@ -51,9 +51,9 @@ class InventoryMenu {
     }
 
     private function inventory(&$menu) {
-        if (Route::has('backend.inventory'))
-            $menu->add(__('inventory::inventory.nav'), [
-                'route'     => 'backend.inventory',
+        if (Route::has('backend.inventories'))
+            $menu->add(__('inventory::inventories.nav'), [
+                'route'     => 'backend.inventories',
                 'icon'      => 'inventory'
             ]);
 

@@ -1,6 +1,6 @@
 <?php return [
 
-    'nav'       => 'Inventory',
+    'nav'           => 'Inventories',
 
     'title'         => 'Inventories',
     'description'   => 'Inventories description',
