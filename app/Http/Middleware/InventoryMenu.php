@@ -16,7 +16,7 @@ class InventoryMenu {
     public function handle($request, Closure $next) {
         // create a submenu
         $sub = backend()->menu()
-            ->add(__('inventory::inventory.nav'), [
+            ->add(__('inventory::inventories.nav'), [
                 'icon'  => 'cogs',
             ])->data('priority', 800);
 
