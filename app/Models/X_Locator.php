@@ -2,10 +2,9 @@
 
 namespace HDSSolutions\Finpar\Models;
 
-use App\Models\Base\Model;
 use HDSSolutions\Finpar\Traits\BelongsToCompany;
 
-abstract class X_Locator extends Model {
+abstract class X_Locator extends Base\Model {
     use BelongsToCompany;
 
     protected $orderBy = [

@@ -2,10 +2,9 @@
 
 namespace HDSSolutions\Finpar\Models;
 
-use App\Models\Base\Model;
 use HDSSolutions\Finpar\Traits\BelongsToCompany;
 
-class X_Inventory extends Model {
+class X_Inventory extends Base\Model {
     use BelongsToCompany;
 
     protected $fillable = [
