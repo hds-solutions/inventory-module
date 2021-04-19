@@ -43,9 +43,6 @@
     label="{{ __('inventory::locator.default.0') }}"
     placeholder="{{ __('inventory::locator.default._') }}" />
 
-<div class="form-row">
-    <div class="offset-0 offset-md-3 col-12 col-md-9">
-        <button type="submit" class="btn btn-success">@lang('inventory::locators.save')</button>
-        <a href="{{ route('backend.locators') }}" class="btn btn-danger">@lang('inventory::locators.cancel')</a>
-    </div>
-</div>
+<x-backend-form-controls
+    submit="inventory::locators.save"
+    cancel="inventory::locators.cancel" cancel-route="backend.locators" />

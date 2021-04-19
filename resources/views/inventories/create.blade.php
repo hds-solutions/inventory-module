@@ -20,6 +20,7 @@
     <div class="card-body">
         <form method="POST" action="{{ route('backend.inventories.store') }}" enctype="multipart/form-data">
             @csrf
+            @onlyform
             @include('inventory::inventories.form')
         </form>
     </div>

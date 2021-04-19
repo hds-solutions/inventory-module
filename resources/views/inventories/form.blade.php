@@ -79,9 +79,6 @@
 </div>
 @endif
 
-<div class="form-row">
-    <div class="offset-0 offset-md-3 col-12 col-md-9">
-        <button type="submit" class="btn btn-success">@lang('inventory::inventories.save')</button>
-        <a href="{{ route('backend.inventories') }}" class="btn btn-danger">@lang('inventory::inventories.cancel')</a>
-    </div>
-</div>
+<x-backend-form-controls
+    submit="inventory::inventories.save"
+    cancel="inventory::inventories.cancel" cancel-route="backend.inventories" />

@@ -38,8 +38,14 @@ class InventoryController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, DataTable $dataTable) {
+        // check only-form flag
+        if ($request->has('only-form'))
+            // redirect to popup callback
+            return view('backend::components.popup-callback', [ 'resource' => new Resource ]);
+
         // load resources
         if ($request->ajax()) return $dataTable->ajax();
+
         // return view with dataTable
         return $dataTable->render('inventory::inventories.index', [ 'count' => Resource::count() ]);
     }
@@ -117,11 +123,17 @@ class InventoryController extends Controller {
         DB::commit();
 
         // check if import was specified
-        return $request->input('import') == true ?
+        if ($request->input('import') == true)
             // redirect to inventory
-            redirect()->route('backend.inventories.edit', $resource) :
-            // redirect to list
-            redirect()->route('backend.inventories');
+            return redirect()->route('backend.inventories.edit', $resource);
+
+        // check return type
+        if ($request->has('only-form'))
+            // redirect to popup callback
+            return view('backend::components.popup-callback', compact('resource'));
+
+        // redirect to list
+        return redirect()->route('backend.inventories');
     }
 
     public function import(Request $request, Resource $resource, File $import) {

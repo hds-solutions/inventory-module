@@ -12,9 +12,6 @@
     placeholder="{{ __('inventory::warehouse.name._') }}"
     {{-- helper="{{ __('inventory::warehouse.name.?') }}" --}} />
 
-<div class="form-row">
-    <div class="offset-0 offset-md-3 col-12 col-md-9">
-        <button type="submit" class="btn btn-success">@lang('inventory::warehouses.save')</button>
-        <a href="{{ route('backend.warehouses') }}" class="btn btn-danger">@lang('inventory::warehouses.cancel')</a>
-    </div>
-</div>
+<x-backend-form-controls
+    submit="inventory::warehouses.save"
+    cancel="inventory::warehouses.cancel" cancel-route="backend.warehouses" />
