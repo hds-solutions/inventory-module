@@ -30,7 +30,7 @@ class PriceChangeDataTable extends Base\DataTable {
             Column::make('description')
                 ->title( __('inventory::pricechange.description.0') ),
 
-            Column::make('document_status')
+            Column::make('document_status_pretty')
                 ->title( __('inventory::pricechange.document_status.0') ),
 
             Column::make('actions'),
