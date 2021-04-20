@@ -1,4 +1,4 @@
-<div class="form-row inventory-line-container mb-3" @if ($selected === null) id="new" @else data-used="true" @endif>
+<div class="form-row mb-3 inventory-line-container" @if ($selected === null) id="new" @else data-used="true" @endif>
     <div class="col-12">
         <div class="card bg-light">
             <div class="card-body py-2">
@@ -6,11 +6,11 @@
                 <div class="form-row">
                     <div class="col-1 d-flex justify-content-center">
                         <div class="position-relative d-flex align-items-center">
-                            <img src="{{ isset($selected) ? asset($selected->variant->images->first()->url ?? $selected->product->images->first()->url ?? 'assets/images/default.jpg') : '' }}"
+                            <img src="{{ isset($selected) ? asset($selected->variant->images->first()->url ?? $selected->product->images->first()->url ?? 'backend-module/assets/images/default.jpg') : '' }}"
                                 class="img-fluid mh-75px" id="line_preview">
                         </div>
                     </div>
-                    <div class="col-9 col-xl-10">
+                    <div class="col-9 col-xl-10 d-flex align-items-center">
                         <div class="form-row">
 
                             <div class="col-8 d-flex align-items-center mb-2">
@@ -21,7 +21,7 @@
                                     placeholder="@lang('inventory::inventory.lines.product_id._')">
                                     <option value="" selected disabled hidden>@lang('inventory::inventory.lines.product_id.0')</option>
                                     @foreach($products as $product)
-                                    <option value="{{ $product->id }}" url="{{ asset($product->images->first()->url ?? 'assets/images/default.jpg') }}"
+                                    <option value="{{ $product->id }}" url="{{ asset($product->images->first()->url ?? 'backend-module/assets/images/default.jpg') }}"
                                         @if (isset($selected) && !old('product_id') && $selected->product_id == $product->id ||
                                             old('product_id') == $product->id) selected @endif>{{ $product->name }}</option>
                                     @endforeach

@@ -12,7 +12,8 @@
     "minimum-stability": "dev",
     "require": {
         "php": "^7.4|^8.0",
-        "finpar/backend-module": "dev-develop"
+        "finpar/backend-module": "dev-develop",
+        "maatwebsite/excel": "^3.2"
     },
     "autoload": {
         "psr-4": {

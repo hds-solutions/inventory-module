@@ -24,7 +24,8 @@ class InventoryMenu {
             // append items to submenu
             ->warehouses($sub)
             ->locators($sub)
-            ->inventory($sub);
+            ->inventory($sub)
+            ->pricechange($sub);
 
         // continue witn next middleware
         return $next($request);
@@ -54,7 +55,17 @@ class InventoryMenu {
         if (Route::has('backend.inventories'))
             $menu->add(__('inventory::inventories.nav'), [
                 'route'     => 'backend.inventories',
-                'icon'      => 'inventory'
+                'icon'      => 'inventories'
+            ]);
+
+        return $this;
+    }
+
+    private function pricechange(&$menu) {
+        if (Route::has('backend.pricechanges'))
+            $menu->add(__('inventory::pricechanges.nav'), [
+                'route'     => 'backend.pricechanges',
+                'icon'      => 'pricechanges'
             ]);
 
         return $this;

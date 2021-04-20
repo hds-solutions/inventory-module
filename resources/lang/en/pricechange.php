@@ -1,21 +1,9 @@
 <?php return [
 
-    'nav'   => 'Inventory',
+    'nav'   => 'PriceChange',
 
     'details'       => [
         'Details'
-    ],
-
-    'branch_id'  => [
-        'Branch',
-        '_' => 'Branch',
-        '?' => 'Branch help text',
-    ],
-
-    'warehouse_id'  => [
-        'Warehouse',
-        '_' => 'Warehouse',
-        '?' => 'Warehouse help text',
     ],
 
     'description'  => [
@@ -59,22 +47,40 @@
             '?' => 'Variant help text',
         ],
 
-        'locator_id'    => [
-            'Locator',
-            '_' => 'Locator',
-            '?' => 'Locator help text',
+        'current_cost'  => [
+            'Current cost',
+            '_' => 'Current cost',
+            '?' => 'Current cost help text',
         ],
 
-        'current'       => [
-            'Current',
-            '_' => 'Current',
-            '?' => 'Current help text',
+        'current_price' => [
+            'Current price',
+            '_' => 'Current price',
+            '?' => 'Current price help text',
         ],
 
-        'counted'       => [
-            'Counted',
-            '_' => 'Counted',
-            '?' => 'Counted help text',
+        'current_limit' => [
+            'Current limit',
+            '_' => 'Current limit',
+            '?' => 'Current limit help text',
+        ],
+
+        'cost'          => [
+            'Cost',
+            '_' => 'Cost',
+            '?' => 'Cost help text',
+        ],
+
+        'price'         => [
+            'Price',
+            '_' => 'Price',
+            '?' => 'Price help text',
+        ],
+
+        'limit'         => [
+            'Limit',
+            '_' => 'Limit',
+            '?' => 'Limit help text',
         ],
 
         'expire_at'     => [
