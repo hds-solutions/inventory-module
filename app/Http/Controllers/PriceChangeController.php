@@ -5,6 +5,7 @@ namespace HDSSolutions\Finpar\Http\Controllers;
 use App\Http\Controllers\Controller;
 use HDSSolutions\Finpar\DataTables\PriceChangeDataTable as DataTable;
 use HDSSolutions\Finpar\Http\Request;
+use HDSSolutions\Finpar\Jobs\PriceChangeLinesImportJob;
 use HDSSolutions\Finpar\Models\Currency;
 use HDSSolutions\Finpar\Models\File;
 use HDSSolutions\Finpar\Models\PriceChange as Resource;
@@ -123,10 +124,12 @@ class PriceChangeController extends Controller {
     }
 
     public function import(Request $request, Resource $resource, File $import) {
+        // load currencies
+        $currencies = Currency::all();
         // get excel headers
         $headers = (new HeadingRowImport)->toCollection( $import->file() )->flatten()->filter();
         // show view to match headers
-        return view('inventory::pricechanges.import', compact('resource', 'import', 'headers'));
+        return view('inventory::pricechanges.import', compact('resource', 'import', 'currencies', 'headers'));
     }
 
     public function doImport(Request $request, Resource $resource, File $import) {
@@ -145,8 +148,8 @@ class PriceChangeController extends Controller {
             // get match for field from selected header
             $matches->put($field, $headers->get($header));
 
-        // register event to create pricechange lines
-        PriceChangeLinesImport::dispatch($resource, $matches, $import, $request->diff == 'true');
+        // dispatch import job
+        PriceChangeLinesImportJob::dispatch($resource, $matches, $import, $request->currency_id, $request->diff == 'true');
 
         // return to pricechange
         return redirect()->route('backend.pricechanges.show', $resource);
@@ -294,7 +297,7 @@ class PriceChangeController extends Controller {
             $pricechangeLine = $resource->lines->first(function($existingLine) use ($product, $variant, $currency) {
                 // filter product + variant
                 return $existingLine->product_id == $product->id && $existingLine->variant_id == ($variant->id ?? null) &&
-                // filter currency
+                    // filter currency
                     $existingLine->currency_id == $currency->id;
 
             // create a new line

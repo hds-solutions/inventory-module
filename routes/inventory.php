@@ -45,13 +45,13 @@ Route::group([
     Route::resource('pricechanges',     PriceChangeController::class,     $name_prefix)
         ->parameters([ 'pricechanges' => 'resource' ])
         ->name('index', 'backend.pricechanges');
-    Route::post('pricechanges/price',                           [ PriceChangeController::class, 'price' ])
+    Route::post('pricechanges/price',                       [ PriceChangeController::class, 'price' ])
         ->name('backend.pricechanges.price');
-    Route::get('pricechanges/{pricechange}/import/{import}',    [ PriceChangeController::class, 'import'])
+    Route::get('pricechanges/{resource}/import/{import}',   [ PriceChangeController::class, 'import'])
         ->name('backend.pricechanges.import');
-    Route::post('pricechanges/{pricechange}/import/{import}',   [ PriceChangeController::class, 'doImport'])
+    Route::post('pricechanges/{resource}/import/{import}',  [ PriceChangeController::class, 'doImport'])
         ->name('backend.pricechanges.import');
-    Route::post('pricechanges/{pricechange}/process',           [ PriceChangeController::class, 'processIt'])
+    Route::post('pricechanges/{resource}/process',          [ PriceChangeController::class, 'processIt'])
         ->name('backend.pricechanges.process');
 
 });

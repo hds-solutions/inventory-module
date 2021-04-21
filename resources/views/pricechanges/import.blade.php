@@ -71,27 +71,28 @@
         <form method="POST" action="{{ route('backend.pricechanges.import', [ $resource, $import ]) }}">
             @csrf
 
-            <div class="row">
-                @foreach ([
-                    'sku'       => 'SKU',
-                    'price'     => 'Price',
-                ] as $field => $name)
-                    <div class="col">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">@lang('inventory::inventory.import.'.$field)</span>
-                            </div>
-                            <select name="headers[{{ $field }}]" required
-                                class="form-control selectpicker">
-                                <option value="" selected disabled hidden></option>
-                                @foreach ($headers as $idx => $header)
-                                <option value="{{ $idx }}">{{ $header }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                @endforeach
+            @foreach ([
+                'sku'       => 'SKU',
+                'price'     => 'Price',
+            ] as $field => $name)
 
+            <x-backend-form-select name="headers[{{ $field }}]" required
+                :values="$headers" default="null"
+
+                label="{{ 'inventory::inventory.import.'.$field.'.0' }}"
+                placeholder="{{ 'inventory::inventory.import.'.$field.'._' }}"
+                {{-- helper="{{ 'inventory::inventory.import.'.$field.'.?' }}" --}} />
+
+            @endforeach
+
+            <x-backend-form-foreign :resource="$resource ?? null" name="currency_id" required
+                foreign="currencies" :values="$currencies" foreign-add-label="{{ __('cash::currencies.add') }}"
+
+                label="{{ __('cash::cash_book.currency_id.0') }}"
+                placeholder="{{ __('cash::cash_book.currency_id._') }}"
+                {{-- helper="{{ __('cash::cash_book.currency_id.?') }}" --}} />
+
+            <div class="row mb-2">
                 <div class="col-12">
                     <div class="form-check">
                         <input type="hidden" name="diff" value="true">
