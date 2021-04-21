@@ -4,87 +4,137 @@ namespace HDSSolutions\Finpar\Models;
 
 use HDSSolutions\Finpar\Interfaces\Document;
 use HDSSolutions\Finpar\Traits\HasDocumentActions;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
-class Inventory extends X_Inventory implements Document {
+class InventoryMovement extends X_InventoryMovement implements Document {
     use HasDocumentActions;
 
     public function warehouse() {
         return $this->belongsTo(Warehouse::class)->withTrashed();
     }
 
+    public function toWarehouse() {
+        return $this->belongsTo(Warehouse::class, 'to_warehouse_id')->withTrashed();
+    }
+
     public function lines() {
-        return $this->hasMany(InventoryLine::class);
+        return $this->hasMany(InventoryMovementLine::class);
     }
 
     public function prepareIt():?string {
         // check if document has lines
-        if (!$this->lines->count()) return $this->documentError( __('inventory::inventory.no-lines') );
+        if (!$this->lines->count()) return $this->documentError( __('inventory::inventory_movement.no-lines') );
         // foreach lines
-        foreach ($this->lines as $line)
-            // check if line has current qty set
-            if ($line->counted === null)
+        foreach ($this->lines as $line) {
+            // check if line has quantity set
+            if ($line->quantity === null || $line->quantity == 0)
                 // return error
-                return $this->documentError( __('inventory::inventory.line.empty-counted') );
+                return $this->documentError( __('inventory::inventory_movement.lines.empty-quantity', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku ]) );
+            // check if line has toLocator set
+            if ($line->toLocator === null)
+                // return error
+                return $this->documentError( __('inventory::inventory_movement.lines.empty-toLocator', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku ]) );
+
+            // check if product has open inventories in origin branch
+            if (Inventory::hasOpenForProduct( $line->product, $line->variant, $this->warehouse->branch ))
+                // return error
+                return $this->documentError( __('inventory::inventory_movement.lines.has-open-inventories', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku, 'branch' => $this->warehouse->branch->name ]) );
+            // check if product has open inventories in destination branch
+            if (Inventory::hasOpenForProduct( $line->product, $line->variant, $this->toWarehouse->branch ))
+                // return error
+                return $this->documentError( __('inventory::inventory_movement.lines.has-open-inventories', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku, 'branch' => $this->toWarehouse->branch->name ]) );
+
+            // check if product has enough stock
+            if ($line->quantity > ($available = Storage::getQtyAvailable( $line->product, $line->variant, $this->warehouse->branch, with_reserved: true )))
+                // return error
+                return $this->documentError( __('inventory::inventory_movement.lines.no-enough-stock', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku, 'available' => $available ]) );
+        }
         // return status InProgress
         return Document::STATUS_InProgress;
     }
 
     public function approveIt():bool {
+        // reserve storage
+        foreach ($this->lines as $line) {
+            // get origin Storage for product+variant+locator
+            $storage = Storage::getFromProductOnLocator($line->product, $line->variant, $line->locator);
+            // move quantity to reserved
+            $storage->fill([
+                'onhand'    => $storage->onhand - $line->quantity,
+                'reserved'  => $storage->reserved + $line->quantity,
+            ]);
+            // save and check errors
+            if (!$storage->save())
+                // return invalid document status
+                return $this->documentError( $storage->errors()->first() ) === null;
+        }
+
         // mark document as approved
         return true;
     }
 
     public function rejectIt():bool {
+        // check if document was approved
+        if ($this->wasApproved())
+            // reverse reserved storage
+            foreach ($this->lines as $line) {
+                // get origin Storage for product+variant+locator
+                $storage = Storage::getFromProductOnLocator($line->product, $line->variant, $line->locator);
+                // move quantity to onhand
+                $storage->fill([
+                    'onhand'    => $storage->onhand + $line->quantity,
+                    'reserved'  => $storage->reserved - $line->quantity,
+                ]);
+                // save and check errors
+                if (!$storage->save())
+                    // return invalid document status
+                    return $this->documentError( $storage->errors()->first() ) === null;
+            }
         // mark document as rejected
         return true;
     }
 
     public function completeIt():?string {
         // check if the document is approved
-        if (!$this->isApproved()) return $this->documentError( __('inventory::inventory.not-approved') );
+        if (!$this->isApproved()) return $this->documentError( __('inventory::inventory_movement.not-approved') );
+
+        // revalidate status of document through prepareIt()
+        if (!$this->processIt( Document::ACTION_Prepare ))
+            // error message already created by prepareIt()
+            return null;
+
+        // wrap process into transaction
+        DB::beginTransaction();
+
         // foreach lines
         foreach ($this->lines as $line) {
-            // get Storage for product+variant+locator
-            $storage = Storage::getFromProductOnLocator($line->product, $line->variant, $line->locator);
-            // update storage values
-            $storage->fill([
-                // replace onhand quantity with counted
-                'onhand'        => $line->counted,
-                // set expiration date
-                'expire_at'     => $line->expire_at,
-                // set last inventoried date to today
-                'inventoried'   => now(),
-            ]);
+            // get origin Storage for product+variant+locator
+            $origin = Storage::getFromProductOnLocator($line->product, $line->variant, $line->locator);
+            // substract reserved quantity
+            $origin->fill([ 'reserved' => $origin->reserved - $line->quantity ]);
             // save and check errors
-            if (!$storage->save())
+            if (!$origin->save())
                 // return invalid document status
-                return $this->documentError( $storage->errors()->first() );
+                return $this->documentError( $origin->errors()->first() );
+
+            // get destination Storage for product+variant+locator
+            $destination = Storage::getFromProductOnLocator($line->product, $line->variant, $line->toLocator);
+            // add onhand quantity
+            $destination->fill([ 'onhand' => $destination->onhand + $line->quantity ]);
+            // save and check errors
+            if (!$destination->save())
+                // return invalid document status
+                return $this->documentError( $destination->errors()->first() );
         }
+
+        // process finished
+        DB::commit();
+
         // return completed status
         return Document::STATUS_Completed;
     }
 
-    public static function hasOpenForProduct(Product|int $product, Variant|int $variant = null, Branch|int $branch = null):bool {
-        // return if there are open Inventories with product|variant present
-        return self::openForProduct($product, $variant, $branch)->count() > 0;
-    }
-
-    public function scopeOpenForProduct(Builder $query, Product|int $product, Variant|int $variant = null, Branch|int $branch = null):Builder {
-        // find open inventories
-        $query = $this->scopeOpen($query);
-        // check if branch is filtered
-        if ($branch !== null) $query = $this->scopeOfBranch($query, $branch);
-        // filter inventories that has Product|Variant line
-        return $query->whereHas('lines', fn($line) => $line->ofProduct($product, $variant));
-    }
-
-    public function scopeOfBranch(Builder $query, Branch|int $branch):Builder {
-        // return inventories of branch
-        return $query->whereIn('warehouse_id', ($branch instanceof Branch ? $branch : Branch::find($branch))->warehouses->pluck('branch_id'));
-    }
-
-    public function createInventoryLines():bool {
+    public function createInventoryMovementLines():bool {
         // foreach all products
         foreach (Product::with([ 'variants.locators', 'locators' ])->get() as $product)
 
@@ -100,7 +150,7 @@ class Inventory extends X_Inventory implements Document {
                     }) !== null) continue;
 
                     // create inventory line with product on locator
-                    $inventoryLine = InventoryLine::create([
+                    $inventoryLine = InventoryMovementLine::create([
                         'inventory_id'  => $this->id,
                         'product_id'    => $product->id,
                         'locator_id'    => $storage->locator_id,
@@ -120,7 +170,7 @@ class Inventory extends X_Inventory implements Document {
                     }) !== null) continue;
 
                     // create inventory line with product on locator
-                    $inventoryLine = InventoryLine::create([
+                    $inventoryLine = InventoryMovementLine::create([
                         'inventory_id'  => $this->id,
                         'product_id'    => $product->id,
                         'locator_id'    => $locator->id,
@@ -144,7 +194,7 @@ class Inventory extends X_Inventory implements Document {
                         }) !== null) continue;
 
                         // create inventory line with variant on locator
-                        $inventoryLine = InventoryLine::create([
+                        $inventoryLine = InventoryMovementLine::create([
                             'inventory_id'  => $this->id,
                             'product_id'    => $product->id,
                             'variant_id'    => $variant->id,
@@ -167,7 +217,7 @@ class Inventory extends X_Inventory implements Document {
                         }) !== null) continue;
 
                         // create inventory line with product on locator
-                        $inventoryLine = InventoryLine::create([
+                        $inventoryLine = InventoryMovementLine::create([
                             'inventory_id'  => $this->id,
                             'product_id'    => $product->id,
                             'variant_id'    => $variant->id,

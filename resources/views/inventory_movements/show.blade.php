@@ -1,7 +1,7 @@
 @extends('backend::layouts.master')
 
-@section('page-name', __('inventory::inventories.title'))
-@section('description', __('inventory::inventories.description'))
+@section('page-name', __('inventory::inventory_movements.title'))
+@section('description', __('inventory::inventory_movements.description'))
 
 @section('content')
 
@@ -10,15 +10,15 @@
         <div class="row">
             <div class="col-6">
                 <i class="fas fa-user-plus"></i>
-                @lang('inventory::inventories.show')
+                @lang('inventory::inventory_movements.show')
             </div>
             <div class="col-6 d-flex justify-content-end">
                 @if (!$resource->isCompleted())
-                <a href="{{ route('backend.inventories.edit', $resource) }}"
-                    class="btn btn-sm ml-2 btn-info">@lang('inventory::inventories.edit')</a>
+                <a href="{{ route('backend.inventory_movements.edit', $resource) }}"
+                    class="btn btn-sm ml-2 btn-info">@lang('inventory::inventory_movements.edit')</a>
                 @endif
-                <a href="{{ route('backend.inventories.create') }}"
-                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::inventories.add')</a>
+                <a href="{{ route('backend.inventory_movements.create') }}"
+                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::inventory_movements.add')</a>
             </div>
         </div>
     </div>
@@ -28,7 +28,7 @@
 
         <div class="row">
             <div class="col">
-                <h2>@lang('inventory::inventory.details.0')</h2>
+                <h2>@lang('inventory::inventory_movement.details.0')</h2>
             </div>
         </div>
 
@@ -36,27 +36,27 @@
             <div class="col-12">
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::inventory.branch_id.0'):</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::inventory_movement.branch_id.0'):</div>
                     <div class="col-8 col-lg-6 h4">{{ $resource->warehouse->branch->name }}</div>
                 </div>
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::inventory.warehouse_id.0'):</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::inventory_movement.warehouse_id.0'):</div>
                     <div class="col-8 col-lg-6 h4">{{ $resource->warehouse->name }}</div>
                 </div>
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::inventory.description.0'):</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::inventory_movement.description.0'):</div>
                     <div class="col-8 col-lg-6 h4">{{ $resource->description }}</div>
                 </div>
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::inventory.created_at.0'):</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::inventory_movement.created_at.0'):</div>
                     <div class="col-8 col-lg-6 h4">{{ pretty_date($resource->created_at, true) }}</div>
                 </div>
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::inventory.document_status.0'):</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::inventory_movement.document_status.0'):</div>
                     <div class="col-8 col-lg-6 h4">{{ Document::__($resource->document_status) }}</div>
                 </div>
 
@@ -65,7 +65,7 @@
 
         <div class="row">
             <div class="col">
-                <h2>@lang('inventory::inventory.lines.0')</h2>
+                <h2>@lang('inventory::inventory_movement.lines.0')</h2>
             </div>
         </div>
 
@@ -76,13 +76,12 @@
                     <table class="table table-sm table-striped table-borderless table-hover" width="100%" cellspacing="0">
                         <thead>
                             <tr>
-                                <th class="w-150px">@lang('inventory::inventory.lines.image.0')</th>
-                                <th>@lang('inventory::inventory.lines.product_id.0')</th>
-                                <th>@lang('inventory::inventory.lines.variant_id.0')</th>
-                                <th>@lang('inventory::inventory.lines.locator_id.0')</th>
-                                <th class="w-150px text-center">@lang('inventory::inventory.lines.current.0')</th>
-                                <th class="w-150px text-center">@lang('inventory::inventory.lines.counted.0')</th>
-                                <th class="w-150px text-center">@lang('inventory::inventory.lines.expire_at.0')</th>
+                                <th class="w-150px">@lang('inventory::inventory_movement.lines.image.0')</th>
+                                <th class="">@lang('inventory::inventory_movement.lines.product_id.0')</th>
+                                <th>@lang('inventory::inventory_movement.lines.variant_id.0')</th>
+                                <th class="text-center">@lang('inventory::inventory_movement.lines.locator_id.0')</th>
+                                <th class="w-150px text-center">@lang('inventory::inventory_movement.lines.quantity.0')</th>
+                                <th class="text-center">@lang('inventory::inventory_movement.lines.to_locator_id.0')</th>
                             </tr>
                         </thead>
 
@@ -97,8 +96,8 @@
                                                 // first variant image
                                                 $line->variant->images->first()->url :
                                                 // first product image or default as fallback
-                                                ($line->product->images->first()->url ?? 'assets/images/default.jpg')
-                                            ) }}" class="img-fluid mh-75px">
+                                                ($line->product->images->first()->url ?? 'backend-module/assets/images/default.jpg')
+                                            ) }}" class="img-fluid mh-50px">
                                         </div>
                                     </td>
                                     <td class="align-middle pl-3">{{ $line->product->name }}</td>
@@ -114,9 +113,8 @@
                                         @endif
                                     </td>
                                     <td class="align-middle text-center">{{ $line->locator->name ?? '--' }}</td>
-                                    <td class="align-middle text-center h4 font-weight-bold">{{ $line->current ?? 0 }}</td>
-                                    <td class="align-middle text-center h4 font-weight-bold">{{ $line->counted ?? '--' }}</td>
-                                    <td class="align-middle text-center">{{ substr($line->expire_at ?? '--', 0, 10) }}</td>
+                                    <td class="align-middle text-center h4 font-weight-bold">{{ $line->quantity }}</td>
+                                    <td class="align-middle text-center">{{ $line->toLocator->name ?? '--' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -127,7 +125,7 @@
         </div>
 
         @include('backend::components.document-actions', [
-            'route'     => 'backend.inventories.process',
+            'route'     => 'backend.inventory_movements.process',
             'resource'  => $resource,
         ])
 

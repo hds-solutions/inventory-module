@@ -27,8 +27,8 @@ class X_Storage extends Base\Model {
     ];
 
     protected $casts = [
-        'onhand'        => 'decimal:2',
-        'reserved'      => 'decimal:2',
+        'onhand'        => 'integer',
+        'reserved'      => 'integer',
         'inventoried'   => 'datetime',
         'expire_at'     => 'datetime',
     ];

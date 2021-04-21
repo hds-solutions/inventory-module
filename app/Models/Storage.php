@@ -19,12 +19,12 @@ class Storage extends X_Storage {
     }
 
     private static $cache = [];
-    public static function getQtyAvailable(Product $product, ?Variant $variant = null, ?Branch $branch = null, bool $cache = true):int {
+    public static function getQtyAvailable(Product $product, ?Variant $variant = null, ?Branch $branch = null, bool $with_reserved = false, bool $cache = true):int {
         // check cache
         if (array_key_exists($key = implode('|', [
             $product->getKey(),
-            optional($variant)->getKey() ?? '?',
-            optional($branch)->getKey() ?? '?',
+            $variant?->getKey() ?? '?',
+            $branch?->getKey() ?? '?',
         ]), self::$cache) && $cache)
             // return from cache
             return self::$cache[ $key ];
@@ -36,7 +36,7 @@ class Storage extends X_Storage {
             // // check if locator is enabled
             // if (ProductLocator::isLocationEnabled($product, $storage->locator))
                 // add available quantuty
-                $qtyAvailable += $storage->available;
+                $qtyAvailable += $with_reserved ? $storage->onhand + $storage->reserved : $storage->onhand - $storage->reserved;
         }
         // save to cache
         self::$cache[ $key ] = $qtyAvailable;

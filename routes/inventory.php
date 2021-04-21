@@ -5,6 +5,7 @@ use HDSSolutions\Finpar\Http\Controllers\{
     WarehouseController,
     LocatorController,
     InventoryController,
+    InventoryMovementController,
     PriceChangeController,
 };
 
@@ -34,6 +35,12 @@ Route::group([
         ->name('backend.inventories.import');
     Route::post('inventories/{resource}/process',           [ InventoryController::class, 'processIt' ])
         ->name('backend.inventories.process');
+
+    Route::resource('inventory_movements',  InventoryMovementController::class, $name_prefix)
+        ->parameters([ 'inventory_movements' => 'resource' ])
+        ->name('index', 'backend.inventory_movements');
+    Route::post('inventory_movements/{resource}/process',   [ InventoryMovementController::class, 'processIt' ])
+        ->name('backend.inventory_movements.process');
 
     Route::resource('pricechanges',     PriceChangeController::class,     $name_prefix)
         ->parameters([ 'pricechanges' => 'resource' ])
