@@ -1,15 +1,15 @@
 <?php return [
 
-    'nav'           => 'PriceChanges',
+    'nav'           => 'Price Changes',
 
-    'title'         => 'PriceChanges',
-    'description'   => 'PriceChanges description',
+    'title'         => 'Price Changes',
+    'description'   => 'Price Changes description',
 
-    'index'         => 'PriceChanges list',
-    'create'        => 'Create new PriceChange',
-    'add'           => 'Add new PriceChange ...',
-    'show'          => 'PriceChange Details',
-    'edit'          => 'Edit PriceChange',
+    'index'         => 'Price Changes list',
+    'create'        => 'Create new Price Change',
+    'add'           => 'Add new Price Change ...',
+    'show'          => 'Price Change Details',
+    'edit'          => 'Edit Price Change',
 
     'save'          => 'Save',
     'save-create'   => 'Save & Import Lines',
