@@ -86,7 +86,8 @@
             @endforeach
 
             <x-backend-form-foreign :resource="$resource ?? null" name="currency_id" required
-                foreign="currencies" :values="$currencies" foreign-add-label="{{ __('cash::currencies.add') }}"
+                foreign="currencies" :values="backend()->currencies()" foreign-add-label="{{ __('cash::currencies.add') }}"
+                append="decimals" default="{{ backend()->currency()->id }}"
 
                 label="{{ __('cash::cash_book.currency_id.0') }}"
                 placeholder="{{ __('cash::cash_book.currency_id._') }}"
