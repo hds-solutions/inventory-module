@@ -132,8 +132,8 @@ class InventoryController extends Controller {
             // redirect to popup callback
             return view('backend::components.popup-callback', compact('resource'));
 
-        // redirect to list
-        return redirect()->route('backend.inventories');
+        // redirect to resource details
+        return redirect()->route('backend.inventories.show', $resource);
     }
 
     public function import(Request $request, Resource $resource, File $import) {
@@ -194,7 +194,7 @@ class InventoryController extends Controller {
      */
     public function edit(Resource $resource) {
         // check if inventory is already approved or completed
-        if ($resource->isApproved() || $resource->isCompleted())
+        if ($resource->isApproved() || $resource->isProcessed())
             // redirect to show route
             return redirect()->route('backend.inventories.show', $resource);
 
