@@ -17,7 +17,7 @@
                     class="btn btn-sm ml-2 btn-info">@lang('inventory::inventories.edit')</a>
                 @endif
                 <a href="{{ route('backend.inventories.create') }}"
-                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::inventories.add')</a>
+                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::inventories.create')</a>
             </div>
         </div>
     </div>

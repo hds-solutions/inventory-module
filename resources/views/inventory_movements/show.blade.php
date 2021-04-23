@@ -18,7 +18,7 @@
                     class="btn btn-sm ml-2 btn-info">@lang('inventory::inventory_movements.edit')</a>
                 @endif
                 <a href="{{ route('backend.inventory_movements.create') }}"
-                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::inventory_movements.add')</a>
+                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::inventory_movements.create')</a>
             </div>
         </div>
     </div>

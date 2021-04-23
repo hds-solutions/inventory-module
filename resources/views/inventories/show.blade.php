@@ -18,7 +18,7 @@
                     class="btn btn-sm ml-2 btn-info">@lang('inventory::inventories.edit')</a>
                 @endif
                 <a href="{{ route('backend.inventories.create') }}"
-                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::inventories.add')</a>
+                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::inventories.create')</a>
             </div>
         </div>
     </div>
@@ -97,7 +97,7 @@
                                                 // first variant image
                                                 $line->variant->images->first()->url :
                                                 // first product image or default as fallback
-                                                ($line->product->images->first()->url ?? 'assets/images/default.jpg')
+                                                ($line->product->images->first()->url ?? 'backend-module/assets/images/default.jpg')
                                             ) }}" class="img-fluid mh-75px">
                                         </div>
                                     </td>

@@ -18,7 +18,7 @@
                     class="btn btn-sm ml-2 btn-info">@lang('inventory::pricechange.edit')</a>
                 @endif
                 <a href="{{ route('backend.pricechanges.create') }}"
-                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::pricechange.add')</a>
+                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::pricechange.create')</a>
             </div>
         </div>
     </div>

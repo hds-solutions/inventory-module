@@ -13,7 +13,7 @@
             </div>
             <div class="col-6 d-flex justify-content-end">
                 {{-- <a href="{{ route('backend.warehouses.create') }}"
-                    class="btn btn-sm btn-primary">@lang('inventory::companieies.add')</a> --}}
+                    class="btn btn-sm btn-primary">@lang('inventory::warehouses.create')</a> --}}
             </div>
         </div>
     </div>

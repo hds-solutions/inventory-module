@@ -13,12 +13,12 @@
             </div>
             <div class="col-6 d-flex justify-content-end">
                 <a href="{{ route('backend.locators.create') }}"
-                    class="btn btn-sm btn-primary">@lang('inventory::locators.add')</a>
+                    class="btn btn-sm btn-primary">@lang('inventory::locators.create')</a>
             </div>
         </div>
     </div>
     <div class="card-body">
-        <form method="POST" action="{{ route('backend.locators.update', $resource->id) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('backend.locators.update', $resource) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
             @include('inventory::locators.form')
