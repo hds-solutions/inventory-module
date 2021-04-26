@@ -179,7 +179,7 @@ class InventoryController extends Controller {
             'lines.product.images',
             'lines.variant.images',
             'lines.variant.values.option',
-            'lines.variant.values.option_value',
+            'lines.variant.values.optionValue',
             'lines.locator',
         ]);
         // redirect to list
