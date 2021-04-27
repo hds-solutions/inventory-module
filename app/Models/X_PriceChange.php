@@ -4,7 +4,7 @@ namespace HDSSolutions\Finpar\Models;
 
 use HDSSolutions\Finpar\Traits\BelongsToCompany;
 
-class X_PriceChange extends Base\Model {
+abstract class X_PriceChange extends Base\Model {
     use BelongsToCompany;
 
     protected $fillable = [

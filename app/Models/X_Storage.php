@@ -5,7 +5,7 @@ namespace HDSSolutions\Finpar\Models;
 use HDSSolutions\Finpar\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Builder;
 
-class X_Storage extends Base\Model {
+abstract class X_Storage extends Base\Model {
     use BelongsToCompany;
 
     public function __construct(array $attributes = []) {
