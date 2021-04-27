@@ -20,17 +20,17 @@ class X_Storage extends Base\Model {
         'locator_id',
         'product_id',
         'variant_id',
+        'pending',
         'onhand',
         'reserved',
-        'pending',
         'inventoried',
         'expire_at',
     ];
 
     protected $casts = [
+        'pending'       => 'integer',
         'onhand'        => 'integer',
         'reserved'      => 'integer',
-        'pending'       => 'integer',
         'inventoried'   => 'datetime',
         'expire_at'     => 'datetime',
     ];
