@@ -24,6 +24,17 @@ class CreateWarehousesTable extends Migration {
             $table->foreignTo('Branch');
             $table->string('name');
         });
+
+        // create locators table
+        $schema->create('locators', function(Blueprint $table) {
+            $table->id();
+            $table->foreignTo('Company');
+            $table->foreignTo('Warehouse');
+            $table->string('x')->default(0);
+            $table->string('y')->default(0);
+            $table->string('z')->default(0);
+            $table->boolean('default')->default(false);
+        });
     }
 
     /**
@@ -32,6 +43,7 @@ class CreateWarehousesTable extends Migration {
      * @return void
      */
     public function down() {
+        Schema::dropIfExists('locators');
         Schema::dropIfExists('warehouses');
     }
 

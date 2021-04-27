@@ -26,8 +26,9 @@ class CreateStoragesTable extends Migration {
             $table->unique([ 'locator_id', 'product_id', 'variant_id' ]);
             $table->unsignedInteger('onhand')->default(0);
             $table->unsignedInteger('reserved')->default(0);
-            $table->dateTime('inventoried')->nullable();
+            $table->unsignedInteger('pending')->default(0);
             $table->dateTime('expire_at')->nullable();
+            $table->timestamp('inventoried_at')->nullable();
         });
     }
 

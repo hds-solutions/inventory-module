@@ -23,8 +23,21 @@ class CreateInventoriesTable extends Migration {
             $table->foreignTo('Company');
             $table->string('description');
             $table->foreignTo('Warehouse');
-
+            // use table as document
             $table->asDocument();
+        });
+
+        // create table
+        $schema->create('inventory_lines', function(Blueprint $table) {
+            $table->id();
+            $table->foreignTo('Company');
+            $table->foreignTo('Inventory');
+            $table->foreignTo('Locator');
+            $table->foreignTo('Product');
+            $table->foreignTo('Variant')->nullable();
+            $table->unsignedInteger('current');
+            $table->unsignedInteger('counted')->nullable();
+            $table->dateTime('expire_at')->nullable();
         });
     }
 
@@ -34,6 +47,7 @@ class CreateInventoriesTable extends Migration {
      * @return void
      */
     public function down() {
+        Schema::dropIfExists('inventory_lines');
         Schema::dropIfExists('inventories');
     }
 

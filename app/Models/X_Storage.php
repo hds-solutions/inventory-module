@@ -22,6 +22,7 @@ class X_Storage extends Base\Model {
         'variant_id',
         'onhand',
         'reserved',
+        'pending',
         'inventoried',
         'expire_at',
     ];
@@ -29,6 +30,7 @@ class X_Storage extends Base\Model {
     protected $casts = [
         'onhand'        => 'integer',
         'reserved'      => 'integer',
+        'pending'       => 'integer',
         'inventoried'   => 'datetime',
         'expire_at'     => 'datetime',
     ];

@@ -22,8 +22,24 @@ class CreatePriceChangesTable extends Migration {
             $table->id();
             $table->foreignTo('Company');
             $table->string('description');
-
+            // use table as document
             $table->asDocument();
+        });
+
+        // create table
+        $schema->create('price_change_lines', function(Blueprint $table) {
+            $table->id();
+            $table->foreignTo('Company');
+            $table->foreignTo('PriceChange');
+            $table->foreignTo('Product');
+            $table->foreignTo('Variant')->nullable();
+            $table->foreignTo('Currency');
+            $table->unsignedInteger('current_cost');
+            $table->unsignedInteger('current_price');
+            $table->unsignedInteger('current_limit');
+            $table->unsignedInteger('cost')->nullable();
+            $table->unsignedInteger('price')->nullable();
+            $table->unsignedInteger('limit')->nullable();
         });
     }
 
@@ -33,6 +49,7 @@ class CreatePriceChangesTable extends Migration {
      * @return void
      */
     public function down() {
+        Schema::dropIfExists('price_change_lines');
         Schema::dropIfExists('price_changes');
     }
 
