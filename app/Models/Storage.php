@@ -49,9 +49,8 @@ class Storage extends X_Storage {
         // get storages from product
         $storages = self::where('product_id', $product->id);
         // filter variant if is specified
-        if ($variant !== null)
-            // get storages that have product variant
-            $storages->where('variant_id', $variant->id);
+        if ($variant !== null) $storages->where('variant_id', $variant->id);
+        else $storages->whereNull('variant_id');
         // filter branch if is specified
         if ($branch !== null)
             // get storages that have locators on the branch (linked thought warehouse)

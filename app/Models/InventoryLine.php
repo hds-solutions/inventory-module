@@ -27,6 +27,7 @@ class InventoryLine extends X_InventoryLine {
         $query->where('product_id', $product instanceof Product ? $product->id : $product);
         // filter variant if is set
         if ($variant !== null) $query->where('variant_id', $product instanceof Product ? $product->id : $product);
+        else $query->whereNull('variant_id');
         // return filtered query
         return $query;
     }
