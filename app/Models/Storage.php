@@ -18,6 +18,10 @@ class Storage extends X_Storage {
         return $this->belongsTo(Variant::class)->withTrashed();
     }
 
+    public function scopeOfProduct(int|Product $product, int|Variant|null $variant = null) {
+        // TODO:
+    }
+
     private static $cache = [];
     public static function getQtyAvailable(Product $product, ?Variant $variant = null, ?Branch $branch = null, bool $with_reserved = false, bool $cache = true):int {
         // check cache

@@ -19,13 +19,17 @@ class Inventory extends X_Inventory implements Document {
 
     public function prepareIt():?string {
         // check if document has lines
-        if (!$this->lines->count()) return $this->documentError( __('inventory::inventory.no-lines') );
+        if (!$this->lines()->count()) return $this->documentError( __('inventory::inventory.no-lines') );
         // foreach lines
         foreach ($this->lines as $line)
             // check if line has current qty set
             if ($line->counted === null)
                 // return error
-                return $this->documentError( __('inventory::inventory.line.empty-counted') );
+                return $this->documentError(__('inventory::inventory.line.empty-counted', [
+                    'product'   => $line->product->name,
+                    'variant'   => $line->variant?->sku,
+                ]));
+
         // return status InProgress
         return Document::STATUS_InProgress;
     }
@@ -61,6 +65,7 @@ class Inventory extends X_Inventory implements Document {
                 // return invalid document status
                 return $this->documentError( $storage->errors()->first() );
         }
+
         // return completed status
         return Document::STATUS_Completed;
     }

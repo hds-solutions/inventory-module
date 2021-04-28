@@ -23,7 +23,7 @@ class InventoryMovement extends X_InventoryMovement implements Document {
 
     public function prepareIt():?string {
         // check if document has lines
-        if (!$this->lines->count()) return $this->documentError( __('inventory::inventory_movement.no-lines') );
+        if (!$this->lines()->count()) return $this->documentError( __('inventory::inventory_movement.no-lines') );
         // foreach lines
         foreach ($this->lines as $line) {
             // check if line has quantity set
