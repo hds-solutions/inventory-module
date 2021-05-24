@@ -17,6 +17,25 @@ class Inventory extends X_Inventory implements Document {
         return $this->hasMany(InventoryLine::class);
     }
 
+    public static function hasOpenForProduct(Product|int $product, Variant|int $variant = null, Branch|int $branch = null):bool {
+        // return if there are open Inventories with product|variant present
+        return self::openForProduct($product, $variant, $branch)->count() > 0;
+    }
+
+    public function scopeOpenForProduct(Builder $query, Product|int $product, Variant|int $variant = null, Branch|int $branch = null):Builder {
+        // find open inventories
+        $query = $this->scopeOpen($query);
+        // check if branch is filtered
+        if ($branch !== null) $query = $this->scopeOfBranch($query, $branch);
+        // filter inventories that has Product|Variant line
+        return $query->whereHas('lines', fn($line) => $line->ofProduct($product, $variant));
+    }
+
+    public function scopeOfBranch(Builder $query, Branch|int $branch):Builder {
+        // return inventories of branch
+        return $query->whereIn('warehouse_id', ($branch instanceof Branch ? $branch : Branch::find($branch))->warehouses->pluck('branch_id'));
+    }
+
     public function prepareIt():?string {
         // check if document has lines
         if (!$this->lines()->count()) return $this->documentError( __('inventory::inventory.no-lines') );
@@ -68,25 +87,6 @@ class Inventory extends X_Inventory implements Document {
 
         // return completed status
         return Document::STATUS_Completed;
-    }
-
-    public static function hasOpenForProduct(Product|int $product, Variant|int $variant = null, Branch|int $branch = null):bool {
-        // return if there are open Inventories with product|variant present
-        return self::openForProduct($product, $variant, $branch)->count() > 0;
-    }
-
-    public function scopeOpenForProduct(Builder $query, Product|int $product, Variant|int $variant = null, Branch|int $branch = null):Builder {
-        // find open inventories
-        $query = $this->scopeOpen($query);
-        // check if branch is filtered
-        if ($branch !== null) $query = $this->scopeOfBranch($query, $branch);
-        // filter inventories that has Product|Variant line
-        return $query->whereHas('lines', fn($line) => $line->ofProduct($product, $variant));
-    }
-
-    public function scopeOfBranch(Builder $query, Branch|int $branch):Builder {
-        // return inventories of branch
-        return $query->whereIn('warehouse_id', ($branch instanceof Branch ? $branch : Branch::find($branch))->warehouses->pluck('branch_id'));
     }
 
     public function createInventoryLines():bool {

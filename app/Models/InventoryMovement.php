@@ -30,10 +30,6 @@ class InventoryMovement extends X_InventoryMovement implements Document {
             if ($line->quantity === null || $line->quantity == 0)
                 // return error
                 return $this->documentError( __('inventory::inventory_movement.lines.empty-quantity', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku ]) );
-            // check if line has toLocator set
-            if ($line->toLocator === null)
-                // return error
-                return $this->documentError( __('inventory::inventory_movement.lines.empty-toLocator', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku ]) );
 
             // check if product has open inventories in origin branch
             if (Inventory::hasOpenForProduct( $line->product, $line->variant, $this->warehouse->branch ))
@@ -56,6 +52,11 @@ class InventoryMovement extends X_InventoryMovement implements Document {
     public function approveIt():bool {
         // reserve storage
         foreach ($this->lines as $line) {
+            // check if line has toLocator set
+            if ($line->toLocator === null)
+                // return error
+                return $this->documentError( __('inventory::inventory_movement.lines.empty-toLocator', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku ]) );
+
             // get origin Storage for product+variant+locator
             $storage = Storage::getFromProductOnLocator($line->product, $line->variant, $line->locator);
             // move quantity to reserved
@@ -97,11 +98,6 @@ class InventoryMovement extends X_InventoryMovement implements Document {
     public function completeIt():?string {
         // check if the document is approved
         if (!$this->isApproved()) return $this->documentError( __('inventory::inventory_movement.not-approved') );
-
-        // revalidate status of document through prepareIt()
-        if (!$this->processIt( Document::ACTION_Prepare ))
-            // error message already created by prepareIt()
-            return null;
 
         // wrap process into transaction
         DB::beginTransaction();
