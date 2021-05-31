@@ -5,14 +5,8 @@ namespace HDSSolutions\Finpar\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Route;
 
-class InventoryMenu {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
+class InventoryMenu extends Base\Menu {
+
     public function handle($request, Closure $next) {
         // create a submenu
         $sub = backend()->menu()
@@ -33,7 +27,7 @@ class InventoryMenu {
     }
 
     private function warehouses(&$menu) {
-        if (Route::has('backend.warehouses'))
+        if (Route::has('backend.warehouses') && $this->can('warehouses'))
             $menu->add(__('inventory::warehouses.nav'), [
                 'route'     => 'backend.warehouses',
                 'icon'      => 'warehouses'
@@ -43,7 +37,7 @@ class InventoryMenu {
     }
 
     private function locators(&$menu) {
-        if (Route::has('backend.locators'))
+        if (Route::has('backend.locators') && $this->can('locators'))
             $menu->add(__('inventory::locators.nav'), [
                 'route'     => 'backend.locators',
                 'icon'      => 'locators'
@@ -53,7 +47,7 @@ class InventoryMenu {
     }
 
     private function inventories(&$menu) {
-        if (Route::has('backend.inventories'))
+        if (Route::has('backend.inventories') && $this->can('inventories'))
             $menu->add(__('inventory::inventories.nav'), [
                 'route'     => 'backend.inventories',
                 'icon'      => 'inventories'
@@ -63,7 +57,7 @@ class InventoryMenu {
     }
 
     private function inventory_movements(&$menu) {
-        if (Route::has('backend.inventory_movements'))
+        if (Route::has('backend.inventory_movements') && $this->can('inventory_movements'))
             $menu->add(__('inventory::inventory_movements.nav'), [
                 'route'     => 'backend.inventory_movements',
                 'icon'      => 'inventory_movements'
@@ -73,7 +67,7 @@ class InventoryMenu {
     }
 
     private function pricechanges(&$menu) {
-        if (Route::has('backend.pricechanges'))
+        if (Route::has('backend.pricechanges') && $this->can('pricechanges'))
             $menu->add(__('inventory::pricechanges.nav'), [
                 'route'     => 'backend.pricechanges',
                 'icon'      => 'pricechanges'
