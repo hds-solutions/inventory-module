@@ -24,7 +24,7 @@
 <div class="form-row form-group mb-0">
     <label class="col-12 col-md-3 control-label mt-2 mb-3">@lang('inventory::inventory.lines.0')</label>
     <div class="col-9" data-multiple=".inventory-line-container" data-template="#new">
-        @php $old_lines = array_group(old('lines') ?? []); @endphp
+        <?php $old_lines = array_group(old('lines') ?? []); ?>
         {{-- add product current lines --}}
         @if (isset($resource)) @foreach($resource->lines as $idx => $selected)
             @include('inventory::inventories.line', [
@@ -32,7 +32,7 @@
                 'selected'  => $selected,
                 'old'       => $old_lines[$idx] ?? null,
             ])
-            @php unset($old_lines[$idx]); @endphp
+            <?php unset($old_lines[$idx]); ?>
         @endforeach @endif
 
         {{-- add new added --}}
