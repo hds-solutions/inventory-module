@@ -1,6 +1,6 @@
 @extends('backend::layouts.master')
 
-@section('page-name', __('inventory::pricechanges.title'))
+@section('page-name', __('inventory::price_changes.title'))
 
 @section('content')
 
@@ -9,15 +9,15 @@
         <div class="row">
             <div class="col-6">
                 <i class="fas fa-user-plus"></i>
-                @lang('inventory::pricechange.show')
+                @lang('inventory::price_change.show')
             </div>
             <div class="col-6 d-flex justify-content-end">
                 @if (!$resource->isCompleted())
-                <a href="{{ route('backend.pricechanges.edit', $resource) }}"
-                    class="btn btn-sm ml-2 btn-info">@lang('inventory::pricechange.edit')</a>
+                <a href="{{ route('backend.price_changes.edit', $resource) }}"
+                    class="btn btn-sm ml-2 btn-info">@lang('inventory::price_change.edit')</a>
                 @endif
-                <a href="{{ route('backend.pricechanges.create') }}"
-                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::pricechange.create')</a>
+                <a href="{{ route('backend.price_changes.create') }}"
+                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::price_change.create')</a>
             </div>
         </div>
     </div>
@@ -27,7 +27,7 @@
 
         <div class="row">
             <div class="col">
-                <h2>@lang('inventory::pricechange.details.0')</h2>
+                <h2>@lang('inventory::price_change.details.0')</h2>
             </div>
         </div>
 
@@ -35,27 +35,27 @@
             <div class="col-12">
 
                 {{-- <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::pricechange.branch_id.0'):</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::price_change.branch_id.0'):</div>
                     <div class="col-8 col-lg-6 h4">{{ $resource->warehouse->branch->name }}</div>
                 </div>
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::pricechange.warehouse_id.0'):</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::price_change.warehouse_id.0'):</div>
                     <div class="col-8 col-lg-6 h4">{{ $resource->warehouse->name }}</div>
                 </div> --}}
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::pricechange.description.0'):</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::price_change.description.0'):</div>
                     <div class="col-8 col-lg-6 h4">{{ $resource->description }}</div>
                 </div>
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::pricechange.created_at.0'):</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::price_change.created_at.0'):</div>
                     <div class="col-8 col-lg-6 h4">{{ pretty_date($resource->created_at, true) }}</div>
                 </div>
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::pricechange.document_status.0'):</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::price_change.document_status.0'):</div>
                     <div class="col-8 col-lg-6 h4">{{ Document::__($resource->document_status) }}</div>
                 </div>
 
@@ -68,7 +68,7 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('backend.pricechanges.import', [ $resource, $import ]) }}">
+        <form method="POST" action="{{ route('backend.price_changes.import', [ $resource, $import ]) }}">
             @csrf
 
             @foreach ([

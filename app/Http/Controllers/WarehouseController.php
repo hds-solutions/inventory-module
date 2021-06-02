@@ -9,6 +9,12 @@ use HDSSolutions\Finpar\Models\Branch;
 use HDSSolutions\Finpar\Models\Warehouse as Resource;
 
 class WarehouseController extends Controller {
+
+    public function __construct() {
+        // check resource Policy
+        $this->authorizeResource(Resource::class, 'resource');
+    }
+
     /**
      * Display a listing of the resource.
      *

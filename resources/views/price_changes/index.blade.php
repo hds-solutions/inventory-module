@@ -1,7 +1,7 @@
 @extends('backend::layouts.master')
 
-@section('page-name', __('inventory::pricechanges.title'))
-@section('description', __('inventory::pricechanges.description'))
+@section('page-name', __('inventory::price_changes.title'))
+@section('description', __('inventory::price_changes.description'))
 
 @section('content')
 
@@ -10,11 +10,11 @@
         <div class="row">
             <div class="col-6">
                 <i class="fas fa-table"></i>
-                @lang('inventory::pricechanges.index')
+                @lang('inventory::price_changes.index')
             </div>
             <div class="col-6 d-flex justify-content-end">
-                <a href="{{ route('backend.pricechanges.create') }}"
-                    class="btn btn-sm btn-primary">@lang('inventory::pricechanges.create')</a>
+                <a href="{{ route('backend.price_changes.create') }}"
+                    class="btn btn-sm btn-primary">@lang('inventory::price_changes.create')</a>
             </div>
         </div>
     </div>
@@ -33,8 +33,8 @@
                 <h3>@lang('backend.empty.title')</h3>
                 <p class="text-muted">
                     @lang('backend.empty.description')
-                    <a href="{{ route('backend.pricechanges.create') }}" class="text-custom">
-                        <ins>@lang('inventory::pricechanges.create')</ins>
+                    <a href="{{ route('backend.price_changes.create') }}" class="text-custom">
+                        <ins>@lang('inventory::price_changes.create')</ins>
                     </a>
                 </p>
             </div>

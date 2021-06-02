@@ -9,6 +9,12 @@ use HDSSolutions\Finpar\Models\Locator as Resource;
 use HDSSolutions\Finpar\Models\Warehouse;
 
 class LocatorController extends Controller {
+
+    public function __construct() {
+        // check resource Policy
+        $this->authorizeResource(Resource::class, 'resource');
+    }
+
     /**
      * Display a listing of the resource.
      *

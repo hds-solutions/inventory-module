@@ -1,4 +1,4 @@
-<div class="form-row mb-3 pricechange-line-container" @if ($selected === null) id="new" @else data-used="true" @endif>
+<div class="form-row mb-3 price_change-line-container" @if ($selected === null) id="new" @else data-used="true" @endif>
     <div class="col-12">
         <div class="card bg-light">
             <div class="card-body py-2">
@@ -17,8 +17,8 @@
                                     data-preview="#line_preview" data-preview-init="false"
                                     value="{{ isset($selected) && !old('product_id') ? $selected->product_id : old('product_id') }}"
                                     class="form-control selectpicker {{ $errors->has('product_id') ? 'is-danger' : '' }}"
-                                    placeholder="@lang('inventory::pricechange.lines.product_id._')">
-                                    <option value="" selected disabled hidden>@lang('inventory::pricechange.lines.product_id.0')</option>
+                                    placeholder="@lang('inventory::price_change.lines.product_id._')">
+                                    <option value="" selected disabled hidden>@lang('inventory::price_change.lines.product_id.0')</option>
                                     @foreach($products as $product)
                                     <option value="{{ $product->id }}" url="{{ asset($product->images->first()->url ?? 'backend-module/assets/images/default.jpg') }}"
                                         @if (isset($selected) && !old('product_id') && $selected->product_id == $product->id ||
@@ -31,8 +31,8 @@
                                     data-filtered-by='[name="lines[product_id][]"]' data-filtered-using="product" data-filtered-init="false"
                                     value="{{ isset($selected) && !old('variant_id') ? $selected->variant_id : old('variant_id') }}"
                                     class="form-control selectpicker {{ $errors->has('variant_id') ? 'is-danger' : '' }}"
-                                    placeholder="@lang('inventory::pricechange.lines.variant_id._')">
-                                    <option value="" selected disabled hidden>@lang('inventory::pricechange.lines.variant_id.0')</option>
+                                    placeholder="@lang('inventory::price_change.lines.variant_id._')">
+                                    <option value="" selected disabled hidden>@lang('inventory::price_change.lines.variant_id.0')</option>
                                     @foreach($products->pluck('variants')->flatten() as $variant)
                                     <option value="{{ $variant->id }}" data-product="{{ $variant->product_id }}"
                                         @if (isset($selected) && !old('variant_id') && $selected->variant_id == $variant->id ||
@@ -44,8 +44,8 @@
                                 <select name="lines[currency_id][]" data-live-search="true" @if (isset($selected)) id="f{{ $id = Str::random(16) }}" @endif
                                     value="{{ isset($selected) && !old('currency_id') ? $selected->currency_id : old('currency_id') }}"
                                     class="form-control selectpicker {{ $errors->has('currency_id') ? 'is-danger' : '' }}"
-                                    placeholder="@lang('inventory::pricechange.lines.currency_id._')">
-                                    <option value="" selected disabled hidden>@lang('inventory::pricechange.lines.currency_id.0')</option>
+                                    placeholder="@lang('inventory::price_change.lines.currency_id._')">
+                                    <option value="" selected disabled hidden>@lang('inventory::price_change.lines.currency_id.0')</option>
                                     @foreach($currencies as $currency)
                                     <option value="{{ $currency->id }}" title="{{ $currency->name }}"
                                         data-decimals="{{ $currency->decimals }}"
@@ -62,16 +62,16 @@
                                     <div class="col-12">
                                         <div class="input-group">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text">@lang('inventory::pricechange.lines.cost.0')</label>
+                                                <label class="input-group-text">@lang('inventory::price_change.lines.cost.0')</label>
                                             </div>
                                             <input name="lines[current_cost][]" type="number" thousand readonly
                                                 data-currency-by="{{ isset($selected) ? "#f$id" : '[name="lines[currency_id][]"]' }}"
                                                 value="{{ isset($selected) ? number($selected->current_cost, $selected->currency->decimals) : '' }}" @if ($selected !== null) required @endif
-                                                class="form-control" placeholder="@lang('inventory::pricechange.lines.current_cost.0')">
+                                                class="form-control" placeholder="@lang('inventory::price_change.lines.current_cost.0')">
                                             <input name="lines[cost][]" type="number" min="0"
                                                 data-currency-by="{{ isset($selected) ? "#f$id" : '[name="lines[currency_id][]"]' }}"
                                                 value="{{ isset($selected) ? number($selected->cost, $selected->currency->decimals) : '' }}" thousand
-                                                class="form-control" placeholder="@lang('inventory::pricechange.lines.cost.0')">
+                                                class="form-control" placeholder="@lang('inventory::price_change.lines.cost.0')">
                                         </div>
                                     </div>
                                 </div>
@@ -81,16 +81,16 @@
                                     <div class="col-12">
                                         <div class="input-group">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text">@lang('inventory::pricechange.lines.price.0')</label>
+                                                <label class="input-group-text">@lang('inventory::price_change.lines.price.0')</label>
                                             </div>
                                             <input name="lines[current_price][]" type="number" thousand readonly
                                                 data-currency-by="{{ isset($selected) ? "#f$id" : '[name="lines[currency_id][]"]' }}"
                                                 value="{{ isset($selected) ? number($selected->current_price, $selected->currency->decimals) : '' }}" @if ($selected !== null) required @endif
-                                                class="form-control" placeholder="@lang('inventory::pricechange.lines.current_price.0')">
+                                                class="form-control" placeholder="@lang('inventory::price_change.lines.current_price.0')">
                                             <input name="lines[price][]" type="number" min="0"
                                                 data-currency-by="{{ isset($selected) ? "#f$id" : '[name="lines[currency_id][]"]' }}"
                                                 value="{{ isset($selected) ? number($selected->price, $selected->currency->decimals) : '' }}" thousand
-                                                class="form-control" placeholder="@lang('inventory::pricechange.lines.price.0')">
+                                                class="form-control" placeholder="@lang('inventory::price_change.lines.price.0')">
                                         </div>
                                     </div>
                                 </div>
@@ -100,16 +100,16 @@
                                     <div class="col-12">
                                         <div class="input-group">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text">@lang('inventory::pricechange.lines.limit.0')</label>
+                                                <label class="input-group-text">@lang('inventory::price_change.lines.limit.0')</label>
                                             </div>
                                             <input name="lines[current_limit][]" type="number" thousand readonly
                                                 data-currency-by="{{ isset($selected) ? "#f$id" : '[name="lines[currency_id][]"]' }}"
                                                 value="{{ isset($selected) ? number($selected->current_limit, $selected->currency->decimals) : '' }}" @if ($selected !== null) required @endif
-                                                class="form-control" placeholder="@lang('inventory::pricechange.lines.current_limit.0')">
+                                                class="form-control" placeholder="@lang('inventory::price_change.lines.current_limit.0')">
                                             <input name="lines[limit][]" type="number" min="0"
                                                 data-currency-by="{{ isset($selected) ? "#f$id" : '[name="lines[currency_id][]"]' }}"
                                                 value="{{ isset($selected) ? number($selected->limit, $selected->currency->decimals) : '' }}" thousand
-                                                class="form-control" placeholder="@lang('inventory::pricechange.lines.limit.0')">
+                                                class="form-control" placeholder="@lang('inventory::price_change.lines.limit.0')">
                                         </div>
                                     </div>
                                 </div>

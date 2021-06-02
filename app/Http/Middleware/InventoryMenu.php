@@ -20,7 +20,7 @@ class InventoryMenu extends Base\Menu {
             ->locators($sub)
             ->inventories($sub)
             ->inventory_movements($sub)
-            ->pricechanges($sub);
+            ->price_changes($sub);
 
         // continue witn next middleware
         return $next($request);
@@ -66,11 +66,11 @@ class InventoryMenu extends Base\Menu {
         return $this;
     }
 
-    private function pricechanges(&$menu) {
-        if (Route::has('backend.pricechanges') && $this->can('pricechanges'))
-            $menu->add(__('inventory::pricechanges.nav'), [
-                'route'     => 'backend.pricechanges',
-                'icon'      => 'pricechanges'
+    private function price_changes(&$menu) {
+        if (Route::has('backend.price_changes') && $this->can('price_changes'))
+            $menu->add(__('inventory::price_changes.nav'), [
+                'route'     => 'backend.price_changes',
+                'icon'      => 'price_changes'
             ]);
 
         return $this;

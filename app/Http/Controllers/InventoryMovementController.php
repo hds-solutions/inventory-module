@@ -22,6 +22,11 @@ use Maatwebsite\Excel\HeadingRowImport;
 class InventoryMovementController extends Controller {
     use CanProcessDocument;
 
+    public function __construct() {
+        // check resource Policy
+        $this->authorizeResource(Resource::class, 'resource');
+    }
+
     protected function documentClass():string {
         // return class
         return Resource::class;

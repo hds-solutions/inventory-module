@@ -20,6 +20,11 @@ use Maatwebsite\Excel\HeadingRowImport;
 class PriceChangeController extends Controller {
     use CanProcessDocument;
 
+    public function __construct() {
+        // check resource Policy
+        $this->authorizeResource(Resource::class, 'resource');
+    }
+
     protected function documentClass():string {
         // return class
         return Resource::class;
@@ -27,7 +32,7 @@ class PriceChangeController extends Controller {
 
     protected function redirectTo():string {
         // go to pricechange view
-        return 'backend.pricechanges.show';
+        return 'backend.price_changes.show';
     }
 
     /**
@@ -45,7 +50,7 @@ class PriceChangeController extends Controller {
         if ($request->ajax()) return $dataTable->ajax();
 
         // return view with dataTable
-        return $dataTable->render('inventory::pricechanges.index', [ 'count' => Resource::count() ]);
+        return $dataTable->render('inventory::price_changes.index', [ 'count' => Resource::count() ]);
     }
 
     /**
@@ -59,7 +64,7 @@ class PriceChangeController extends Controller {
         // get currencies
         $currencies = Currency::all();
         // show create form
-        return view('inventory::pricechanges.create', compact('products', 'currencies'));
+        return view('inventory::price_changes.create', compact('products', 'currencies'));
     }
 
     public function price(Request $request) {
@@ -96,7 +101,7 @@ class PriceChangeController extends Controller {
             return $redirect;
 
         // check for file import
-        if ($request->input('import') == true && ($spreadsheet = $request->file('pricechange')) !== null) {
+        if ($request->input('import') == true && ($spreadsheet = $request->file('price_change')) !== null) {
 
             // save file to disk
             if (!($file = File::upload( $request, $spreadsheet, $this ))->save())
@@ -109,7 +114,7 @@ class PriceChangeController extends Controller {
             DB::commit();
 
             // redirect to import headers configuration
-            return redirect()->route('backend.pricechanges.import', [ $resource, 'import' => $file ]);
+            return redirect()->route('backend.price_changes.import', [ $resource, 'import' => $file ]);
         }
 
         // confirm transaction
@@ -117,10 +122,10 @@ class PriceChangeController extends Controller {
 
         // check if import was specified
         return $request->input('import') == true ?
-            // redirect to pricechange
-            redirect()->route('backend.pricechanges.edit', $resource) :
+            // redirect to price_change
+            redirect()->route('backend.price_changes.edit', $resource) :
             // redirect to list
-            redirect()->route('backend.pricechanges');
+            redirect()->route('backend.price_changes');
     }
 
     public function import(Request $request, Resource $resource, File $import) {
@@ -129,7 +134,7 @@ class PriceChangeController extends Controller {
         // get excel headers
         $headers = (new HeadingRowImport)->toCollection( $import->file() )->flatten()->filter();
         // show view to match headers
-        return view('inventory::pricechanges.import', compact('resource', 'import', 'currencies', 'headers'));
+        return view('inventory::price_changes.import', compact('resource', 'import', 'currencies', 'headers'));
     }
 
     public function doImport(Request $request, Resource $resource, File $import) {
@@ -151,8 +156,8 @@ class PriceChangeController extends Controller {
         // dispatch import job
         PriceChangeLinesImportJob::dispatch($resource, $matches, $import, $request->currency_id, $request->diff == 'true');
 
-        // return to pricechange
-        return redirect()->route('backend.pricechanges.show', $resource);
+        // return to price_change
+        return redirect()->route('backend.price_changes.show', $resource);
     }
 
     /**
@@ -170,7 +175,7 @@ class PriceChangeController extends Controller {
             'lines.variant.values.optionValue',
         ]);
         // redirect to list
-        return view('inventory::pricechanges.show', compact('resource'));
+        return view('inventory::price_changes.show', compact('resource'));
     }
 
     /**
@@ -183,7 +188,7 @@ class PriceChangeController extends Controller {
         // check if pricechange is already approved or completed
         if ($resource->isApproved() || $resource->isCompleted())
             // redirect to show route
-            return redirect()->route('backend.pricechanges.show', $resource);
+            return redirect()->route('backend.price_changes.show', $resource);
 
         // get products
         $products = Product::with([ 'images', 'variants' ])->get();
@@ -198,7 +203,7 @@ class PriceChangeController extends Controller {
         ]);
 
         // show edit form
-        return view('inventory::pricechanges.edit', compact('products', 'currencies', 'resource'));
+        return view('inventory::price_changes.edit', compact('products', 'currencies', 'resource'));
     }
 
     /**
@@ -217,7 +222,7 @@ class PriceChangeController extends Controller {
             // return back with errors
             return back()
                 ->withInput()
-                ->withErrors([ __('models/pricechange.already-completed') ]);
+                ->withErrors([ __('models/price_change.already-completed') ]);
 
         // start a transaction
         DB::beginTransaction();
@@ -235,7 +240,7 @@ class PriceChangeController extends Controller {
             return $redirect;
 
         // check for file import
-        if ($request->input('import') == true && ($spreadsheet = $request->file('pricechange')) !== null) {
+        if ($request->input('import') == true && ($spreadsheet = $request->file('price_change')) !== null) {
             // save file to disk
             if (!($file = File::upload( $request, $spreadsheet, $this ))->save())
                 // redirect back with errors
@@ -247,7 +252,7 @@ class PriceChangeController extends Controller {
             DB::commit();
 
             // redirect to import headers configuration
-            return redirect()->route('backend.pricechanges.import', [ $resource, 'import' => $file ]);
+            return redirect()->route('backend.price_changes.import', [ $resource, 'import' => $file ]);
         }
 
         // confirm transaction
@@ -255,10 +260,10 @@ class PriceChangeController extends Controller {
 
         // check if import was specified
         return $request->input('import') == true ?
-            // redirect to pricechange
-            redirect()->route('backend.pricechanges.edit', $resource) :
+            // redirect to price_change
+            redirect()->route('backend.price_changes.edit', $resource) :
             // redirect to list
-            redirect()->route('backend.pricechanges.show', $resource);
+            redirect()->route('backend.price_changes.show', $resource);
     }
 
     /**
@@ -274,7 +279,7 @@ class PriceChangeController extends Controller {
             return back()
                 ->withErrors($resource->errors()->any() ? $resource->errors() : [ $resource->getDocumentError() ]);
         // redirect to list
-        return redirect()->route('backend.pricechanges');
+        return redirect()->route('backend.price_changes');
     }
 
     private function syncLines(Resource $resource, array $lines) {

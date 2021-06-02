@@ -14,24 +14,24 @@ class PriceChangeDataTable extends Base\DataTable {
     public function __construct() {
         parent::__construct(
             Resource::class,
-            route('backend.pricechanges'),
+            route('backend.price_changes'),
         );
     }
 
     protected function getColumns() {
         return [
             Column::computed('id')
-                ->title( __('inventory::pricechange.id.0') )
+                ->title( __('inventory::price_change.id.0') )
                 ->hidden(),
 
             Column::make('warehouse.branch.name')
-                ->title( __('inventory::pricechange.branch_id.0') ),
+                ->title( __('inventory::price_change.branch_id.0') ),
 
             Column::make('description')
-                ->title( __('inventory::pricechange.description.0') ),
+                ->title( __('inventory::price_change.description.0') ),
 
             Column::make('document_status_pretty')
-                ->title( __('inventory::pricechange.document_status.0') ),
+                ->title( __('inventory::price_change.document_status.0') ),
 
             Column::make('actions'),
         ];
