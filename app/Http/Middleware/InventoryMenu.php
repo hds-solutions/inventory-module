@@ -11,7 +11,8 @@ class InventoryMenu extends Base\Menu {
         // create a submenu
         $sub = backend()->menu()
             ->add(__('inventory::inventories.nav'), [
-                'icon'  => 'cogs',
+                'nickname'  => 'inventory',
+                'icon'      => 'cogs',
             ])->data('priority', 800);
 
         $this
