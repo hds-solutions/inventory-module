@@ -21,6 +21,7 @@ class CreateInventoriesTable extends Migration {
         $schema->create('inventories', function(Blueprint $table) {
             $table->id();
             $table->foreignTo('Company');
+            $table->string('document_number');
             $table->string('description');
             $table->foreignTo('Warehouse');
             // use table as document

@@ -62,9 +62,14 @@ class PriceChangeController extends Controller {
         // get products
         $products = Product::with([ 'images', 'variants' ])->get();
         // get currencies
-        $currencies = Currency::all();
+        $currencies = backend()->currencies();
+
+        $highs = [
+            'document_number'   => Resource::nextDocumentNumber(),
+        ];
+
         // show create form
-        return view('inventory::price_changes.create', compact('products', 'currencies'));
+        return view('inventory::price_changes.create', compact('products', 'currencies', 'highs'));
     }
 
     public function price(Request $request) {
@@ -130,7 +135,7 @@ class PriceChangeController extends Controller {
 
     public function import(Request $request, Resource $resource, File $import) {
         // load currencies
-        $currencies = Currency::all();
+        $currencies = backend()->currencies();
         // get excel headers
         $headers = (new HeadingRowImport)->toCollection( $import->file() )->flatten()->filter();
         // show view to match headers
@@ -193,7 +198,7 @@ class PriceChangeController extends Controller {
         // get products
         $products = Product::with([ 'images', 'variants' ])->get();
         // get currencies
-        $currencies = Currency::all();
+        $currencies = backend()->currencies();
 
         // load pricechange lines
         $resource->load([

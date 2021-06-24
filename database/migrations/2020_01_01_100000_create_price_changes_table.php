@@ -21,6 +21,7 @@ class CreatePriceChangesTable extends Migration {
         $schema->create('price_changes', function(Blueprint $table) {
             $table->id();
             $table->foreignTo('Company');
+            $table->string('document_number');
             $table->string('description');
             // use table as document
             $table->asDocument();

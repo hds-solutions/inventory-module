@@ -1,5 +1,12 @@
 @include('backend::components.errors')
 
+<x-backend-form-text name="document_number" required
+    :resource="$resource ?? null" :default="$highs['document_number'] ?? null"
+
+    label="inventory::inventory.document_number.0"
+    placeholder="inventory::inventory.document_number._"
+    {{-- helper="inventory::inventory.document_number.?" --}} />
+
 <x-backend-form-foreign :resource="$resource ?? null" name="branch_id" required
     foreign="branches" :values="$branches" foreign-add-label="{{ __('inventory::branches.add') }}"
 
@@ -21,69 +28,48 @@
     placeholder="{{ __('inventory::inventory.description._') }}"
     {{-- helper="{{ __('inventory::inventory.description.?') }}" --}} />
 
-<div class="form-row form-group mb-0">
-    <label class="col-12 col-md-3 control-label mt-2 mb-3">@lang('inventory::inventory.lines.0')</label>
-    <div class="col-9" data-multiple=".inventory-line-container" data-template="#new">
-        <?php $old_lines = array_group(old('lines') ?? []); ?>
-        {{-- add product current lines --}}
-        @if (isset($resource)) @foreach($resource->lines as $idx => $selected)
-            @include('inventory::inventories.line', [
-                'products'  => $products,
-                'selected'  => $selected,
-                'old'       => $old_lines[$idx] ?? null,
-            ])
-            <?php unset($old_lines[$idx]); ?>
-        @endforeach @endif
+<x-backend-form-multiple name="lines" contents-view="inventory::inventories.form.line"
+    data-type="inventory"
 
-        {{-- add new added --}}
-        @foreach($old_lines as $old)
-            {{-- ignore empty --}}
-            @if ( ($old['product_id'] ?? null) === null &&
-                ($old['variant_id'] ?? null) === null &&
-                ($old['locator_id'] ?? null) === null)
-                @continue
-            @endif
-            @include('inventory::inventories.line', [
-                'products'  => $products,
-                'selected'  => null,
-                'old'       => $old,
-            ])
-        @endforeach
+    :values="$products" values-as="products"
+    :extra="$branches" extra-as="branches"
+    :selecteds="isset($resource) ? $resource->lines : []" grouped old-filter-fields="product_id,locator_id"
 
-        {{-- add empty for adding new lines --}}
-        @include('inventory::inventories.line', [
-            'products'  => $products,
-            'selected'  => null,
-            'old'       => null,
-        ])
-    </div>
-</div>
+    contents-size="xxl"
+    container-class="my-3"
+    card="bg-light"
 
-@if (!isset($resource) || $resource->lines->count() == 0)
-<div class="form-row form-group align-items-center">
-    <div class="col-11 col-md-8 col-lg-6 offset-md-3">
+    label="inventory::inventory.lines.0">
 
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text" id="inventory-name">Excel</span>
-            </div>
-            <div class="custom-file">
-                <input type="file" name="inventory" class="custom-file-input" id="inventory-file" aria-describedby="inventory-name">
-                <label class="custom-file-label" for="inventory-file" data-show-file-name="true">@lang('inventory::inventory.file._')</label>
-            </div>
-            <div class="input-group-append">
-                <button type="submit"
-                    formaction="{{ !isset($resource) ?
-                        route('backend.inventories.store', [ 'import' => true ]) :
-                        route('backend.inventories.update', [ $resource, 'import' => true ])
-                    }}"
-                    class="btn btn-primary" id="inventory-label">@lang('inventory::inventories.save-create')</button>
+    @if (!isset($resource) || $resource->lines->count() == 0)
+    <x-slot name="card-footer">
+        <div class="form-row form-group align-items-center">
+            <div class="col-11 col-md-8 col-lg-6 offset-md-5">
+
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="inventory-name">Excel</span>
+                    </div>
+                    <div class="custom-file">
+                        <input type="file" name="inventory" class="custom-file-input" id="inventory-file" aria-describedby="inventory-name">
+                        <label class="custom-file-label" for="inventory-file" data-show-file-name="true">@lang('inventory::inventory.file._')</label>
+                    </div>
+                    <div class="input-group-append">
+                        <button type="submit"
+                            formaction="{{ !isset($resource) ?
+                                route('backend.inventories.store', [ 'import' => true ]) :
+                                route('backend.inventories.update', [ $resource, 'import' => true ])
+                            }}"
+                            class="btn btn-primary" id="inventory-label">@lang('inventory::inventories.save-create')</button>
+                    </div>
+                </div>
+
             </div>
         </div>
+    </x-slot>
+    @endif
 
-    </div>
-</div>
-@endif
+</x-backend-form-multiple>
 
 <x-backend-form-controls
     submit="inventory::inventories.save"

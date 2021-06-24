@@ -8,11 +8,13 @@ abstract class X_PriceChange extends Base\Model {
     use BelongsToCompany;
 
     protected $fillable = [
+        'document_number',
         'description',
     ];
 
     protected static $rules = [
-        'description'   => [ 'required' ],
+        'document_number'   => [ 'required', 'unique:price_changes,document_number,{id}' ],
+        'description'       => [ 'required' ],
     ];
 
 }

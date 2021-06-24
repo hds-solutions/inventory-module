@@ -8,6 +8,11 @@ use HDSSolutions\Finpar\Traits\HasDocumentActions;
 class PriceChange extends X_PriceChange implements Document {
     use HasDocumentActions;
 
+    public static function nextDocumentNumber():string {
+        // return next document number for specified stamping
+        return str_increment(self::max('document_number') ?? null);
+    }
+
     public function lines() {
         return $this->hasMany(PriceChangeLine::class);
     }

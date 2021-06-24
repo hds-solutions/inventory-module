@@ -6,6 +6,12 @@
         'Details'
     ],
 
+    'document_number'  => [
+        'Document Number',
+        '_' => 'Document Number',
+        '?' => 'Document Number help text',
+    ],
+
     'branch_id'  => [
         'Branch',
         '_' => 'Branch',

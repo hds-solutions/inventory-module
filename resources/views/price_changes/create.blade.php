@@ -1,4 +1,4 @@
-@extends('backend::layouts.master')
+@extends('inventory::layouts.master')
 
 @section('page-name', __('inventory::price_changes.title'))
 

@@ -6,6 +6,12 @@
         'Details'
     ],
 
+    'document_number'  => [
+        'Document Number',
+        '_' => 'Document Number',
+        '?' => 'Document Number help text',
+    ],
+
     'description'  => [
         'Description',
         '_' => 'Description',
@@ -45,6 +51,12 @@
             'Variant',
             '_' => 'Variant',
             '?' => 'Variant help text',
+        ],
+
+        'currency_id'    => [
+            'Currency',
+            '_' => 'Currency',
+            '?' => 'Currency help text',
         ],
 
         'current_cost'  => [

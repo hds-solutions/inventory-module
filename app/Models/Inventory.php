@@ -9,17 +9,22 @@ use Illuminate\Database\Eloquent\Builder;
 class Inventory extends X_Inventory implements Document {
     use HasDocumentActions;
 
+    public static function hasOpenForProduct(Product|int $product, Variant|int $variant = null, Branch|int $branch = null):bool {
+        // return if there are open Inventories with product|variant present
+        return self::openForProduct($product, $variant, $branch)->count() > 0;
+    }
+
+    public static function nextDocumentNumber():string {
+        // return next document number for specified stamping
+        return str_increment(self::max('document_number') ?? null);
+    }
+
     public function warehouse() {
         return $this->belongsTo(Warehouse::class)->withTrashed();
     }
 
     public function lines() {
         return $this->hasMany(InventoryLine::class);
-    }
-
-    public static function hasOpenForProduct(Product|int $product, Variant|int $variant = null, Branch|int $branch = null):bool {
-        // return if there are open Inventories with product|variant present
-        return self::openForProduct($product, $variant, $branch)->count() > 0;
     }
 
     public function scopeOpenForProduct(Builder $query, Product|int $product, Variant|int $variant = null, Branch|int $branch = null):Builder {

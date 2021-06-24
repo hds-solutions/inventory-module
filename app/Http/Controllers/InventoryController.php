@@ -65,8 +65,13 @@ class InventoryController extends Controller {
         $branches = Branch::with([ 'warehouses.locators' ])->get();
         // get products
         $products = Product::with([ 'images', 'variants' ])->get();
+
+        $highs = [
+            'document_number'   => Resource::nextDocumentNumber(),
+        ];
+
         // show create form
-        return view('inventory::inventories.create', compact('branches', 'products'));
+        return view('inventory::inventories.create', compact('branches', 'products', 'highs'));
     }
 
     public function stock(Request $request) {
