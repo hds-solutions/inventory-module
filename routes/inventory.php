@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use HDSSolutions\Finpar\Http\Controllers\{
     WarehouseController,
     LocatorController,
+    InOutController,
     InventoryController,
     InventoryMovementController,
     PriceChangeController,
@@ -16,15 +17,21 @@ Route::group([
     // name prefix
     $name_prefix = [ 'as' => 'backend' ];
 
-    Route::resource('warehouses',       WarehouseController::class,     $name_prefix)
+    Route::resource('warehouses',               WarehouseController::class, $name_prefix)
         ->parameters([ 'warehouses' => 'resource' ])
         ->name('index', 'backend.warehouses');
 
-    Route::resource('locators',         LocatorController::class,       $name_prefix)
+    Route::resource('locators',                 LocatorController::class,   $name_prefix)
         ->parameters([ 'locators' => 'resource' ])
         ->name('index', 'backend.locators');
 
-    Route::resource('inventories',      InventoryController::class,     $name_prefix)
+    Route::resource('in_outs',                  InOutController::class,     $name_prefix)
+        ->parameters([ 'in_outs' => 'resource' ])
+        ->name('index', 'backend.in_outs');
+    Route::post('in_outs/{resource}/process',   [ InOutController::class, 'processIt'])
+        ->name('backend.in_outs.process');
+
+    Route::resource('inventories',              InventoryController::class, $name_prefix)
         ->parameters([ 'inventories' => 'resource' ])
         ->name('index', 'backend.inventories');
     Route::post('inventories/stock',                        [ InventoryController::class, 'stock' ])

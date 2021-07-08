@@ -12,6 +12,8 @@ class InventoryPermissionsSeeder extends Base\PermissionsSeeder {
         return [
             $this->resource('warehouses'),
             $this->resource('locators'),
+            $this->resource('in_outs'),
+            $this->document('in_outs'),
             $this->resource('inventories'),
             $this->document('inventories'),
             $this->resource('inventory_movements'),
@@ -26,6 +28,7 @@ class InventoryPermissionsSeeder extends Base\PermissionsSeeder {
         $this->role('Depositor', [
             'warehouses.*',
             'locators.*',
+            'in_outs.*',
             'inventories.*',
             'inventory_movements.*',
             'pricechanges.*',

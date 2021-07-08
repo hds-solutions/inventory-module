@@ -19,6 +19,7 @@ class InventoryMenu extends Base\Menu {
             // append items to submenu
             ->warehouses($sub)
             ->locators($sub)
+            ->in_outs($sub)
             ->inventories($sub)
             ->inventory_movements($sub)
             ->price_changes($sub);
@@ -42,6 +43,16 @@ class InventoryMenu extends Base\Menu {
             $menu->add(__('inventory::locators.nav'), [
                 'route'     => 'backend.locators',
                 'icon'      => 'locators'
+            ]);
+
+        return $this;
+    }
+
+    private function in_outs(&$menu) {
+        if (Route::has('backend.in_outs') && $this->can('in_outs'))
+            $menu->add(__('inventory::in_outs.nav'), [
+                'route'     => 'backend.in_outs',
+                'icon'      => 'in_outs'
             ]);
 
         return $this;

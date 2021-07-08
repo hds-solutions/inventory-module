@@ -11,6 +11,11 @@ class InventoryDataTable extends Base\DataTable {
         'warehouse.branch',
     ];
 
+    protected array $orderBy = [
+        'document_status'   => 'asc',
+        'created_at'        => 'desc',
+    ];
+
     public function __construct() {
         parent::__construct(
             Resource::class,
@@ -24,8 +29,18 @@ class InventoryDataTable extends Base\DataTable {
                 ->title( __('inventory::inventory.id.0') )
                 ->hidden(),
 
-            Column::make('warehouse.branch.name')
-                ->title( __('inventory::inventory.branch_id.0') ),
+            Column::make('document_number')
+                ->title( __('inventory::inventory.document_number.0') )
+                ->renderRaw('bold:document_number'),
+
+            Column::make('created_at')
+                ->title( __('inventory::inventory.created_at.0') )
+                ->renderRaw('datetime:created_at;F j, Y H:i'),
+
+            Column::make('warehouse.name')
+                ->title( __('inventory::inventory.warehouse_id.0') )
+                ->renderRaw('view:inventory')
+                ->data( view('inventory::inventories.datatable.warehouse')->render() ),
 
             Column::make('description')
                 ->title( __('inventory::inventory.description.0') ),
