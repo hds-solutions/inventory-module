@@ -9,6 +9,7 @@ abstract class X_InOutLine extends Base\Model {
     protected $fillable = [
         'in_out_id',
         'order_line_id',
+        'invoice_line_id',
         'product_id',
         'variant_id',
         'locator_id',
@@ -18,7 +19,8 @@ abstract class X_InOutLine extends Base\Model {
 
     protected static array $rules = [
         'in_out_id'         => [ 'required' ],
-        'order_line_id'     => [ 'required' ],
+        'order_line_id'     => [ 'sometimes', 'nullable' ],
+        'invoice_line_id'   => [ 'sometimes', 'nullable' ],
         'product_id'        => [ 'required' ],
         'variant_id'        => [ 'sometimes', 'nullable' ],
         'locator_id'        => [ 'sometimes', 'nullable' ],

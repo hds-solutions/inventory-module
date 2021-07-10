@@ -36,6 +36,12 @@
         '?' => 'Partner help text',
     ],
 
+    'order_id'      => [
+        'Order',
+        '_' => 'Order',
+        '?' => 'Order help text',
+    ],
+
     'transacted_at' => [
         'Date',
         '_' => 'Date',

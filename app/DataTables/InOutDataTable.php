@@ -3,14 +3,15 @@
 namespace HDSSolutions\Finpar\DataTables;
 
 use HDSSolutions\Finpar\Models\InOut as Resource;
-use HDSSolutions\Finpar\Traits\SearchablePartnerable;
+use HDSSolutions\Finpar\Traits\DatatableWithPartnerable;
 use Illuminate\Database\Eloquent\Builder;
 use Yajra\DataTables\Html\Column;
 
 class InOutDataTable extends Base\DataTable {
-    use SearchablePartnerable;
+    use DatatableWithPartnerable;
 
     protected array $with = [
+        'order',
         'partnerable',
         'warehouse.branch',
     ];
@@ -36,6 +37,9 @@ class InOutDataTable extends Base\DataTable {
             Column::make('document_number')
                 ->title( __('inventory::in_out.document_number.0') )
                 ->renderRaw('bold:document_number'),
+
+            Column::make('order.document_number')
+                ->title( __('inventory::in_out.order_id.0') ),
 
             Column::make('transacted_at')
                 ->title( __('inventory::in_out.transacted_at.0') )
@@ -63,6 +67,11 @@ class InOutDataTable extends Base\DataTable {
             ->leftJoin('customers', 'customers.id', 'in_outs.partnerable_id')
             // join to people
             ->join('people', 'people.id', 'customers.id');
+    }
+
+    protected function filters(Builder $query):Builder {
+        // filter only InOut documents
+        return $query->where('is_material_return', false);
     }
 
 }

@@ -15,6 +15,10 @@ class InOutLine extends X_InOutLine {
         return $this->belongsTo(OrderLine::class);
     }
 
+    public function invoiceLine() {
+        return $this->belongsTo(InvoiceLine::class);
+    }
+
     public function product() {
         return $this->belongsTo(Product::class);
     }
@@ -25,6 +29,13 @@ class InOutLine extends X_InOutLine {
 
     public function locator() {
         return $this->belongsTo(Locator::class);
+    }
+
+    public function invoiceLines() {
+        return $this->belongsToMany(InvoiceLine::class)
+            ->using(InOutLineInvoiceLine::class)
+            ->withPivot([ 'quantity_movement', 'quantity_invoiced' ])
+            ->withTimestamps();
     }
 
     public function beforeSave(Validator $validator) {

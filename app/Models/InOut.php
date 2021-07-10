@@ -7,10 +7,13 @@ use HDSSolutions\Finpar\Traits\HasDocumentActions;
 use HDSSolutions\Finpar\Traits\HasPartnerable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Validator;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships as HasExtendedRelationships;
 
 class InOut extends X_InOut implements Document {
     use HasDocumentActions,
         HasPartnerable;
+
+    use HasExtendedRelationships;
 
     public static function nextDocumentNumber():string {
         // return next document number for specified stamping
@@ -29,8 +32,35 @@ class InOut extends X_InOut implements Document {
         return $this->belongsTo(Employee::class);
     }
 
+    public function order() {
+        return $this->belongsTo(Order::class);
+    }
+
     public function invoice() {
         return $this->belongsTo(Invoice::class);
+    }
+
+    public function orders() {
+        return $this->hasManyDeep(Order::class, [
+            InOutLine::class,   InOutLineInvoiceLine::class,
+            InvoiceLine::class, InvoiceLineOrderLine::class,
+            OrderLine::class,
+        ], [
+            'deleted_at',       // bypass (idk why adds an IS NULL comparison with this column)
+            'in_out_line_id',   // see (2) below
+            'id',               // see (3) below
+            'invoice_line_id',  // see (4) below
+            'id',               // see (5) below
+            'id',               // see (6) below
+        ], [
+            '??',               // ignored (not used in query)
+            'id',               // (2) InOutLine.id = InOutLineInvoiceLine.in_out_line_id
+            'invoice_line_id',  // (3) InOutLineInvoiceLine.invoice_line_id = InvoiceLine.id
+            'id',               // (4) InvoiceLine.id = InvoiceLineOrderLine.invoice_line_id
+            'order_line_id',    // (5) InvoiceLineOrderLine.order_line_id = OrderLine.id
+            'order_id',         // (6) OrderLine.order_id = Order.id
+        // prevent columns overlap
+        ])->select('orders.*');
     }
 
     public function lines() {
@@ -67,19 +97,30 @@ class InOut extends X_InOut implements Document {
     }
 
     public function prepareIt():?string {
-        // validations where is_material_return
-        if ($this->is_material_return &&
-            // InOut of Order must be completed in order to return items
-            self::ofOrder( $this->order )->completed()->count() == 0)
+        // validations when is material_return
+        if ($this->is_material_return) {
 
-            // return process error
-            return $this->documentError('inventory::in_out.order-not-completed', [
-                'order' => $this->order,
-            ]);
+            // get orders through far orders relationship (see this.orders() method)
+            foreach ($this->orders()->get() as $order)
+                // InOut's of Order must be completed
+                if (self::ofOrder( $order )->open()->count())
+                    // return process error
+                    return $this->documentError('inventory::in_out.order-has-pending-inouts', [
+                        'order' => $this->order,
+                    ]);
 
-        // isSale=true and
-        if ($this->is_sale && $this->is_material_return) foreach ($this->lines as $line) {
-            // TODO: if is_material_return=true && line.quantity_movement == 0, reject since can't return empty lines
+            // check that lines has qty movement and invoiced aty
+            foreach ($this->lines as $line) {
+                // check that line movement quantity isn't 0 (zero)
+                if ($line->quantity_movement === 0)
+                    // reject with process error
+                    return $this->documentError('inventory::in_out.lines.qty-zero', [
+                        'product'   => $line->product->name,
+                        'variant'   => $line->variant?->sku,
+                    ]);
+
+                // TODO: check that qty <= invoiced
+            }
         }
 
         // return status InProgress
@@ -89,8 +130,6 @@ class InOut extends X_InOut implements Document {
     public function completeIt():?string {
         // process lines, updating stock based on document type
         foreach ($this->lines as $line) {
-            // TODO: if is_material_return=true
-                // TODO: check if returned quantity is greater than invoiced quantity and reject it
 
             // save total quantity to move
             $quantityToMove = $line->quantity_movement;
@@ -160,7 +199,7 @@ class InOut extends X_InOut implements Document {
                 ]);
         }
 
-        // if document is_material_return, create a CreditNote for the returning amount
+        // if document is material_return, create a CreditNote for the returning amount
         if ($this->is_material_return) {
             // TODO: create CreditNote
         }
@@ -182,6 +221,7 @@ class InOut extends X_InOut implements Document {
             'employee_id'       => $order->employee_id,
             'partnerable_type'  => $order->partnerable_type,
             'partnerable_id'    => $order->partnerable_id,
+            'order_id'          => $order->id,
             'transacted_at'     => $order->transacted_at,
             'is_purchase'       => $order->is_purchase,
         ]);

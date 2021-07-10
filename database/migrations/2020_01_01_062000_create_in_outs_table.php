@@ -25,8 +25,8 @@ class CreateInOutsTable extends Migration {
             $table->foreignTo('Warehouse');
             $table->foreignTo('Employee');
             $table->morphable('partner');
-            $table->foreignTo('Order')->nullable();
-            $table->foreignTo('Invoice')->nullable();
+            $table->foreignTo('Order')->nullable();     // when InOut.is_sale
+            $table->foreignTo('Invoice')->nullable();   // when InOut.is_purchase
             $table->timestamp('transacted_at')->useCurrent();
             $table->string('document_number');
             $table->boolean('is_purchase')->default(false);
@@ -39,7 +39,8 @@ class CreateInOutsTable extends Migration {
         $schema->create('in_out_lines', function(Blueprint $table) {
             $table->id();
             $table->foreignTo('InOut');
-            $table->foreignTo('OrderLine');
+            $table->foreignTo('OrderLine')->nullable();
+            $table->foreignTo('InvoiceLine')->nullable();
             $table->foreignTo('Product');
             $table->foreignTo('Variant')->nullable();
             $table->unique([ 'in_out_id', 'product_id', 'variant_id' ]);
