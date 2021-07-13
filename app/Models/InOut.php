@@ -20,6 +20,29 @@ class InOut extends X_InOut implements Document {
         return str_increment(self::max('document_number') ?? null);
     }
 
+    public function __construct(array|Order|Invoice $attributes = []) {
+        // check if is instance of Order
+        if (($order = $attributes) instanceof Order) $attributes = self::fromResource($order, 'order_id');
+        // check if is instance of Invoice
+        if (($order = $attributes) instanceof Invoice) $attributes = self::fromResource($order, 'invoice_id');
+        // redirect attributes to parent
+        parent::__construct(is_array($attributes) ? $attributes : []);
+    }
+
+    private static function fromResource(Order|Invoice $resource, string $relation):array {
+        // copy attributes from resource
+        return [
+            'branch_id'         => $resource->branch_id,
+            'warehouse_id'      => $resource->warehouse_id,
+            'employee_id'       => $resource->employee_id,
+            'partnerable_type'  => $resource->partnerable_type,
+            'partnerable_id'    => $resource->partnerable_id,
+            $relation           => $resource->id,
+            'transacted_at'     => $resource->transacted_at,
+            'is_purchase'       => $resource->is_purchase,
+        ];
+    }
+
     public function branch() {
         return $this->belongsTo(Branch::class);
     }
@@ -120,6 +143,24 @@ class InOut extends X_InOut implements Document {
                     ]);
 
                 // TODO: check that qty <= invoiced
+                $already_returned = $quantity_invoiced = 0;
+                foreach ($this->invoice->materialReturns->pluck('lines')->flatten() as $returnedLine) {
+                    // check if line matches with invoiceLine
+                    if ($returnedLine->invoice_line_id !== $line->invoice_line_id) continue;
+                    // add already returned quantity for current line
+                    $already_returned += $returnedLine->quantity_movement;
+                    // save invoiced quantity
+                    $quantity_invoiced = $returnedLine->invoiceLine->quantity_invoiced;
+                }
+
+                // check if returning quantity > quantity available to return
+                if ($line->quantity_movement > ($available = $quantity_invoiced - $already_returned))
+                    // reject with error
+                    return $this->documentError('inventory::in_out.lines.returning-gt-available', [
+                        'product'   => $line->product->name,
+                        'variant'   => $line->variant?->sku,
+                        'available' => $available,
+                    ]);
             }
         }
 
@@ -130,62 +171,25 @@ class InOut extends X_InOut implements Document {
     public function completeIt():?string {
         // process lines, updating stock based on document type
         foreach ($this->lines as $line) {
-
             // save total quantity to move
             $quantityToMove = $line->quantity_movement;
+
             // get Variant|Product locators
             foreach (($line->variant ?? $line->product)->locators as $locator) {
-                // ignore storage if hasn't available stock
-                if (($storage = Storage::getFromProductOnLocator($line->product, $line->variant, $locator))->available == 0) continue;
+                // update storage
+                if (!$this->updateStorage(Storage::getFromProductOnLocator($line->product, $line->variant, $locator), $quantityToMove))
+                    // stop process and return error
+                    return false;
+                // check if all movement quantity was already moved and exit loop
+                if ($quantityToMove == 0) break;
+            }
 
-                // save available stock on current storage
-                $availableOnStorage = $storage->available;
-
-                // if document isSale, substract stock from Storage
-                if ($this->isSale) {
-                    // update stock on storage
-                    $storage->fill([
-                        // substract available from storage.onHand
-                        'on_hand'   => $storage->on_hand - $availableOnStorage,
-                        // substract available from storage.reserved
-                        'reserved'  => $storage->reserved - $availableOnStorage,
-                    ]);
-
-                    // substract available from total quantity to move
-                    $quantityToMove -= $availableOnStorage;
-                }
-
-                // if document isPurchase, add available stock on Storage
-                if ($this->isPurchase) {
-                    // update stock on storage
-                    $storage->fill([
-                        // add movement quantity to storage.onHand
-                        'on_hand'   => $storage->on_hand + $quantityToMove,
-                        // substract movement quantity from storage.pending
-                        'pending'   => $storage->pending - $quantityToMove,
-                    ]);
-
-                    // set quantity to move to 0 (zero), all movement when to first location found
-                    $quantityToMove = 0;
-                }
-
-                // if document is_material_return, add available stock on Storage
-                if ($this->is_material_return) {
-                    // update stock on storage
-                    $storage->fill([
-                        // add movement quantity to storage.onHand
-                        'on_hand'   => $storage->on_hand + $quantityToMove,
-                    ]);
-
-                    // set quantity to move to 0 (zero), all movement when to first location found
-                    $quantityToMove = 0;
-                }
-
-                // save storage changes
-                if (!$storage->save())
-                    // return document error
-                    return $this->documentError( $storage->errors()->first() );
-
+            // update stock for Variant|Product on existing Storages
+            foreach (Storage::getFromProduct($line->product, $line->variant, $this->branch) as $storage) {
+                // update existing storage
+                if (!$this->updateStorage($storage, $quantityToMove))
+                    // stop process and return error
+                    return false;
                 // check if all movement quantity was already moved and exit loop
                 if ($quantityToMove == 0) break;
             }
@@ -193,19 +197,84 @@ class InOut extends X_InOut implements Document {
             // if not all movement quantity can be moved, reject process
             if ($quantityToMove > 0)
                 // return document error
-                return $this->documentError('inventory::in_out.lines.no-storage-found', [
+                return $this->documentError('inventory::in_out.lines.'.($this->is_material_return ? 'no-storage-found' : 'no-stock'), [
                     'product'   => $line->product->name,
                     'variant'   => $line->variant?->sku,
                 ]);
+
+            // update delivered/received quantity on Order/Invoice
+            if (!$this->is_material_return) {
+                // if is_sale, update OrderLine.quantity_delivered
+                if ($this->is_sale && !$line->orderLine->update([ 'quantity_delivered' => $line->quantity_movement ]))
+                    // return document error
+                    return $this->documentError( $line->orderLine->errors()->first() );
+
+                // if is_purchase, update InvoiceLine.quantity_received
+                if ($this->is_purchase && !$line->invoiceLine->update([ 'quantity_received' => $line->quantity_movement ]))
+                    // return document error
+                    return $this->documentError( $line->invoiceLine->errors()->first() );
+            }
         }
 
         // if document is material_return, create a CreditNote for the returning amount
         if ($this->is_material_return) {
-            // TODO: create CreditNote
+            // create CreditNote
+            if (!($creditNote = CreditNote::createFromMaterialReturn( $this ))->exists || $creditNote->errors()->count() > 0)
+                // redirect creditNote error
+                return $this->documentError( $creditNote->errors()->first() );
         }
 
         // return completed status
         return Document::STATUS_Completed;
+    }
+
+    private function updateStorage(Storage $storage, int &$quantityToMove):bool {
+        // if document is_material_return, add returned stock on Storage.onhand
+        if ($this->is_material_return) {
+            // update stock on storage
+            $storage->fill([
+                // add movement quantity to storage.onHand
+                'onhand'    => $storage->onhand + $quantityToMove,
+            ]);
+            // set quantity to move to 0 (zero), all movement when to first location found
+            $quantityToMove = 0;
+
+        } else {
+            // if document is_sale, substract stock from Storage
+            if ($this->is_sale) {
+                // get available onhand stock on current storage
+                $available = $storage->reserved > $quantityToMove ? $quantityToMove : $storage->available;
+                // update stock on storage
+                $storage->fill([
+                    // substract available from storage.onHand
+                    'onhand'    => $storage->onhand - $available,
+                    // substract available from storage.reserved
+                    'reserved'  => $storage->reserved - $available,
+                ]);
+
+                // substract available from total quantity to move
+                $quantityToMove -= $available;
+            }
+
+            // if document is_purchase, add available stock on Storage
+            if ($this->is_purchase) {
+                // get available pending stock on current storage
+                $received = $storage->pending > $quantityToMove ? $quantityToMove : $storage->pending;
+                // update stock on storage
+                $storage->fill([
+                    // add movement quantity to storage.onHand
+                    'onhand'    => $storage->onhand + $received,
+                    // substract movement quantity from storage.pending
+                    'pending'   => $storage->pending - $received,
+                ]);
+
+                // set quantity to move to 0 (zero), all movement when to first location found
+                $quantityToMove -= $received;
+            }
+        }
+
+        // save storage changes, and document error if failed
+        return !$storage->save() ? $this->documentError( $storage->errors()->first() ) : true;
     }
 
     public function scopeOfOrder(Builder $query, int|Order $order) {
@@ -213,48 +282,96 @@ class InOut extends X_InOut implements Document {
         return $query->where('order_id', $order instanceof Order ? $order->id : $order);
     }
 
-    public static function createFromOrder(Order $order):self {
-        // create new document
-        $inOut = new self([
-            'branch_id'         => $order->branch_id,
-            'warehouse_id'      => $order->warehouse_id,
-            'employee_id'       => $order->employee_id,
-            'partnerable_type'  => $order->partnerable_type,
-            'partnerable_id'    => $order->partnerable_id,
-            'order_id'          => $order->id,
-            'transacted_at'     => $order->transacted_at,
-            'is_purchase'       => $order->is_purchase,
-        ]);
-        // save header
-        if (!$inOut->save())
-            // save error message and return instance
-            return tap($inOut, fn($inOut) => $inOut->documentError( $inOut->errors()->first() ));
+    public static function createFromOrder(int|Order $order, array $attributes = []):self {
+        // make InOut resource
+        $resource = self::makeFromOrder($order, $attributes);
 
-        // copy Order lines to InOut
-        foreach ($order->lines as $orderLine) {
-            // ignore line if product.type isn't stockable
-            if (!$orderLine->product->stockable) continue;
+        // stop process if inOut can't be saved
+        if (!$resource->save())
+            // return error through document error
+            return tap($resource, fn($resource) => $resource->documentError( $resource->errors()->first() ));
 
-            // create new InOutLine
-            $inOutLine = $inOut->lines()->make([
-                'order_line_id'     => $orderLine->id,
-                'product_id'        => $orderLine->product_id,
-                'variant_id'        => $orderLine->variant_id,
-                'quantity_ordered'  => $orderLine->quantity_ordered,
-                'quantity_movement' => $orderLine->quantity_ordered,
-            ]);
-            // set first locator of Product|Variant
-            $inOutLine->locator()->associate( ($orderLine->variant ?? $orderLine->product)->locators()->first() );
-            // save line
-            if (!$inOutLine->save()) {
-                // save error message and return instance
-                $inOut->documentError( $inOutLine->errors()->first() );
-                return $inOut;
-            }
+        // foreach lines
+        foreach ($resource->lines as $line) {
+            // link with parent
+            $line->inOut()->associate($resource);
+            // stop process if line can't be saved
+            if (!$line->save())
+                // return error through document error
+                return tap($resource, fn($resource) => $resource->documentError( $line->errors()->first() ));
         }
 
-        // return created document
-        return $inOut;
+        // return created inOut resource
+        return $resource;
+    }
+
+    public static function makeFromOrder(int|Order $order, array $attributes = []):self {
+        // load order if isn't instance
+        if (!$order instanceof Order) $order = Order::findOrFail($order);
+
+        // create new resource from Order
+        $resource = new self($order);
+        // append extra attributes
+        $resource->fill( $attributes );
+
+        // create InvoiceLines from OrderLines
+        $order->lines->each(function($orderLine) use ($resource) {
+            // ignore line if product.type isn't stockable
+            if (!$orderLine->product->stockable) return;
+            // create a new InvoiceLine from OrderLine
+            $resource->lines->push( $line = $resource->lines()->make($orderLine) );
+            // set first locator of Product|Variant
+            $line->locator()->associate( ($orderLine->variant ?? $orderLine->product)->locators()->first() );
+        });
+
+        // return resource
+        return $resource;
+    }
+
+    public static function createFromInvoice(int|Invoice $invoice, array $attributes = []):self {
+        // make InOut resource
+        $resource = self::makeFromInvoice($invoice, $attributes);
+
+        // stop process if inOut can't be saved
+        if (!$resource->save())
+            // return error through document error
+            return tap($resource, fn($resource) => $resource->documentError( $resource->errors()->first() ));
+
+        // foreach lines
+        foreach ($resource->lines as $line) {
+            // link with parent
+            $line->inOut()->associate($resource);
+            // stop process if line can't be saved
+            if (!$line->save())
+                // return error through document error
+                return tap($resource, fn($resource) => $resource->documentError( $line->errors()->first() ));
+        }
+
+        // return created inOut resource
+        return $resource;
+    }
+
+    public static function makeFromInvoice(int|Invoice $invoice, array $attributes = []):self {
+        // load invoice if isn't instance
+        if (!$invoice instanceof Invoice) $invoice = Invoice::findOrFail($invoice);
+
+        // create new resource from Invoice
+        $resource = new self($invoice);
+        // append extra attributes
+        $resource->fill( $attributes );
+
+        // create InvoiceLines from OrderLines
+        $invoice->lines->each(function($invoiceLine) use ($resource) {
+            // ignore line if product.type isn't stockable
+            if (!$invoiceLine->product->stockable) return;
+            // create a new InvoiceLine from OrderLine
+            $resource->lines->push( $line = $resource->lines()->make($invoiceLine) );
+            // set first locator of Product|Variant
+            $line->locator()->associate( ($invoiceLine->variant ?? $invoiceLine->product)->locators()->first() );
+        });
+
+        // return resource
+        return $resource;
     }
 
 }

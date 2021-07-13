@@ -7,6 +7,26 @@ use Illuminate\Validation\Validator;
 
 class InOutLine extends X_InOutLine {
 
+    public function __construct(array|OrderLine|InvoiceLine $attributes = []) {
+        // check if is instance of OrderLine
+        if (($orderLine = $attributes) instanceof OrderLine) $attributes = self::fromResourceLine($orderLine, 'order_line_id', 'quantity_ordered');
+        // check if is instance of InvoiceLine
+        if (($invoiceLine = $attributes) instanceof InvoiceLine) $attributes = self::fromResourceLine($invoiceLine, 'invoice_line_id', 'quantity_invoiced');
+        // redirect attributes to parent
+        parent::__construct(is_array($attributes) ? $attributes : []);
+    }
+
+    private static function fromResourceLine(OrderLine|InvoiceLine $resourceLine, string $relation, string $quantity_field):array {
+        // copy attributes from resource line
+        return [
+            $relation           => $resourceLine->id,
+            'product_id'        => $resourceLine->product_id,
+            'variant_id'        => $resourceLine->variant_id,
+            'quantity_ordered'  => $resourceLine->$quantity_field,
+            'quantity_movement' => $resourceLine->$quantity_field,
+        ];
+    }
+
     public function inOut() {
         return $this->belongsTo(InOut::class);
     }
