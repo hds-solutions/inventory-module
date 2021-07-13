@@ -142,7 +142,7 @@ class InOut extends X_InOut implements Document {
                         'variant'   => $line->variant?->sku,
                     ]);
 
-                // TODO: check that qty <= invoiced
+                // check that qty to return <= invoiced - already_returned
                 $already_returned = $quantity_invoiced = 0;
                 foreach ($this->invoice->materialReturns->pluck('lines')->flatten() as $returnedLine) {
                     // check if line matches with invoiceLine

@@ -31,7 +31,6 @@ class CreateInOutsTable extends Migration {
             $table->string('document_number');
             $table->boolean('is_purchase')->default(false);
             $table->boolean('is_material_return')->default(false);
-            $table->boolean('is_complete')->default(false);
             // use table as document
             $table->asDocument();
         });

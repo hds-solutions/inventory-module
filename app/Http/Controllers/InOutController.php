@@ -8,6 +8,7 @@ use HDSSolutions\Finpar\Http\Request;
 use HDSSolutions\Finpar\Models\Branch;
 use HDSSolutions\Finpar\Models\Currency;
 use HDSSolutions\Finpar\Models\Customer;
+use HDSSolutions\Finpar\Models\Employee;
 use HDSSolutions\Finpar\Models\InOut as Resource;
 use HDSSolutions\Finpar\Models\InOutLine;
 use HDSSolutions\Finpar\Models\Product;
@@ -57,18 +58,47 @@ class InOutController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function create(Request $request) {
-        // load cash_books
-        $customers = Customer::all();
-        // // load current company branches
-        // $branches = backend()->company()->branches;
+        // load customers
+        $customers = Customer::with([
+            // 'addresses', // TODO: Customer.addresses
+        ])->get();
+        // load current company branches with warehouses
+        $branches = backend()->company()->branches()->with([
+            'warehouses'    => fn($warehouse) => $warehouse->with([
+                'locators',
+            ]),
+        ])->get()->transform(fn($branch) => $branch
+            // override loaded warehouses, add relation to parent manually
+            ->setRelation('warehouses', $branch->warehouses->transform(fn($warehouse) => $warehouse
+                // set Warehouse.branch relation manually to avoid more queries
+                ->setRelation('branch', $branch)
+                // override loaded locators, add relation to parent manually
+                ->setRelation('locators', $warehouse->locators->transform(fn($locator) => $locator
+                    // set Locator.warehouse relation manuallty to avoid more queries
+                    ->setRelation('warehouse', $warehouse)
+                ))
+            ))
+        );
+        // load employees
+        $employees = Employee::all();
         // load products
         $products = Product::with([
             'images',
             'variants',
-        ])->get();
+        ])->get()->transform(fn($product) => $product
+            // override loaded variants, add relation to parent manually
+            ->setRelation('variants', $product->variants->transform(fn($variant) => $variant
+                // set Variant.product relation manually to avoid more queries
+                ->setRelation('product', $product)
+            ))
+        );
+
+        $highs = [
+            'document_number'   => Resource::nextDocumentNumber(),
+        ];
 
         // show create form
-        return view('inventory::in_outs.create', compact('customers', 'products'));
+        return view('inventory::in_outs.create', compact('customers', 'branches', 'employees', 'products', 'highs'));
     }
 
     /**
@@ -151,24 +181,50 @@ class InOutController extends Controller {
 
         // load resource relations
         $resource->load([
-            'lines.product',
+            'order',
+            'invoice',
+            'lines' => fn($line) => $line->with([
+                'product',
+            ]),
         ]);
 
-        // get branches with warehouses
-        $branches = Branch::with([ 'warehouses.locators' ])->get();
-
         // load customers
-        $customers = Customer::all();
-        // // load current company branches
-        // $branches = backend()->company()->branches;
+        $customers = Customer::with([
+            // 'addresses', // TODO: Customer.addresses
+        ])->get();
+        // load current company branches with warehouses
+        $branches = backend()->company()->branches()->with([
+            'warehouses'    => fn($warehouse) => $warehouse->with([
+                'locators',
+            ]),
+        ])->get()->transform(fn($branch) => $branch
+            // override loaded warehouses, add relation to parent manually
+            ->setRelation('warehouses', $branch->warehouses->transform(fn($warehouse) => $warehouse
+                // set Warehouse.branch relation manually to avoid more queries
+                ->setRelation('branch', $branch)
+                // override loaded locators, add relation to parent manually
+                ->setRelation('locators', $warehouse->locators->transform(fn($locator) => $locator
+                    // set Locator.warehouse relation manuallty to avoid more queries
+                    ->setRelation('warehouse', $warehouse)
+                ))
+            ))
+        );
+        // load employees
+        $employees = Employee::all();
         // load products
         $products = Product::with([
             'images',
             'variants',
-        ])->get();
+        ])->get()->transform(fn($product) => $product
+            // override loaded variants, add relation to parent manually
+            ->setRelation('variants', $product->variants->transform(fn($variant) => $variant
+                // set Variant.product relation manually to avoid more queries
+                ->setRelation('product', $product)
+            ))
+        );
 
         // show edit form
-        return view('inventory::in_outs.edit', compact('branches', 'customers', 'products', 'resource'));
+        return view('inventory::in_outs.edit', compact('customers', 'branches', 'employees', 'products', 'resource'));
     }
 
     /**

@@ -7,26 +7,28 @@
     placeholder="inventory::inventory.document_number._"
     {{-- helper="inventory::inventory.document_number.?" --}} />
 
-<x-backend-form-foreign :resource="$resource ?? null" name="branch_id" required
-    foreign="branches" :values="$branches" foreign-add-label="{{ __('inventory::branches.add') }}"
-
-    label="{{ __('inventory::inventory.branch_id.0') }}"
-    placeholder="{{ __('inventory::inventory.branch_id._') }}"
-    {{-- helper="{{ __('inventory::inventory.branch_id.?') }}" --}} />
-
-<x-backend-form-foreign :resource="$resource ?? null" name="warehouse_id" required
-    filtered-by="[name=branch_id]" filtered-using="branch"
-    foreign="warehouses" :values="$branches->pluck('warehouses')->flatten()" foreign-add-label="{{ __('inventory::warehouses.add') }}"
-
-    label="{{ __('inventory::inventory.warehouse_id.0') }}"
-    placeholder="{{ __('inventory::inventory.warehouse_id._') }}"
-    {{-- helper="{{ __('inventory::product.warehouse_id.?') }}" --}} />
-
 <x-backend-form-text :resource="$resource ?? null" name="description" required
     default="{{ __('inventory::inventory.nav').' @ '.now() }}"
     label="{{ __('inventory::inventory.description.0') }}"
     placeholder="{{ __('inventory::inventory.description._') }}"
     {{-- helper="{{ __('inventory::inventory.description.?') }}" --}} />
+
+<x-backend-form-foreign :resource="$resource ?? null" name="branch_id" required
+    foreign="branches" :values="$branches" foreign-add-label="{{ __('inventory::branches.add') }}"
+
+    label="{{ __('inventory::inventory.branch_id.0') }}"
+    placeholder="{{ __('inventory::inventory.branch_id._') }}"
+    {{-- helper="{{ __('inventory::inventory.branch_id.?') }}" --}}>
+
+    <x-backend-form-foreign :resource="$resource ?? null" name="warehouse_id" required secondary
+        filtered-by="[name=branch_id]" filtered-using="branch"
+        foreign="warehouses" :values="$branches->pluck('warehouses')->flatten()" foreign-add-label="{{ __('inventory::warehouses.add') }}"
+
+        label="{{ __('inventory::inventory.warehouse_id.0') }}"
+        placeholder="{{ __('inventory::inventory.warehouse_id._') }}"
+        {{-- helper="{{ __('inventory::product.warehouse_id.?') }}" --}} />
+
+</x-backend-form-foreign>
 
 <x-backend-form-multiple name="lines" contents-view="inventory::inventories.form.line"
     data-type="inventory"

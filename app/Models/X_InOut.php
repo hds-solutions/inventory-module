@@ -17,17 +17,14 @@ abstract class X_InOut extends Base\Model {
         'order_id',
         'invoice_id',
         'transacted_at',
-        'stamping',
         'document_number',
         'is_purchase',
         'is_material_return',
-        'is_complete',
     ];
 
     protected $attributes = [
         'is_purchase'           => false,
         'is_material_return'    => false,
-        'is_complete'           => false,
     ];
 
     public function isPurchase():bool {
