@@ -14,10 +14,13 @@ require('laravel-mix-merge-manifest');
 mix.setPublicPath(public = '../../../public').mergeManifest();
 
 // set assets root
-assetsRoot = process.env.ASSET_URL;
-assetsRoot = assetsRoot !== undefined ? assetsRoot : process.env.APP_URL;
-assetsRoot = assetsRoot !== undefined ? assetsRoot : 'https://localhost';
-mix.setResourceRoot( assetsRoot );
+mix.setResourceRoot( assetsRoot
+    // get ASSET_URL ?? APP_URL from parameters
+     = process.env.npm_config_asset_url ?? process.env.npm_config_app_url
+    // get ASSET_URL ?? APP_URL from .env variables
+    ?? process.env.ASSET_URL ?? process.env.APP_URL
+    // fallback to localhost
+    ?? 'https://localhost' );
 
 // configure mix
 mix.options({
@@ -33,7 +36,7 @@ mix.autoload({
 });
 
 // disable notifications in prod
-if (mix.inProduction()) mix.disableNotifications();
+if (mix.inProduction() || [ 'warn', 'silent' ].includes(process.env.npm_config_loglevel)) mix.disableNotifications();
 
 // execute mix
 mix
