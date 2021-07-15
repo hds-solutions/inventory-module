@@ -20,6 +20,7 @@ class InventoryMenu extends Base\Menu {
             ->warehouses($sub)
             ->locators($sub)
             ->in_outs($sub)
+            ->material_returns($sub)
             ->inventories($sub)
             ->inventory_movements($sub)
             ->price_changes($sub);
@@ -53,6 +54,16 @@ class InventoryMenu extends Base\Menu {
             $menu->add(__('inventory::in_outs.nav'), [
                 'route'     => 'backend.in_outs',
                 'icon'      => 'in_outs'
+            ]);
+
+        return $this;
+    }
+
+    private function material_returns(&$menu) {
+        if (Route::has('backend.material_returns') && $this->can('material_returns'))
+            $menu->add(__('inventory::material_returns.nav'), [
+                'route'     => 'backend.material_returns',
+                'icon'      => 'material_returns'
             ]);
 
         return $this;

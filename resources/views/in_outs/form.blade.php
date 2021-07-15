@@ -48,15 +48,6 @@
     placeholder="inventory::in_out.order_id._"
     {{-- helper="inventory::in_out.order_id.?" --}} />
 
-<x-backend-form-foreign name="invoice_id" required
-    :values="isset($resource) && $resource?->invoice ? collect([ $resource->invoice ]) : []" :resource="$resource ?? null"
-
-    {{-- foreign="employees" foreign-add-label="sales::employees.add" --}}
-
-    label="inventory::in_out.invoice_id.0"
-    placeholder="inventory::in_out.invoice_id._"
-    {{-- helper="inventory::in_out.invoice_id.?" --}} />
-
 <x-backend-form-foreign name="employee_id" required
     :values="$employees" :resource="$resource ?? null" show="full_name"
 
@@ -86,7 +77,6 @@
     placeholder="inventory::in_out.address_id._"
     helper="inventory::in_out.address_id.?" /> --}}
 
-@if ($resource ?? false)
 <x-backend-form-multiple name="lines" contents-view="inventory::in_outs.form.line"
     data-type="in_out" editable="false"
 
@@ -99,7 +89,6 @@
     card="bg-light"
 
     label="inventory::in_out.lines.0" />
-@endif
 
 <x-backend-form-controls
     submit="inventory::in_outs.save"

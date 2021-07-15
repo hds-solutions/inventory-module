@@ -1,6 +1,6 @@
 <?php return [
 
-    'nav'   => 'In/Out',
+    'nav'   => 'Material Returns',
 
     'details'       => [
         'Details'
@@ -36,22 +36,16 @@
         '?' => 'Partner help text',
     ],
 
-    'order_id'      => [
-        'Order',
-        '_' => 'Order',
-        '?' => 'Order help text',
+    'invoice_id'    => [
+        'Invoice',
+        '_' => 'Invoice',
+        '?' => 'Invoice help text',
     ],
 
     'transacted_at' => [
         'Date',
         '_' => 'Date',
         '?' => 'Date help text',
-    ],
-
-    'is_purchase' => [
-        'Is Purchase?',
-        '_' => 'Yes, It\'s a Purchase',
-        '?' => 'Is Purchase help text',
     ],
 
     'description'  => [

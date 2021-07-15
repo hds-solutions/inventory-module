@@ -27,24 +27,12 @@ abstract class X_InOut extends Base\Model {
         'is_material_return'    => false,
     ];
 
-    public function isPurchase():bool {
-        return $this->is_purchase;
-    }
-
     public function getIsSaleAttribute():bool {
         return !$this->is_purchase;
     }
 
-    public function isSale():bool {
-        return $this->is_sale;
-    }
-
-    public function isMaterialReturn():bool {
-        return $this->is_material_return;
-    }
-
-    public function isComplete():bool {
-        return $this->is_complete;
+    public function getTransactedAtPrettyAttribute():string {
+        return pretty_date($this->transacted_at, true);
     }
 
 }

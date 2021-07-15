@@ -3,20 +3,20 @@
 namespace HDSSolutions\Finpar\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use HDSSolutions\Finpar\DataTables\InOutDataTable as DataTable;
+use HDSSolutions\Finpar\DataTables\MaterialReturnDataTable as DataTable;
 use HDSSolutions\Finpar\Http\Request;
 use HDSSolutions\Finpar\Models\Branch;
 use HDSSolutions\Finpar\Models\Currency;
 use HDSSolutions\Finpar\Models\Customer;
 use HDSSolutions\Finpar\Models\Employee;
-use HDSSolutions\Finpar\Models\InOut as Resource;
+use HDSSolutions\Finpar\Models\MaterialReturn as Resource;
 use HDSSolutions\Finpar\Models\InOutLine;
 use HDSSolutions\Finpar\Models\Product;
 use HDSSolutions\Finpar\Models\Variant;
 use HDSSolutions\Finpar\Traits\CanProcessDocument;
 use Illuminate\Support\Facades\DB;
 
-class InOutController extends Controller {
+class MaterialReturnController extends Controller {
     use CanProcessDocument;
 
     public function __construct() {
@@ -31,7 +31,7 @@ class InOutController extends Controller {
 
     protected function redirectTo():string {
         // go to resource view
-        return 'backend.in_outs.show';
+        return 'backend.material_returns.show';
     }
 
     /**
@@ -49,7 +49,7 @@ class InOutController extends Controller {
         if ($request->ajax()) return $dataTable->ajax();
 
         // return view with dataTable
-        return $dataTable->render('inventory::in_outs.index', [ 'count' => Resource::count() ]);
+        return $dataTable->render('inventory::material_returns.index', [ 'count' => Resource::count() ]);
     }
 
     /**
@@ -61,6 +61,7 @@ class InOutController extends Controller {
         // load customers
         $customers = Customer::with([
             // 'addresses', // TODO: Customer.addresses
+            'invoices',
         ])->get();
         // load current company branches with warehouses
         $branches = backend()->company()->branches()->with([
@@ -98,7 +99,7 @@ class InOutController extends Controller {
         ];
 
         // show create form
-        return view('inventory::in_outs.create', compact('customers', 'branches', 'employees', 'products', 'highs'));
+        return view('inventory::material_returns.create', compact('customers', 'branches', 'employees', 'products', 'highs'));
     }
 
     /**
@@ -111,26 +112,20 @@ class InOutController extends Controller {
         // start a transaction
         DB::beginTransaction();
 
-        // create resource
-        $resource = new Resource( $request->input() );
-
-        // TODO: set real data
-        $resource->branch_id = 1;
-        $resource->transaction_date = now();
+        // create resource from Invoice
+        $resource = Resource::createFromInvoice( $request->input('invoice_id'), $request->except([
+            'partnerable_id',
+            'invoice_id',
+        ]) );
         // associate Partner
         $resource->partnerable()->associate( Customer::findOrFail($request->partnerable_id) );
 
         // save resource
-        if (!$resource->save())
+        if (!$resource->exists || $resource->getDocumentError() !== null)
             // redirect with errors
             return back()
-                ->withErrors( $resource->errors() )
+                ->withErrors( $resource->getDocumentError() )
                 ->withInput();
-
-        // sync inventory lines
-        if (($redirect = $this->syncLines($resource, $request->get('lines'))) !== true)
-            // return redirection
-            return $redirect;
 
         // confirm transaction
         DB::commit();
@@ -140,7 +135,7 @@ class InOutController extends Controller {
             // redirect to popup callback
             view('inventory::components.popup-callback', compact('resource')) :
             // redirect to resource details
-            redirect()->route('backend.in_outs.show', $resource);
+            redirect()->route('backend.material_returns.show', $resource);
     }
 
     /**
@@ -164,7 +159,7 @@ class InOutController extends Controller {
         ]);
 
         // redirect to list
-        return view('inventory::in_outs.show', compact('resource'));
+        return view('inventory::material_returns.show', compact('resource'));
     }
 
     /**
@@ -177,11 +172,11 @@ class InOutController extends Controller {
         // check if document is already approved or processed
         if ($resource->isApproved() || $resource->isProcessed())
             // redirect to show route
-            return redirect()->route('backend.in_outs.show', $resource);
+            return redirect()->route('backend.material_returns.show', $resource);
 
         // load resource relations
         $resource->load([
-            'order',
+            'invoice',
             'lines' => fn($line) => $line->with([
                 'product',
             ]),
@@ -223,7 +218,7 @@ class InOutController extends Controller {
         );
 
         // show edit form
-        return view('inventory::in_outs.edit', compact('customers', 'branches', 'employees', 'products', 'resource'));
+        return view('inventory::material_returns.edit', compact('customers', 'branches', 'employees', 'products', 'resource'));
     }
 
     /**
@@ -237,17 +232,14 @@ class InOutController extends Controller {
         // find resource
         $resource = Resource::findOrFail($id);
 
-        // cast values to boolean
-        if ($request->has('is_purchase'))   $request->merge([ 'is_purchase' => $request->is_purchase == 'true' ]);
-
         // start a transaction
         DB::beginTransaction();
 
-        // associate Partner
-        $resource->partnerable()->associate( Customer::findOrFail($request->get('partnerable_id')) );
-
         // save resource
-        if (!$resource->update( $request->input() ))
+        if (!$resource->update( $request->except([
+            'partnerable_id',
+            'invoice_id',
+        ]) ))
             // redirect with errors
             return back()
                 ->withErrors( $resource->errors() )
@@ -262,7 +254,7 @@ class InOutController extends Controller {
         DB::commit();
 
         // redirect to resource details
-        return redirect()->route('backend.in_outs.show', $resource);
+        return redirect()->route('backend.material_returns.show', $resource);
     }
 
     /**
@@ -280,57 +272,43 @@ class InOutController extends Controller {
             return back()
                 ->withErrors($resource->errors()->any() ? $resource->errors() : [ $resource->getDocumentError() ]);
         // redirect to list
-        return redirect()->route('backend.in_outs');
-    }
-
-    public function price(Request $request) {
-        // get resources
-        $product = $request->has('product') ? Product::findOrFail($request->product) : null;
-        $variant = $request->has('variant') ? Variant::findOrFail($request->variant) : null;
-        $currency = $request->has('currency') ? Currency::findOrFail($request->currency) : null;
-        // return stock for requested product
-        return response()->json($variant?->price($currency)?->pivot ?? $product?->price($currency)?->pivot);
+        return redirect()->route('backend.material_returns');
     }
 
     private function syncLines(Resource $resource, array $lines) {
-        // load inventory lines
-        $resource->load(['lines']);
+        // load resource lines
+        $resource->load([ 'lines' ]);
 
         // foreach new/updated lines
         foreach (($lines = array_group( $lines )) as $line) {
             // ignore line if product wasn't specified
-            if (!isset($line['product_id']) || is_null($line['price']) || is_null($line['quantity'])) continue;
+            if (!isset($line['product_id']) || is_null($line['locator_id']) || is_null($line['quantity_movement'])) continue;
             // load product
             $product = Product::find($line['product_id']);
             // load variant, if was specified
             $variant = isset($line['variant_id']) ? $product->variants->firstWhere('id', $line['variant_id']) : null;
 
             // find existing line
-            $orderLine = $resource->lines->first(function($iLine) use ($product, $variant) {
-                return $iLine->product_id == $product->id &&
-                    $iLine->variant_id == ($variant->id ?? null);
-            // create a new line
-            }) ?? InOutLine::make([
-                'order_id'      => $resource->id,
-                'currency_id'   => $resource->currency_id,
-                'product_id'    => $product->id,
-                'variant_id'    => $variant->id ?? null,
-            ]);
+            $materialReturnLine = $resource->lines->first(function($mrLine) use ($product, $variant) {
+                return $mrLine->product_id == $product->id &&
+                    $mrLine->variant_id == ($variant->id ?? null);
+            });
+            //
+            if ($materialReturnLine === null)
+                return back()->withInput()
+                    ->withErrors([ 'inventory::material_return.lines.inexistent-line' ]);
 
             // update line values
-            $orderLine->fill([
-                'price'     => $line['price'],
-                'quantity'  => $line['quantity'],
-                'total'     => $line['total'],
+            $materialReturnLine->fill([
+                'quantity_movement'  => $line['quantity_movement'],
             ]);
-            // save inventory line
-            if (!$orderLine->save())
-                return back()
-                    ->withInput()
-                    ->withErrors( $orderLine->errors() );
+            // save resource line
+            if (!$materialReturnLine->save())
+                return back()->withInput()
+                    ->withErrors( $materialReturnLine->errors() );
         }
 
-        // find removed inventory lines
+        // find removed resource lines
         foreach ($resource->lines as $line) {
             // deleted flag
             $deleted = true;

@@ -5,6 +5,7 @@ use HDSSolutions\Finpar\Http\Controllers\{
     WarehouseController,
     LocatorController,
     InOutController,
+    MaterialReturnController,
     InventoryController,
     InventoryMovementController,
     PriceChangeController,
@@ -27,9 +28,16 @@ Route::group([
 
     Route::resource('in_outs',                  InOutController::class,     $name_prefix)
         ->parameters([ 'in_outs' => 'resource' ])
-        ->name('index', 'backend.in_outs');
+        ->name('index', 'backend.in_outs')
+        ->except([ 'create', 'store' ]);
     Route::post('in_outs/{resource}/process',   [ InOutController::class, 'processIt'])
         ->name('backend.in_outs.process');
+
+    Route::resource('material_returns',         MaterialReturnController::class,    $name_prefix)
+        ->parameters([ 'material_returns' => 'resource' ])
+        ->name('index', 'backend.material_returns');
+    Route::post('material_returns/{resource}/process',  [ MaterialReturnController::class, 'processIt'])
+        ->name('backend.material_returns.process');
 
     Route::resource('inventories',              InventoryController::class, $name_prefix)
         ->parameters([ 'inventories' => 'resource' ])
