@@ -30,4 +30,8 @@ class MaterialReturnLine extends A_InOutLine {
         return $this->belongsTo(InvoiceLine::class);
     }
 
+    public function __toString():string {
+        return "{$this->product->name} {$this->variant?->sku}";
+    }
+
 }

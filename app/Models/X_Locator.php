@@ -22,4 +22,8 @@ abstract class X_Locator extends Base\Model {
         return $this->x.' : '.$this->y.' : '.$this->z;
     }
 
+    public function __toString():string {
+        return $this->name;
+    }
+
 }

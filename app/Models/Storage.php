@@ -84,4 +84,8 @@ class Storage extends X_Storage {
         return $storage;
     }
 
+    public function __toString():string {
+        return "{$this->locator} {$this->product->name} {$this->variant?->sku} [ onhand: {$this->onhand}, reserved: {$this->reserved}, pending: {$this->pending} ]";
+    }
+
 }

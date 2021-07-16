@@ -9,7 +9,7 @@
         <div class="form-row">
 
             <div class="col-3">
-                <x-form-foreign name="lines[product_id][]" :required="$selected !== null"
+                <x-form-foreign name="lines[product_id][]" :required="$selected !== null" readonly
                     :values="$products" data-live-search="true"
                     default="{{ $old['product_id'] ?? $selected?->product_id }}"
 
@@ -26,7 +26,7 @@
             </div>
 
             <div class="col-3">
-                <x-form-foreign name="lines[variant_id][]" {{-- :required="$selected !== null" --}}
+                <x-form-foreign name="lines[variant_id][]" :required="$selected !== null" readonly
                     :values="$products->pluck('variants')->flatten()" data-live-search="true"
                     default="{{ $old['variant_id'] ?? $selected?->variant_id }}"
 
@@ -46,7 +46,7 @@
             </div>
 
             <div class="col-3">
-                <x-form-foreign name="lines[locator_id][]" {{-- :required="$selected !== null" --}}
+                <x-form-foreign name="lines[locator_id][]" :required="$selected !== null"
                     :values="$branches->pluck('warehouses')->flatten()->pluck('locators')->flatten()" data-live-search="true"
                     default="{{ $old['locator_id'] ?? $selected?->locator_id }}"
 

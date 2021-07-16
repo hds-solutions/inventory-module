@@ -30,10 +30,16 @@ class InOut extends A_InOut {
     }
 
     protected function updateStorage(Storage $storage, int &$quantityToMove):bool {
+        logger("Storage $storage");
+
         // if document is_sale, substract stock from Storage
         if ($this->is_sale) {
             // get available onhand stock on current storage
-            $available = $storage->reserved > $quantityToMove ? $quantityToMove : $storage->available;
+            $available = $storage->reserved > $quantityToMove ? $quantityToMove : $storage->reserved;
+            // check if no qty available on this storage
+            if (!$available) return true;
+            //
+            logger("Substracting $available from $storage");
             // update stock on storage
             $storage->fill([
                 // substract available from storage.onHand
@@ -50,6 +56,10 @@ class InOut extends A_InOut {
         if ($this->is_purchase) {
             // get available pending stock on current storage
             $received = $storage->pending > $quantityToMove ? $quantityToMove : $storage->pending;
+            // check if no qty available on this storage
+            if (!$received) return true;
+            //
+            logger("Adding $available to $storage");
             // update stock on storage
             $storage->fill([
                 // add movement quantity to storage.onHand

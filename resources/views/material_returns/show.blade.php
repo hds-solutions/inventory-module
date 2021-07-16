@@ -79,14 +79,14 @@
                                 <th class="w-150px">@lang('inventory::material_return.lines.image.0')</th>
                                 <th>@lang('inventory::material_return.lines.product_id.0')</th>
                                 <th>@lang('inventory::material_return.lines.variant_id.0')</th>
-                                <th class="w-150px text-center">@lang('inventory::material_return.lines.quantity_ordered.0')</th>
-                                <th class="w-150px text-center">@lang('inventory::material_return.lines.quantity_movement.0')</th>
+                                <th class="w-200px text-center">@lang('inventory::material_return.lines.locator_id.0')</th>
+                                <th class="w-250px text-center">@lang('inventory::material_return.lines.quantity_movement.0')</th>
                             </tr>
                         </thead>
 
                         <tbody>
                             @foreach ($resource->lines as $line)
-                                <tr>
+                                <tr data-toggle="collapse" data-target=".line-{{ $line->id }}-details">
                                     <td>
                                         <div class="d-flex justify-content-center">
                                             <img src="{{ asset(
@@ -121,8 +121,18 @@
                                         </div>
                                         @endif
                                     </td>
-                                    <td class="align-middle text-center h5">{{ $line->quantity_ordered }}</td>
+                                    <td class="align-middle text-center">{{ $line->locator->name }}</td>
                                     <td class="align-middle text-center h4 font-weight-bold">{{ $line->quantity_movement }}</td>
+                                </tr>
+                                <tr class="d-none"></tr>
+                                <tr class="collapse line-{{ $line->id }}-details">
+                                    <td class="py-0"></td>
+                                    <td class="py-0 pl-3" colspan="3">
+                                        <a href="{{ route('backend.invoices.show', $line->invoiceLine->invoice) }}"
+                                            class="text-secondary text-decoration-none">{{ $line->invoiceLine->invoice->document_number }}</a> <small class="ml-1">{{ $line->invoiceLine->invoice->transacted_at_pretty }}</small>
+                                    </td>
+                                    <td class="py-0 text-center">{{ $line->quantity_ordered }}</td>
+                                    {{-- <td class="py-0"></td> --}}
                                 </tr>
                             @endforeach
                         </tbody>

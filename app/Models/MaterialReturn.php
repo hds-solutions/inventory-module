@@ -85,6 +85,8 @@ class MaterialReturn extends A_InOut {
 
         // check that lines has qty movement and invoiced aty
         foreach ($this->lines as $line) {
+            // load invoiced quantity
+            $quantity_invoiced = $line->invoiceLine->quantity_invoiced;
             // check that line movement quantity isn't 0 (zero)
             if ($line->quantity_movement === 0)
                 // reject with process error
@@ -94,14 +96,12 @@ class MaterialReturn extends A_InOut {
                 ]);
 
             // check that qty to return <= invoiced - already_returned
-            $already_returned = $quantity_invoiced = 0;
+            $already_returned = 0;
             foreach ($this->invoice->materialReturns()->completed()->get()->pluck('lines')->flatten() as $returnedLine) {
                 // check if line matches with invoiceLine
                 if ($returnedLine->invoice_line_id !== $line->invoice_line_id) continue;
                 // add already returned quantity for current line
                 $already_returned += $returnedLine->quantity_movement;
-                // save invoiced quantity
-                $quantity_invoiced = $returnedLine->invoiceLine->quantity_invoiced;
             }
 
             // check if returning quantity > quantity available to return

@@ -82,11 +82,20 @@ abstract class A_InOut extends X_InOut implements Document {
     public final function completeIt():?string {
         // process lines, updating stock based on document type
         foreach ($this->lines as $line) {
+            logger(__('Processing line #:line of '.class_basename(statis::class).' #:id: :product :variant', [
+                'line'  => $line->id,
+                'id'    => $this->id,
+                'product'   => $line->product->name,
+                'variant'   => $line->variant?->sku,
+            ]));
+
             // save total quantity to move
             $quantityToMove = $line->quantity_movement;
 
             // get Variant|Product locators
             foreach (($line->variant ?? $line->product)->locators as $locator) {
+                // check if locator belongs to current branch
+                if ($locator->warehouse->branch_id !== $this->branch_id) continue;
                 // update storage
                 if (!$this->updateStorage(Storage::getFromProductOnLocator($line->product, $line->variant, $locator), $quantityToMove))
                     // stop process and return error
