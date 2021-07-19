@@ -1,5 +1,7 @@
 <?php return [
 
+    'nav'           => 'Warehouse',
+
     'name'          => [
         'Warehouse name',
         '_' => 'Warehouse name',
