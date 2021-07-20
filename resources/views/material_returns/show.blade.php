@@ -8,17 +8,17 @@
 <div class="card mb-3">
     <div class="card-header">
         <div class="row">
-            <div class="col-6">
-                <i class="fas fa-user-plus"></i>
+            <div class="col-6 d-flex align-items-center">
+                <i class="fas fa-user-plus mr-2"></i>
                 @lang('inventory::material_returns.show')
             </div>
             <div class="col-6 d-flex justify-content-end">
                 @if (!$resource->isCompleted())
                 <a href="{{ route('backend.material_returns.edit', $resource) }}"
-                    class="btn btn-sm ml-2 btn-info">@lang('inventory::material_returns.edit')</a>
+                    class="btn btn-sm ml-2 btn-outline-primary btn-hover-info">@lang('inventory::material_returns.edit')</a>
                 @endif
                 <a href="{{ route('backend.material_returns.create') }}"
-                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::material_returns.create')</a>
+                    class="btn btn-sm ml-2 btn-outline-primary">@lang('inventory::material_returns.create')</a>
             </div>
         </div>
     </div>
@@ -121,7 +121,7 @@
                                         </div>
                                         @endif
                                     </td>
-                                    <td class="align-middle text-center">{{ $line->locator->name }}</td>
+                                    <td class="align-middle text-center">{{ $line->locator?->name ?? '--' }}</td>
                                     <td class="align-middle text-center h4 font-weight-bold">{{ $line->quantity_movement }}</td>
                                 </tr>
                                 <tr class="d-none"></tr>
@@ -145,6 +145,7 @@
         @include('backend::components.document-actions', [
             'route'     => 'backend.material_returns.process',
             'resource'  => $resource,
+            'title'     => $resource->document_number,
         ])
 
     </div>

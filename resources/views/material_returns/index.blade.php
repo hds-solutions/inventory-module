@@ -8,13 +8,13 @@
     <div class="card mb-3">
         <div class="card-header">
             <div class="row">
-                <div class="col-6">
-                    <i class="fas fa-table"></i>
+                <div class="col-6 d-flex align-items-center">
+                    <i class="fas fa-table mr-2"></i>
                     @lang('inventory::material_returns.index')
                 </div>
                 <div class="col-6 d-flex justify-content-end">
                     <a href="{{ route('backend.material_returns.create') }}"
-                       class="btn btn-sm btn-primary">@lang('inventory::material_returns.create')</a>
+                       class="btn btn-sm btn-outline-primary">@lang('inventory::material_returns.create')</a>
                 </div>
             </div>
         </div>
@@ -24,7 +24,7 @@
                     {{ $dataTable->table() }}
                     @include('backend::components.datatable-actions', [
                         'actions'   => [ 'show', 'update', 'delete' ],
-                        'label'     => '{resource.name}',
+                        'label'     => '{resource.document_number}',
                     ])
                 </div>
             @else
