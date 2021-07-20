@@ -112,6 +112,14 @@ class MaterialReturn extends A_InOut {
                     'variant'   => $line->variant?->sku,
                     'available' => $available,
                 ]);
+
+            // check that line has locator assigned
+            if ($line->locator === null)
+                // reject with error
+                return $this->documentError('inventory::material_return.lines.no-locator', [
+                    'product'   => $line->product->name,
+                    'variant'   => $line->variant?->sku,
+                ]);
         }
 
         // return status InProgress
