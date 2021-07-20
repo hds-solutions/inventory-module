@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use HDSSolutions\Finpar\Http\Controllers\{
+use HDSSolutions\Laravel\Http\Controllers\{
     WarehouseController,
     LocatorController,
     InOutController,

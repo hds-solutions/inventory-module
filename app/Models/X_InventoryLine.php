@@ -1,8 +1,8 @@
 <?php
 
-namespace HDSSolutions\Finpar\Models;
+namespace HDSSolutions\Laravel\Models;
 
-use HDSSolutions\Finpar\Traits\BelongsToCompany;
+use HDSSolutions\Laravel\Traits\BelongsToCompany;
 
 abstract class X_InventoryLine extends Base\Model {
     use BelongsToCompany;

@@ -1,6 +1,6 @@
 <?php
 
-namespace HDSSolutions\Finpar;
+namespace HDSSolutions\Laravel;
 
 class Inventory {
 

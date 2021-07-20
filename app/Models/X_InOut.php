@@ -1,8 +1,8 @@
 <?php
 
-namespace HDSSolutions\Finpar\Models;
+namespace HDSSolutions\Laravel\Models;
 
-use HDSSolutions\Finpar\Traits\BelongsToCompany;
+use HDSSolutions\Laravel\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Builder;
 
 abstract class X_InOut extends Base\Model {

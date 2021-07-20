@@ -1,8 +1,8 @@
 <?php
 
-namespace HDSSolutions\Finpar\DataTables;
+namespace HDSSolutions\Laravel\DataTables;
 
-use HDSSolutions\Finpar\Models\InventoryMovement as Resource;
+use HDSSolutions\Laravel\Models\InventoryMovement as Resource;
 use Yajra\DataTables\Html\Column;
 
 class InventoryMovementDataTable extends Base\DataTable {

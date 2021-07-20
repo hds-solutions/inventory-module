@@ -1,11 +1,11 @@
 <?php
 
-namespace HDSSolutions\Finpar\Jobs;
+namespace HDSSolutions\Laravel\Jobs;
 
-use HDSSolutions\Finpar\Imports\PriceChangeLinesImporter as Importer;
-use HDSSolutions\Finpar\Models\Currency;
-use HDSSolutions\Finpar\Models\File;
-use HDSSolutions\Finpar\Models\PriceChange;
+use HDSSolutions\Laravel\Imports\PriceChangeLinesImporter as Importer;
+use HDSSolutions\Laravel\Models\Currency;
+use HDSSolutions\Laravel\Models\File;
+use HDSSolutions\Laravel\Models\PriceChange;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Facades\Excel;
 

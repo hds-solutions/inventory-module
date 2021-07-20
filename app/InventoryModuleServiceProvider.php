@@ -1,19 +1,19 @@
 <?php
 
-namespace HDSSolutions\Finpar;
+namespace HDSSolutions\Laravel;
 
-use HDSSolutions\Finpar\Processes\DocumentEngine;
+use HDSSolutions\Laravel\Processes\DocumentEngine;
 use HDSSolutions\Laravel\Modules\ModuleServiceProvider;
 use Illuminate\Foundation\AliasLoader;
 
 class InventoryModuleServiceProvider extends ModuleServiceProvider {
 
     protected array $middlewares = [
-        \HDSSolutions\Finpar\Http\Middleware\InventoryMenu::class,
+        \HDSSolutions\Laravel\Http\Middleware\InventoryMenu::class,
     ];
 
     private $commands = [
-        // \HDSSolutions\Finpar\Commands\Mix::class,
+        // \HDSSolutions\Laravel\Commands\Mix::class,
     ];
 
     public function bootEnv():void {

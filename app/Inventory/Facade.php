@@ -1,6 +1,6 @@
 <?php
 
-namespace HDSSolutions\Finpar\Inventory;
+namespace HDSSolutions\Laravel\Inventory;
 
 class Facade extends \Illuminate\Support\Facades\Facade {
     /**

@@ -1,12 +1,12 @@
 <?php
 
-namespace HDSSolutions\Finpar\Http\Controllers;
+namespace HDSSolutions\Laravel\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use HDSSolutions\Finpar\DataTables\WarehouseDataTable as DataTable;
-use HDSSolutions\Finpar\Http\Request;
-use HDSSolutions\Finpar\Models\Branch;
-use HDSSolutions\Finpar\Models\Warehouse as Resource;
+use HDSSolutions\Laravel\DataTables\WarehouseDataTable as DataTable;
+use HDSSolutions\Laravel\Http\Request;
+use HDSSolutions\Laravel\Models\Branch;
+use HDSSolutions\Laravel\Models\Warehouse as Resource;
 
 class WarehouseController extends Controller {
 

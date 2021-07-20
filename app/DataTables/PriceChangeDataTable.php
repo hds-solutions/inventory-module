@@ -1,8 +1,8 @@
 <?php
 
-namespace HDSSolutions\Finpar\DataTables;
+namespace HDSSolutions\Laravel\DataTables;
 
-use HDSSolutions\Finpar\Models\PriceChange as Resource;
+use HDSSolutions\Laravel\Models\PriceChange as Resource;
 use Yajra\DataTables\Html\Column;
 
 class PriceChangeDataTable extends Base\DataTable {

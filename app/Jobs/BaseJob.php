@@ -1,9 +1,9 @@
 <?php
 
-namespace HDSSolutions\Finpar\Jobs;
+namespace HDSSolutions\Laravel\Jobs;
 
-use HDSSolutions\Finpar\Http\Middleware\SettingsLoader;
-use HDSSolutions\Finpar\Models\Company;
+use HDSSolutions\Laravel\Http\Middleware\SettingsLoader;
+use HDSSolutions\Laravel\Models\Company;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

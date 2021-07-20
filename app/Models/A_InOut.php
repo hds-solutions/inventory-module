@@ -1,10 +1,10 @@
 <?php
 
-namespace HDSSolutions\Finpar\Models;
+namespace HDSSolutions\Laravel\Models;
 
-use HDSSolutions\Finpar\Interfaces\Document;
-use HDSSolutions\Finpar\Traits\HasDocumentActions;
-use HDSSolutions\Finpar\Traits\HasPartnerable;
+use HDSSolutions\Laravel\Interfaces\Document;
+use HDSSolutions\Laravel\Traits\HasDocumentActions;
+use HDSSolutions\Laravel\Traits\HasPartnerable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Validator;
 

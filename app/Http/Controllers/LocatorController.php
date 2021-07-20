@@ -1,12 +1,12 @@
 <?php
 
-namespace HDSSolutions\Finpar\Http\Controllers;
+namespace HDSSolutions\Laravel\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use HDSSolutions\Finpar\DataTables\LocatorDataTable as DataTable;
-use HDSSolutions\Finpar\Http\Request;
-use HDSSolutions\Finpar\Models\Locator as Resource;
-use HDSSolutions\Finpar\Models\Warehouse;
+use HDSSolutions\Laravel\DataTables\LocatorDataTable as DataTable;
+use HDSSolutions\Laravel\Http\Request;
+use HDSSolutions\Laravel\Models\Locator as Resource;
+use HDSSolutions\Laravel\Models\Warehouse;
 
 class LocatorController extends Controller {
 

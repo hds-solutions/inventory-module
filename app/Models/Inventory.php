@@ -1,9 +1,9 @@
 <?php
 
-namespace HDSSolutions\Finpar\Models;
+namespace HDSSolutions\Laravel\Models;
 
-use HDSSolutions\Finpar\Interfaces\Document;
-use HDSSolutions\Finpar\Traits\HasDocumentActions;
+use HDSSolutions\Laravel\Interfaces\Document;
+use HDSSolutions\Laravel\Traits\HasDocumentActions;
 use Illuminate\Database\Eloquent\Builder;
 
 class Inventory extends X_Inventory implements Document {

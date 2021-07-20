@@ -1,8 +1,8 @@
 <?php
 
-namespace HDSSolutions\Finpar\Models;
+namespace HDSSolutions\Laravel\Models;
 
-use HDSSolutions\Finpar\Interfaces\Document;
+use HDSSolutions\Laravel\Interfaces\Document;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;

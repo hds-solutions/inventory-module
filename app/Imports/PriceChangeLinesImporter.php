@@ -1,12 +1,12 @@
 <?php
 
-namespace HDSSolutions\Finpar\Imports;
+namespace HDSSolutions\Laravel\Imports;
 
-use HDSSolutions\Finpar\Models\Currency;
-use HDSSolutions\Finpar\Models\PriceChange;
-use HDSSolutions\Finpar\Models\PriceChangeLine;
-use HDSSolutions\Finpar\Models\Product;
-use HDSSolutions\Finpar\Models\Variant;
+use HDSSolutions\Laravel\Models\Currency;
+use HDSSolutions\Laravel\Models\PriceChange;
+use HDSSolutions\Laravel\Models\PriceChangeLine;
+use HDSSolutions\Laravel\Models\Product;
+use HDSSolutions\Laravel\Models\Variant;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\RemembersChunkOffset;
 use Maatwebsite\Excel\Concerns\ToCollection;

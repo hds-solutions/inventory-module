@@ -1,18 +1,18 @@
 <?php
 
-namespace HDSSolutions\Finpar\Http\Controllers;
+namespace HDSSolutions\Laravel\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use HDSSolutions\Finpar\DataTables\PriceChangeDataTable as DataTable;
-use HDSSolutions\Finpar\Http\Request;
-use HDSSolutions\Finpar\Jobs\PriceChangeLinesImportJob;
-use HDSSolutions\Finpar\Models\Currency;
-use HDSSolutions\Finpar\Models\File;
-use HDSSolutions\Finpar\Models\PriceChange as Resource;
-use HDSSolutions\Finpar\Models\PriceChangeLine;
-use HDSSolutions\Finpar\Models\Product;
-use HDSSolutions\Finpar\Models\Variant;
-use HDSSolutions\Finpar\Traits\CanProcessDocument;
+use HDSSolutions\Laravel\DataTables\PriceChangeDataTable as DataTable;
+use HDSSolutions\Laravel\Http\Request;
+use HDSSolutions\Laravel\Jobs\PriceChangeLinesImportJob;
+use HDSSolutions\Laravel\Models\Currency;
+use HDSSolutions\Laravel\Models\File;
+use HDSSolutions\Laravel\Models\PriceChange as Resource;
+use HDSSolutions\Laravel\Models\PriceChangeLine;
+use HDSSolutions\Laravel\Models\Product;
+use HDSSolutions\Laravel\Models\Variant;
+use HDSSolutions\Laravel\Traits\CanProcessDocument;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\HeadingRowImport;

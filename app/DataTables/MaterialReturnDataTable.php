@@ -1,9 +1,9 @@
 <?php
 
-namespace HDSSolutions\Finpar\DataTables;
+namespace HDSSolutions\Laravel\DataTables;
 
-use HDSSolutions\Finpar\Models\MaterialReturn as Resource;
-use HDSSolutions\Finpar\Traits\DatatableWithPartnerable;
+use HDSSolutions\Laravel\Models\MaterialReturn as Resource;
+use HDSSolutions\Laravel\Traits\DatatableWithPartnerable;
 use Illuminate\Database\Eloquent\Builder;
 use Yajra\DataTables\Html\Column;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace HDSSolutions\Finpar\Http\Middleware;
+namespace HDSSolutions\Laravel\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Route;

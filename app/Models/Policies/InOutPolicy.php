@@ -1,9 +1,9 @@
 <?php
 
-namespace hDSSolutions\Finpar\Models\Policies;
+namespace hDSSolutions\Laravel\Models\Policies;
 
-use hDSSolutions\Finpar\Models\InOut as Resource;
-use HDSSolutions\Finpar\Models\User;
+use hDSSolutions\Laravel\Models\InOut as Resource;
+use HDSSolutions\Laravel\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class InOutPolicy {

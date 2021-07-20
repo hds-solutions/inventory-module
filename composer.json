@@ -1,5 +1,5 @@
 {
-    "name": "finpar/inventory-module",
+    "name": "hds-solutions/inventory-module",
     "description": "Inventory module",
     "type": "laravel-module",
     "license": "GNU GPLv3",
@@ -12,13 +12,13 @@
     "minimum-stability": "dev",
     "require": {
         "php": "^8.0",
-        "finpar/backend-module": "dev-develop",
+        "hds-solutions/backend-module": "dev-develop",
         "maatwebsite/excel": "^3.1"
     },
     "autoload": {
         "psr-4": {
-            "HDSSolutions\\Finpar\\": "app/",
-            "HDSSolutions\\Finpar\\Seeders\\": "database/seeders/"
+            "HDSSolutions\\Laravel\\": "app/",
+            "HDSSolutions\\Laravel\\Seeders\\": "database/seeders/"
         },
         "files": [
             "app/helpers.php"
@@ -27,10 +27,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "HDSSolutions\\Finpar\\InventoryModuleServiceProvider"
+                "HDSSolutions\\Laravel\\InventoryModuleServiceProvider"
             ],
             "aliases": {
-                "Inventory": "HDSSolutions\\Finpar\\Inventory\\Facade"
+                "Inventory": "HDSSolutions\\Laravel\\Inventory\\Facade"
             }
         }
     }

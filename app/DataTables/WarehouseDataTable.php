@@ -1,8 +1,8 @@
 <?php
 
-namespace HDSSolutions\Finpar\DataTables;
+namespace HDSSolutions\Laravel\DataTables;
 
-use HDSSolutions\Finpar\Models\Warehouse as Resource;
+use HDSSolutions\Laravel\Models\Warehouse as Resource;
 use Yajra\DataTables\Html\Column;
 
 class WarehouseDataTable extends Base\DataTable {
