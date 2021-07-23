@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use HDSSolutions\Laravel\DataTables\InventoryMovementDataTable as DataTable;
 use HDSSolutions\Laravel\Http\Request;
 use HDSSolutions\Laravel\Models\Branch;
-use HDSSolutions\Laravel\Models\File;
 use HDSSolutions\Laravel\Models\InventoryMovement as Resource;
 use HDSSolutions\Laravel\Models\InventoryMovementLine;
 use HDSSolutions\Laravel\Models\Locator;
@@ -16,8 +15,6 @@ use HDSSolutions\Laravel\Models\Variant;
 use HDSSolutions\Laravel\Models\Warehouse;
 use HDSSolutions\Laravel\Traits\CanProcessDocument;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
-use Maatwebsite\Excel\HeadingRowImport;
 
 class InventoryMovementController extends Controller {
     use CanProcessDocument;
@@ -37,11 +34,6 @@ class InventoryMovementController extends Controller {
         return 'backend.inventory_movements.show';
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request, DataTable $dataTable) {
         // check only-form flag
         if ($request->has('only-form'))
@@ -55,16 +47,12 @@ class InventoryMovementController extends Controller {
         return $dataTable->render('inventory::inventory_movements.index', [ 'count' => Resource::count() ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create() {
+    public function create(Request $request) {
         // get branches with warehouses
         $branches = Branch::with([ 'warehouses.locators' ])->get();
         // get products
         $products = Product::with([ 'images', 'variants' ])->get();
+
         // show create form
         return view('inventory::inventory_movements.create', compact('branches', 'products'));
     }
@@ -75,6 +63,7 @@ class InventoryMovementController extends Controller {
         $product = $request->has('product') ? Product::findOrFail( $request->product ) : null;
         $variant = $request->has('variant') ? Variant::findOrFail( $request->variant ) : null;
         $locator = $request->has('locator') ? Locator::findOrFail( $request->locator ) : null;
+
         // return stock for requested product
         return response()->json([
             'stock'     => $locator ?
@@ -83,12 +72,6 @@ class InventoryMovementController extends Controller {
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request) {
         // start a transaction
         DB::beginTransaction();
@@ -99,8 +82,7 @@ class InventoryMovementController extends Controller {
         // check for errors
         if (count($resource->errors()) > 0)
             // redirect with errors
-            return back()
-                ->withInput()
+            return back()->withInput()
                 ->withErrors( $resource->errors() );
 
         // sync inventory lines
@@ -120,13 +102,7 @@ class InventoryMovementController extends Controller {
         return redirect()->route('backend.inventory_movements');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Resource  $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Resource $resource) {
+    public function show(Request $request, Resource $resource) {
         // load inventory data
         $resource->load([
             'warehouse.branch',
@@ -136,21 +112,17 @@ class InventoryMovementController extends Controller {
             'lines.variant.values.option_value',
             'lines.locator',
         ]);
+
         // redirect to list
         return view('inventory::inventory_movements.show', compact('resource'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Resource  $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Resource $resource) {
+    public function edit(Request $request, Resource $resource) {
         // check if inventory is already approved or completed
         if ($resource->isApproved() || $resource->isCompleted())
             // redirect to show route
-            return redirect()->route('backend.inventory_movements.show', $resource);
+            return redirect()->route('backend.inventory_movements.show', $resource)
+                ->withErrors([ __('inventory::inventory.already-completed') ]);
 
         // get branches with warehouses
         $branches = Branch::with([ 'warehouses.locators' ])->get();
@@ -167,23 +139,12 @@ class InventoryMovementController extends Controller {
         return view('inventory::inventory_movements.edit', compact('branches', 'products', 'resource'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Resource  $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id) {
-        // find resource
-        $resource = Resource::findOrFail($id);
-
+    public function update(Request $request, Resource $resource) {
         // check if inventory is already approved or completed
         if ($resource->isApproved() || $resource->isCompleted())
             // return back with errors
-            return back()
-                ->withInput()
-                ->withErrors([ __('models/inventory.already-completed') ]);
+            return back()->withInput()
+                ->withErrors([ __('inventory::inventory.already-completed') ]);
 
         // start a transaction
         DB::beginTransaction();
@@ -191,8 +152,7 @@ class InventoryMovementController extends Controller {
         // update resource
         if (!$resource->update( $request->input() ))
             // redirect with errors
-            return back()
-                ->withInput()
+            return back()->withInput()
                 ->withErrors( $resource->errors() );
 
         // sync inventory lines
@@ -207,18 +167,13 @@ class InventoryMovementController extends Controller {
         return redirect()->route('backend.inventory_movements.show', $resource);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Resource  $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Resource $resource) {
+    public function destroy(Request $request, Resource $resource) {
         // delete resource
         if (!$resource->delete())
             // redirect back with errors
             return back()
                 ->withErrors($resource->errors()->any() ? $resource->errors() : [ $resource->getDocumentError() ]);
+
         // redirect to list
         return redirect()->route('backend.inventory_movements');
     }
@@ -259,8 +214,7 @@ class InventoryMovementController extends Controller {
             ]);
             // save inventory line
             if (!$inventoryLine->save())
-                return back()
-                    ->withInput()
+                return back()->withInput()
                     ->withErrors( $inventoryLine->errors() );
         }
 

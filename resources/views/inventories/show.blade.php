@@ -8,17 +8,17 @@
 <div class="card mb-3">
     <div class="card-header">
         <div class="row">
-            <div class="col-6">
-                <i class="fas fa-user-plus"></i>
+            <div class="col-6 d-flex align-items-center">
+                <i class="fas fa-user-plus mr-2"></i>
                 @lang('inventory::inventories.show')
             </div>
             <div class="col-6 d-flex justify-content-end">
                 @if (!$resource->isCompleted())
                 <a href="{{ route('backend.inventories.edit', $resource) }}"
-                    class="btn btn-sm ml-2 btn-info">@lang('inventory::inventories.edit')</a>
+                    class="btn btn-sm ml-2 btn-outline-info">@lang('inventory::inventories.edit')</a>
                 @endif
                 <a href="{{ route('backend.inventories.create') }}"
-                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::inventories.create')</a>
+                    class="btn btn-sm ml-2 btn-outline-primary">@lang('inventory::inventories.create')</a>
             </div>
         </div>
     </div>

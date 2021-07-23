@@ -7,13 +7,13 @@
 <div class="card mb-3">
     <div class="card-header">
         <div class="row">
-            <div class="col-6">
+            <div class="col-6 d-flex align-items-center">
                 <i class="fas fa-company-plus"></i>
                 @lang('inventory::material_returns.create')
             </div>
             <div class="col-6 d-flex justify-content-end">
                 {{-- <a href="{{ route('backend.material_returns.create') }}"
-                    class="btn btn-sm btn-primary">@lang('inventory::material_returns.create')</a> --}}
+                    class="btn btn-sm btn-outline-primary">@lang('inventory::material_returns.create')</a> --}}
             </div>
         </div>
     </div>

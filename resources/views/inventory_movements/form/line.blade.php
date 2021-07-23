@@ -19,9 +19,9 @@
 
                 foreign="products" foreign-add-label="products-catalog::products.add"
 
-                label="inventory::inventory.lines.product_id.0"
-                placeholder="inventory::inventory.lines.product_id._"
-                {{-- helper="inventory::inventory.lines.product_id.?" --}} />
+                label="inventory::inventory_movement.lines.product_id.0"
+                placeholder="inventory::inventory_movement.lines.product_id._"
+                {{-- helper="inventory::inventory_movement.lines.product_id.?" --}} />
         </div>
 
         <div class="col-4 d-flex align-items-center mb-1">
@@ -39,15 +39,15 @@
 
                 foreign="variants" foreign-add-label="products-catalog::variants.add"
 
-                {{-- label="inventory::inventory.lines.variant_id.0" --}}
-                placeholder="inventory::inventory.lines.variant_id._"
-                {{-- helper="inventory::inventory.lines.variant_id.?" --}} />
+                {{-- label="inventory::inventory_movement.lines.variant_id.0" --}}
+                placeholder="inventory::inventory_movement.lines.variant_id._"
+                {{-- helper="inventory::inventory_movement.lines.variant_id.?" --}} />
         </div>
 
         <div class="col-4 d-flex align-items-center">
             <div class="input-group">
                 <div class="input-group-prepend">
-                    <div class="input-group-text">@lang('inventory::inventory.lines.locator_id.0')</div>
+                    <div class="input-group-text">@lang('inventory::inventory_movement.lines.locator_id.0')</div>
                 </div>
                 <x-form-foreign name="lines[locator_id][]" {{-- :required="$selected !== null" --}}
                     :values="$branches->pluck('warehouses')->flatten()->pluck('locators')->flatten()" data-live-search="true"
@@ -63,42 +63,52 @@
 
                     foreign="locators" foreign-add-label="inventory::locators.add"
 
-                    {{-- label="inventory::inventory.lines.locator_id.0" --}}
-                    placeholder="inventory::inventory.lines.locator_id._"
-                    {{-- helper="inventory::inventory.lines.locator_id.?" --}} />
+                    {{-- label="inventory::inventory_movement.lines.locator_id.0" --}}
+                    placeholder="inventory::inventory_movement.lines.locator_id._"
+                    {{-- helper="inventory::inventory_movement.lines.locator_id.?" --}} />
             </div>
         </div>
 
         <div class="col-8 d-flex align-items-center">
             <div class="form-row flex-fill">
 
-                <div class="col-8">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text">@lang('inventory::inventory.lines.current.0') / @lang('inventory::inventory.lines.counted.0')</label>
-                        </div>
-
-                        <x-form-input type="number" name="lines[current][]" readonly
-                            value="{{ $old['current'] ?? $selected?->current ?? null }}"
-                            class="text-center"
-                            placeholder="inventory::inventory.lines.current.0" />
-
-                        <x-form-input type="number" name="lines[counted][]" min="0" :required="$selected !== null"
-                            value="{{ $old['counted'] ?? $selected?->counted ?? null }}"
-                            class="text-center"
-                            placeholder="inventory::inventory.lines.counted.0" />
-                    </div>
-                </div>
-
                 <div class="col-4">
                     <div class="input-group">
                         <div class="input-group-prepend">
-                            <div class="input-group-text">@lang('inventory::inventory.lines.expire_at.0')</div>
+                            <label class="input-group-text">@lang('inventory::inventory_movement.lines.quantity.0')</label>
                         </div>
 
-                        <input name="lines[expire_at][]" type="date"
-                            value="{{ substr($old['expire_at'] ?? $selected?->expire_at ?? '', 0, 10) }}"
-                            class="form-control" placeholder="@lang('inventory::inventory.lines.expire_at.0')">
+                        <x-form-input type="number" name="lines[quantity][]" min="0" :required="$selected !== null"
+                            value="{{ $old['quantity'] ?? $selected?->quantity ?? null }}"
+                            class="text-center"
+                            placeholder="inventory::inventory_movement.lines.quantity.0" />
+                    </div>
+                </div>
+
+                <div class="col-8">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">@lang('inventory::inventory_movement.lines.to_locator_id.0')</div>
+                        </div>
+
+                        <x-form-foreign name="lines[to_locator_id][]" {{-- :required="$selected !== null" --}}
+                            :values="$branches->pluck('warehouses')->flatten()->pluck('locators')->flatten()" data-live-search="true"
+                            default="{{ $old['locator_id'] ?? $selected?->locator_id }}"
+
+                            filtered-by='[name="to_warehouse_id"]' filtered-using="warehouse"
+                            data-filtered-keep-id="true" data-filtered-init="false"
+
+                            show="x : y : z" {{-- title="code" --}}
+                            append="warehouse:warehouse_id"
+                            {{-- data-preview="#line_preview" data-preview-init="false" --}}
+                            {{-- data-preview-url-prepend="{{ asset('') }}" --}}
+
+                            foreign="locators" foreign-add-label="inventory::locators.add"
+
+                            {{-- label="inventory::inventory_movement.lines.locator_id.0" --}}
+                            placeholder="inventory::inventory_movement.lines.locator_id._"
+                            {{-- helper="inventory::inventory_movement.lines.locator_id.?" --}} />
+
                     </div>
                 </div>
 

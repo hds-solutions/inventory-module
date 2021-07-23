@@ -35,11 +35,6 @@ class PriceChangeController extends Controller {
         return 'backend.price_changes.show';
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request, DataTable $dataTable) {
         // check only-form flag
         if ($request->has('only-form'))
@@ -53,12 +48,7 @@ class PriceChangeController extends Controller {
         return $dataTable->render('inventory::price_changes.index', [ 'count' => Resource::count() ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create() {
+    public function create(Request $request) {
         // get products
         $products = Product::with([ 'images', 'variants' ])->get();
         // get currencies
@@ -77,16 +67,11 @@ class PriceChangeController extends Controller {
         $product = $request->has('product') ? Product::findOrFail( $request->product ) : null;
         $variant = $request->has('variant') ? Variant::findOrFail( $request->variant ) : null;
         $currency = $request->has('currency') ? Currency::findOrFail( $request->currency ) : null;
+
         // return stock for requested product
         return response()->json( $variant?->price( $currency )?->pivot ?? $product?->price( $currency )?->pivot );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request) {
         // start a transaction
         DB::beginTransaction();
@@ -96,8 +81,7 @@ class PriceChangeController extends Controller {
         // check for errors
         if (count($resource->errors()) > 0)
             // redirect with errors
-            return back()
-                ->withInput()
+            return back()->withInput()
                 ->withErrors( $resource->errors() );
 
         // sync pricechange lines
@@ -111,8 +95,7 @@ class PriceChangeController extends Controller {
             // save file to disk
             if (!($file = File::upload( $request, $spreadsheet, $this ))->save())
                 // redirect back with errors
-                return back()
-                    ->withInput()
+                return back()->withInput()
                     ->withErrors( $file->errors() );
 
             // confirm transaction
@@ -138,6 +121,7 @@ class PriceChangeController extends Controller {
         $currencies = backend()->currencies();
         // get excel headers
         $headers = (new HeadingRowImport)->toCollection( $import->file() )->flatten()->filter();
+
         // show view to match headers
         return view('inventory::price_changes.import', compact('resource', 'import', 'currencies', 'headers'));
     }
@@ -146,8 +130,7 @@ class PriceChangeController extends Controller {
         // check if selected headers are different from each other
         if (count( array_unique($request->input('headers')) ) !== count($request->input('headers')))
             // return back with errors
-            return back()
-                ->withInput()
+            return back()->withInput()
                 ->withErrors([ 'headers' => 'Selected headers must be different from each other' ]);
 
         // get excel headers
@@ -165,13 +148,7 @@ class PriceChangeController extends Controller {
         return redirect()->route('backend.price_changes.show', $resource);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Resource  $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Resource $resource) {
+    public function show(Request $request, Resource $resource) {
         // load pricechange data
         $resource->load([
             'lines.product.images',
@@ -179,21 +156,17 @@ class PriceChangeController extends Controller {
             'lines.variant.values.option',
             'lines.variant.values.optionValue',
         ]);
+
         // redirect to list
         return view('inventory::price_changes.show', compact('resource'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Resource  $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Resource $resource) {
+    public function edit(Request $request, Resource $resource) {
         // check if pricechange is already approved or completed
         if ($resource->isApproved() || $resource->isCompleted())
             // redirect to show route
-            return redirect()->route('backend.price_changes.show', $resource);
+            return redirect()->route('backend.price_changes.show', $resource)
+                ->withErrors([ __('models/price_change.already-completed') ]);
 
         // get products
         $products = Product::with([ 'images', 'variants' ])->get();
@@ -211,22 +184,11 @@ class PriceChangeController extends Controller {
         return view('inventory::price_changes.edit', compact('products', 'currencies', 'resource'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Resource  $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id) {
-        // find resource
-        $resource = Resource::findOrFail($id);
-
+    public function update(Request $request, Resource $resource) {
         // check if pricechange is already approved or completed
         if ($resource->isApproved() || $resource->isCompleted())
             // return back with errors
-            return back()
-                ->withInput()
+            return back()->withInput()
                 ->withErrors([ __('models/price_change.already-completed') ]);
 
         // start a transaction
@@ -235,8 +197,7 @@ class PriceChangeController extends Controller {
         // update resource
         if (!$resource->update( $request->input() ))
             // redirect with errors
-            return back()
-                ->withInput()
+            return back()->withInput()
                 ->withErrors( $resource->errors() );
 
         // sync pricechange lines
@@ -249,8 +210,7 @@ class PriceChangeController extends Controller {
             // save file to disk
             if (!($file = File::upload( $request, $spreadsheet, $this ))->save())
                 // redirect back with errors
-                return back()
-                    ->withInput()
+                return back()->withInput()
                     ->withErrors( $file->errors() );
 
             // confirm transaction
@@ -271,18 +231,13 @@ class PriceChangeController extends Controller {
             redirect()->route('backend.price_changes.show', $resource);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Resource  $pricechange
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Resource $resource) {
+    public function destroy(Request $request, Resource $resource) {
         // delete resource
         if (!$resource->delete())
             // redirect back with errors
             return back()
                 ->withErrors($resource->errors()->any() ? $resource->errors() : [ $resource->getDocumentError() ]);
+
         // redirect to list
         return redirect()->route('backend.price_changes');
     }
@@ -329,8 +284,7 @@ class PriceChangeController extends Controller {
             ]);
             // save pricechange line
             if (!$pricechangeLine->save())
-                return back()
-                    ->withInput()
+                return back()->withInput()
                     ->withErrors( $pricechangeLine->errors() );
         }
 

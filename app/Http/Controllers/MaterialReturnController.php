@@ -34,11 +34,6 @@ class MaterialReturnController extends Controller {
         return 'backend.material_returns.show';
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request, DataTable $dataTable) {
         // check only-form flag
         if ($request->has('only-form'))
@@ -48,15 +43,13 @@ class MaterialReturnController extends Controller {
         // load resources
         if ($request->ajax()) return $dataTable->ajax();
 
+        // load customers
+        $customers = Customer::all();
+
         // return view with dataTable
-        return $dataTable->render('inventory::material_returns.index', [ 'count' => Resource::count() ]);
+        return $dataTable->render('inventory::material_returns.index', compact('customers') + [ 'count' => Resource::count() ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create(Request $request) {
         // load customers
         $customers = Customer::with([
@@ -102,12 +95,6 @@ class MaterialReturnController extends Controller {
         return view('inventory::material_returns.create', compact('customers', 'branches', 'employees', 'products', 'highs'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request) {
         // start a transaction
         DB::beginTransaction();
@@ -123,9 +110,8 @@ class MaterialReturnController extends Controller {
         // save resource
         if (!$resource->exists || $resource->getDocumentError() !== null)
             // redirect with errors
-            return back()
-                ->withErrors( $resource->getDocumentError() )
-                ->withInput();
+            return back()->withInput()
+                ->withErrors( $resource->getDocumentError() );
 
         // confirm transaction
         DB::commit();
@@ -138,13 +124,7 @@ class MaterialReturnController extends Controller {
             redirect()->route('backend.material_returns.show', $resource);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param \App\Models\Resource $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Resource $resource) {
+    public function show(Request $request, Resource $resource) {
         // load inventory data
         $resource->load([
             'branch',
@@ -162,13 +142,7 @@ class MaterialReturnController extends Controller {
         return view('inventory::material_returns.show', compact('resource'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param \App\Models\Resource $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Resource $resource) {
+    public function edit(Request $request, Resource $resource) {
         // check if document is already approved or processed
         if ($resource->isApproved() || $resource->isProcessed())
             // redirect to show route
@@ -221,17 +195,7 @@ class MaterialReturnController extends Controller {
         return view('inventory::material_returns.edit', compact('customers', 'branches', 'employees', 'products', 'resource'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Resource $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id) {
-        // find resource
-        $resource = Resource::findOrFail($id);
-
+    public function update(Request $request, Resource $resource) {
         // start a transaction
         DB::beginTransaction();
 
@@ -241,9 +205,8 @@ class MaterialReturnController extends Controller {
             'invoice_id',
         ]) ))
             // redirect with errors
-            return back()
-                ->withErrors( $resource->errors() )
-                ->withInput();
+            return back()->withInput()
+                ->withErrors( $resource->errors() );
 
         // sync inventory lines
         if (($redirect = $this->syncLines($resource, $request->get('lines'))) !== true)
@@ -257,20 +220,13 @@ class MaterialReturnController extends Controller {
         return redirect()->route('backend.material_returns.show', $resource);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param \App\Models\Resource $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id) {
-        // find resource
-        $resource = Resource::findOrFail($id);
+    public function destroy(Request $request, Resource $resource) {
         // delete resource
         if (!$resource->delete())
             // redirect with errors
             return back()
                 ->withErrors($resource->errors()->any() ? $resource->errors() : [ $resource->getDocumentError() ]);
+
         // redirect to list
         return redirect()->route('backend.material_returns');
     }

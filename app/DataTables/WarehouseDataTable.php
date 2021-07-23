@@ -3,12 +3,13 @@
 namespace HDSSolutions\Laravel\DataTables;
 
 use HDSSolutions\Laravel\Models\Warehouse as Resource;
+use Illuminate\Database\Eloquent\Builder;
 use Yajra\DataTables\Html\Column;
 
 class WarehouseDataTable extends Base\DataTable {
 
     protected array $with = [
-        'branch'
+        'branch',
     ];
 
     public function __construct() {
@@ -30,8 +31,13 @@ class WarehouseDataTable extends Base\DataTable {
             Column::make('name')
                 ->title( __('inventory::warehouse.name.0') ),
 
-            Column::make('actions'),
+            Column::computed('actions'),
         ];
+    }
+
+    protected function filterBranch(Builder $query, $branch_id):Builder {
+        // filter only from Branch
+        return $query->where('branch_id', $branch_id);
     }
 
 }

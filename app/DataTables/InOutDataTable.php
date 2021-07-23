@@ -3,11 +3,13 @@
 namespace HDSSolutions\Laravel\DataTables;
 
 use HDSSolutions\Laravel\Models\InOut as Resource;
+use HDSSolutions\Laravel\Traits\DatatableAsDocument;
 use HDSSolutions\Laravel\Traits\DatatableWithPartnerable;
 use Illuminate\Database\Eloquent\Builder;
 use Yajra\DataTables\Html\Column;
 
 class InOutDataTable extends Base\DataTable {
+    use DatatableAsDocument;
     use DatatableWithPartnerable;
 
     protected array $with = [
@@ -56,7 +58,7 @@ class InOutDataTable extends Base\DataTable {
             Column::make('document_status_pretty')
                 ->title( __('inventory::in_out.document_status.0') ),
 
-            Column::make('actions'),
+            Column::computed('actions'),
         ];
     }
 
@@ -67,6 +69,21 @@ class InOutDataTable extends Base\DataTable {
             ->leftJoin('customers', 'customers.id', 'in_outs.partnerable_id')
             // join to people
             ->join('people', 'people.id', 'customers.id');
+    }
+
+    protected function filterBranch(Builder $query, $branch_id):Builder {
+        // filter only from Branch
+        return $query->where('branch_id', $branch_id);
+    }
+
+    protected function filterWarehouse(Builder $query, $warehouse_id):Builder {
+        // filter only from Warehouse
+        return $query->where('warehouse_id', $warehouse_id);
+    }
+
+    protected function filterPartnerable(Builder $query, $partnerable_id):Builder {
+        // filter only from Partnerable
+        return $query->where('partnerable_id', $partnerable_id);
     }
 
 }

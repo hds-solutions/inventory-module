@@ -19,8 +19,8 @@
         </div>
         <div class="card-body">
             <form method="POST" action="{{ route('backend.material_returns.update', $resource) }}" enctype="multipart/form-data">
-                @method('PUT')
                 @csrf
+                @method('PUT')
                 @include('inventory::material_returns.form')
             </form>
         </div>

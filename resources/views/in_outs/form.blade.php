@@ -22,19 +22,19 @@
     {{-- helper="inventory::in_out.transacted_at.?" --}} />
 
 <x-backend-form-foreign :resource="$resource ?? null" name="branch_id" required
-    foreign="branches" :values="$branches" foreign-add-label="{{ __('inventory::branches.add') }}"
+    foreign="branches" :values="$branches" foreign-add-label="inventory::branches.add"
 
-    label="{{ __('inventory::in_out.branch_id.0') }}"
-    placeholder="{{ __('inventory::in_out.branch_id._') }}"
-    {{-- helper="{{ __('inventory::in_out.branch_id.?') }}" --}}>
+    label="inventory::in_out.branch_id.0"
+    placeholder="inventory::in_out.branch_id._"
+    {{-- helper="inventory::in_out.branch_id.?" --}}>
 
     <x-backend-form-foreign :resource="$resource ?? null" name="warehouse_id" required secondary
         filtered-by="[name=branch_id]" filtered-using="branch"
-        foreign="warehouses" :values="$branches->pluck('warehouses')->flatten()" foreign-add-label="{{ __('inventory::warehouses.add') }}"
+        foreign="warehouses" :values="$branches->pluck('warehouses')->flatten()" foreign-add-label="inventory::warehouses.add"
 
-        label="{{ __('inventory::in_out.warehouse_id.0') }}"
-        placeholder="{{ __('inventory::in_out.warehouse_id._') }}"
-        {{-- helper="{{ __('inventory::in_out.warehouse_id.?') }}" --}} />
+        label="inventory::in_out.warehouse_id.0"
+        placeholder="inventory::in_out.warehouse_id._"
+        {{-- helper="inventory::in_out.warehouse_id.?" --}} />
 
 </x-backend-form-foreign>
 
@@ -59,11 +59,11 @@
 
 <x-backend-form-foreign :resource="$resource ?? null" name="partnerable_id" required
     show="business_name"
-    foreign="customers" :values="$customers" foreign-add-label="{{ __('inventory::customers.add') }}"
+    foreign="customers" :values="$customers" foreign-add-label="inventory::customers.add"
 
-    label="{{ __('inventory::in_out.partnerable_id.0') }}"
-    placeholder="{{ __('inventory::in_out.partnerable_id._') }}"
-    {{-- helper="{{ __('inventory::in_out.branch_id.?') }}" --}} />
+    label="inventory::in_out.partnerable_id.0"
+    placeholder="inventory::in_out.partnerable_id._"
+    {{-- helper="inventory::in_out.branch_id.?" --}} />
 
 {{-- TODO: Customer.addresses --}} {{--
 <x-backend-form-foreign name="address_id" required

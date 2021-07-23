@@ -1,5 +1,11 @@
 <?php return [
 
+    'branch_id'  => [
+        'Branch',
+        '_' => 'Branch',
+        '?' => 'Branch help text',
+    ],
+
     'warehouse_id'  => [
         'Warehouse',
         '_' => 'Warehouse',

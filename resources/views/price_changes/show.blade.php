@@ -8,17 +8,17 @@
 <div class="card mb-3">
     <div class="card-header">
         <div class="row">
-            <div class="col-6">
-                <i class="fas fa-user-plus"></i>
-                @lang('inventory::price_change.show')
+            <div class="col-6 d-flex align-items-center">
+                <i class="fas fa-user-plus mr-2"></i>
+                @lang('inventory::price_changes.show')
             </div>
             <div class="col-6 d-flex justify-content-end">
                 @if (!$resource->isCompleted())
                 <a href="{{ route('backend.price_changes.edit', $resource) }}"
-                    class="btn btn-sm ml-2 btn-info">@lang('inventory::price_change.edit')</a>
+                    class="btn btn-sm ml-2 btn-outline-info">@lang('inventory::price_changes.edit')</a>
                 @endif
                 <a href="{{ route('backend.price_changes.create') }}"
-                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::price_change.create')</a>
+                    class="btn btn-sm ml-2 btn-outline-primary">@lang('inventory::price_changes.create')</a>
             </div>
         </div>
     </div>

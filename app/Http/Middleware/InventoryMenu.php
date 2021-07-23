@@ -12,7 +12,7 @@ class InventoryMenu extends Base\Menu {
         $sub = backend()->menu()
             ->add(__('inventory::inventories.nav'), [
                 'nickname'  => 'inventory',
-                'icon'      => 'cogs',
+                'icon'      => 'laptop-house',
             ])->data('priority', 800);
 
         $this
@@ -33,7 +33,7 @@ class InventoryMenu extends Base\Menu {
         if (Route::has('backend.warehouses') && $this->can('warehouses'))
             $menu->add(__('inventory::warehouses.nav'), [
                 'route'     => 'backend.warehouses',
-                'icon'      => 'warehouses'
+                'icon'      => 'warehouse'
             ]);
 
         return $this;
@@ -43,7 +43,7 @@ class InventoryMenu extends Base\Menu {
         if (Route::has('backend.locators') && $this->can('locators'))
             $menu->add(__('inventory::locators.nav'), [
                 'route'     => 'backend.locators',
-                'icon'      => 'locators'
+                'icon'      => 'crosshairs'
             ]);
 
         return $this;
@@ -53,7 +53,7 @@ class InventoryMenu extends Base\Menu {
         if (Route::has('backend.in_outs') && $this->can('in_outs'))
             $menu->add(__('inventory::in_outs.nav'), [
                 'route'     => 'backend.in_outs',
-                'icon'      => 'in_outs'
+                'icon'      => 'dolly-flatbed'
             ]);
 
         return $this;
@@ -63,7 +63,7 @@ class InventoryMenu extends Base\Menu {
         if (Route::has('backend.material_returns') && $this->can('material_returns'))
             $menu->add(__('inventory::material_returns.nav'), [
                 'route'     => 'backend.material_returns',
-                'icon'      => 'material_returns'
+                'icon'      => 'recycle'
             ]);
 
         return $this;
@@ -73,7 +73,7 @@ class InventoryMenu extends Base\Menu {
         if (Route::has('backend.inventories') && $this->can('inventories'))
             $menu->add(__('inventory::inventories.nav'), [
                 'route'     => 'backend.inventories',
-                'icon'      => 'inventories'
+                'icon'      => 'clipboard-list'
             ]);
 
         return $this;
@@ -83,7 +83,7 @@ class InventoryMenu extends Base\Menu {
         if (Route::has('backend.inventory_movements') && $this->can('inventory_movements'))
             $menu->add(__('inventory::inventory_movements.nav'), [
                 'route'     => 'backend.inventory_movements',
-                'icon'      => 'inventory_movements'
+                'icon'      => 'shipping-fast'
             ]);
 
         return $this;
@@ -93,7 +93,7 @@ class InventoryMenu extends Base\Menu {
         if (Route::has('backend.price_changes') && $this->can('price_changes'))
             $menu->add(__('inventory::price_changes.nav'), [
                 'route'     => 'backend.price_changes',
-                'icon'      => 'price_changes'
+                'icon'      => 'chart-line'
             ]);
 
         return $this;

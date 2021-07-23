@@ -37,11 +37,6 @@ class InventoryController extends Controller {
         return 'backend.inventories.show';
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request, DataTable $dataTable) {
         // check only-form flag
         if ($request->has('only-form'))
@@ -55,12 +50,7 @@ class InventoryController extends Controller {
         return $dataTable->render('inventory::inventories.index', [ 'count' => Resource::count() ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create() {
+    public function create(Request $request) {
         // get branches with warehouses
         $branches = Branch::with([ 'warehouses.locators' ])->get();
         // get products
@@ -88,12 +78,6 @@ class InventoryController extends Controller {
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request) {
         // start a transaction
         DB::beginTransaction();
@@ -176,13 +160,7 @@ class InventoryController extends Controller {
         return redirect()->route('backend.inventories.show', $resource);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Resource  $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Resource $resource) {
+    public function show(Request $request, Resource $resource) {
         // load inventory data
         $resource->load([
             'warehouse.branch',
@@ -196,13 +174,7 @@ class InventoryController extends Controller {
         return view('inventory::inventories.show', compact('resource'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Resource  $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Resource $resource) {
+    public function edit(Request $request, Resource $resource) {
         // check if inventory is already approved or completed
         if ($resource->isApproved() || $resource->isProcessed())
             // redirect to show route
@@ -223,22 +195,11 @@ class InventoryController extends Controller {
         return view('inventory::inventories.edit', compact('branches', 'products', 'resource'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Resource  $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id) {
-        // find resource
-        $resource = Resource::findOrFail($id);
-
+    public function update(Request $request, Resource $resource) {
         // check if inventory is already approved or completed
         if ($resource->isApproved() || $resource->isCompleted())
             // return back with errors
-            return back()
-                ->withInput()
+            return back()->withInput()
                 ->withErrors([ __('models/inventory.already-completed') ]);
 
         // start a transaction
@@ -247,8 +208,7 @@ class InventoryController extends Controller {
         // update resource
         if (!$resource->update( $request->input() ))
             // redirect with errors
-            return back()
-                ->withInput()
+            return back()->withInput()
                 ->withErrors( $resource->errors() );
 
         // sync inventory lines
@@ -261,8 +221,7 @@ class InventoryController extends Controller {
             // save file to disk
             if (!($file = File::upload( $request, $spreadsheet, $this ))->save())
                 // redirect back with errors
-                return back()
-                    ->withInput()
+                return back()->withInput()
                     ->withErrors( $file->errors() );
 
             // confirm transaction
@@ -283,18 +242,13 @@ class InventoryController extends Controller {
             redirect()->route('backend.inventories.show', $resource);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Resource  $resource
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Resource $resource) {
+    public function destroy(Request $request, Resource $resource) {
         // delete resource
         if (!$resource->delete())
             // redirect back with errors
             return back()
                 ->withErrors($resource->errors()->any() ? $resource->errors() : [ $resource->getDocumentError() ]);
+
         // redirect to list
         return redirect()->route('backend.inventories');
     }

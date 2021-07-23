@@ -9,9 +9,9 @@
 
 <x-backend-form-text :resource="$resource ?? null" name="description" required
     default="{{ __('inventory::price_change.nav').' @ '.now() }}"
-    label="{{ __('inventory::price_change.description.0') }}"
-    placeholder="{{ __('inventory::price_change.description._') }}"
-    {{-- helper="{{ __('inventory::price_change.description.?') }}" --}} />
+    label="inventory::price_change.description.0"
+    placeholder="inventory::price_change.description._"
+    {{-- helper="inventory::price_change.description.?" --}} />
 
 <x-backend-form-multiple name="lines" contents-view="inventory::price_changes.form.line"
     data-type="price_change"
@@ -45,7 +45,7 @@
                                 route('backend.price_changes.store', [ 'import' => true ]) :
                                 route('backend.price_changes.update', [ $resource, 'import' => true ])
                             }}"
-                            class="btn btn-primary" id="price_change-label">@lang('inventory::price_changes.save-create')</button>
+                            class="btn btn-outline-gray btn-hover-primary" id="price_change-label">@lang('inventory::price_changes.save-create')</button>
                     </div>
                 </div>
 
