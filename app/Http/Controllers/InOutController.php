@@ -38,7 +38,7 @@ class InOutController extends Controller {
         // check only-form flag
         if ($request->has('only-form'))
             // redirect to popup callback
-            return view('inventory::components.popup-callback', [ 'resource' => new Resource ]);
+            return view('backend::components.popup-callback', [ 'resource' => new Resource ]);
 
         // load resources
         if ($request->ajax()) return $dataTable->ajax();

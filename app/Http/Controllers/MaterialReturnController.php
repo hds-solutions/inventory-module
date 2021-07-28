@@ -38,7 +38,7 @@ class MaterialReturnController extends Controller {
         // check only-form flag
         if ($request->has('only-form'))
             // redirect to popup callback
-            return view('inventory::components.popup-callback', [ 'resource' => new Resource ]);
+            return view('backend::components.popup-callback', [ 'resource' => new Resource ]);
 
         // load resources
         if ($request->ajax()) return $dataTable->ajax();
@@ -119,7 +119,7 @@ class MaterialReturnController extends Controller {
         // check return type
         return $request->has('only-form') ?
             // redirect to popup callback
-            view('inventory::components.popup-callback', compact('resource')) :
+            view('backend::components.popup-callback', compact('resource')) :
             // redirect to resource details
             redirect()->route('backend.material_returns.show', $resource);
     }
