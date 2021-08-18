@@ -1,7 +1,9 @@
 @include('backend::components.errors')
 
 <x-backend-form-foreign :resource="$resource ?? null" name="branch_id" required
-    foreign="branches" :values="$branches" foreign-add-label="inventory::branches.add"
+    :values="$branches" request="branch" :readonly="request()->has('branch')"
+
+    foreign="branches" foreign-add-label="inventory::branches.add"
 
     label="inventory::warehouse.branch_id.0"
     placeholder="inventory::warehouse.branch_id._"

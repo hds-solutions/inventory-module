@@ -14,7 +14,7 @@ abstract class A_InOut extends X_InOut implements Document {
 
     public final static function nextDocumentNumber(bool $is_purchase = false):string {
         // return next document number for specified stamping
-        return str_increment(self::where('is_purchase', $is_purchase)->max('document_number') ?? null);
+        return str_increment(self::withTrashed()->where('is_purchase', $is_purchase)->max('document_number') ?? null);
     }
 
     protected final static function fromResource(Order|Invoice $resource, string $relation):array {

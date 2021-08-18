@@ -1,13 +1,14 @@
 @include('backend::components.errors')
 
 <x-backend-form-foreign :resource="$resource ?? null" name="warehouse_id" required
-    foreign="warehouses" :values="$warehouses" foreign-add-label="inventory::warehouses.add"
+    :values="$warehouses" request="warehouse" :readonly="request()->has('warehouse')"
+
+    foreign="warehouses" foreign-add-label="inventory::warehouses.add"
     data-live-search="true"
 
     label="inventory::locator.warehouse_id.0"
     placeholder="inventory::locator.warehouse_id._"
     {{-- helper="inventory::locator.warehouse_id.?" --}} />
-
 
 <x-form-row>
     <x-form-label text="inventory::locator.x.0" form-label/>

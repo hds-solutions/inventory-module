@@ -11,7 +11,6 @@ export default class PriceChangeLine extends DocumentLine {
     }
 
     _init() {
-        super._init();
         // capture change on fields
         this.#fields.forEach(field => field.addEventListener('change', e => {
             // ignore if field doesn't have form (deleted line)

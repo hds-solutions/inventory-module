@@ -10,7 +10,7 @@ class PriceChange extends X_PriceChange implements Document {
 
     public static function nextDocumentNumber():string {
         // return next document number for specified stamping
-        return str_increment(self::max('document_number') ?? null);
+        return str_increment(self::withTrashed()->max('document_number') ?? null);
     }
 
     public function lines() {

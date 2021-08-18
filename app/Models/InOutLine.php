@@ -7,9 +7,11 @@ use Illuminate\Validation\Validator;
 
 class InOutLine extends A_InOutLine {
 
-    public function __construct(array|OrderLine $attributes = []) {
+    public function __construct(array|OrderLine|InvoiceLine $attributes = []) {
         // check if is instance of OrderLine
         if (($orderLine = $attributes) instanceof OrderLine) $attributes = self::fromResourceLine($orderLine, 'order_line_id', 'quantity_ordered');
+        // check if is instance of InvoiceLine
+        if (($invoiceLine = $attributes) instanceof InvoiceLine) $attributes = self::fromResourceLine($invoiceLine, 'invoice_line_id', 'quantity_invoiced');
         // redirect attributes to parent
         parent::__construct(is_array($attributes) ? $attributes : []);
     }
@@ -21,6 +23,10 @@ class InOutLine extends A_InOutLine {
 
     public function orderLine() {
         return $this->belongsTo(OrderLine::class);
+    }
+
+    public function invoiceLine() {
+        return $this->belongsTo(InvoiceLine::class);
     }
 
 }

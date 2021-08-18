@@ -7,11 +7,13 @@ use Illuminate\Validation\Validator;
 
 class InOut extends A_InOut {
 
-    public function __construct(array|Order $attributes = []) {
+    public function __construct(array|Order|Invoice $attributes = []) {
         // check if is instance of Order
         if (($order = $attributes) instanceof Order) $attributes = self::fromResource($order, 'order_id');
+        // check if is instance of Invoice
+        if (($invoice = $attributes) instanceof Invoice) $attributes = self::fromResource($invoice, 'invoice_id');
         // redirect attributes to parent
-        parent::__construct(is_array($attributes) ? $attributes : [] + [
+        parent::__construct((is_array($attributes) ? $attributes : []) + [
             // force material_return=false
             'is_material_return'    => false,
         ]);
@@ -59,7 +61,7 @@ class InOut extends A_InOut {
             // check if no qty available on this storage
             if (!$received) return true;
             //
-            logger("Adding $available to $storage");
+            logger("Adding $received to $storage");
             // update stock on storage
             $storage->fill([
                 // add movement quantity to storage.onHand
@@ -121,6 +123,52 @@ class InOut extends A_InOut {
             $resource->lines->push( $line = new InOutLine($orderLine) );
             // set first locator of Product|Variant
             $line->locator()->associate( ($orderLine->variant ?? $orderLine->product)->locators()->first() );
+        });
+
+        // return resource
+        return $resource;
+    }
+
+    public static function createFromInvoice(int|Invoice $invoice, array $attributes = []):self {
+        // make InOut resource
+        $resource = self::makeFromInvoice($invoice, $attributes);
+
+        // stop process if inOut can't be saved
+        if (!$resource->save())
+            // return error through document error
+            return tap($resource, fn($resource) => $resource->documentError( $resource->errors()->first() ));
+
+        // foreach lines
+        foreach ($resource->lines as $line) {
+            // link with parent
+            $line->inOut()->associate($resource);
+            // stop process if line can't be saved
+            if (!$line->save())
+                // return error through document error
+                return tap($resource, fn($resource) => $resource->documentError( $line->errors()->first() ));
+        }
+
+        // return created inOut resource
+        return $resource;
+    }
+
+    public static function makeFromInvoice(int|Invoice $invoice, array $attributes = []):self {
+        // load invoice if isn't instance
+        if (!$invoice instanceof Invoice) $invoice = Invoice::findOrFail($invoice);
+
+        // create new resource from Order
+        $resource = new self($invoice);
+        // append extra attributes
+        $resource->fill( $attributes );
+
+        // create InvoiceLines from InvoiceLines
+        $invoice->lines->each(function($invoiceLine) use ($resource) {
+            // ignore line if product.type isn't stockable
+            if (!$invoiceLine->product->stockable) return;
+            // create a new InOutLine from InvoiceLine
+            $resource->lines->push( $line = new InOutLine($invoiceLine) );
+            // set first locator of Product|Variant
+            $line->locator()->associate( ($invoiceLine->variant ?? $invoiceLine->product)->locators()->first() );
         });
 
         // return resource
