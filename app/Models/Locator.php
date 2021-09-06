@@ -16,7 +16,7 @@ class Locator extends X_Locator {
     }
 
     protected function beforeSave(Validator $validator) {
-        // check if the onlt locator on warehouse
+        // check if the only locator on warehouse
         if ($this->warehouse->locators()->whereKeyNot( $this->id )->count() > 0) return;
         // force default because is the only one
         $this->default = true;
