@@ -20,7 +20,7 @@ export default class InventoryMovement extends Document {
             // foreach lines and fire change
             this.lines.forEach(line =>
                 // fire change on first <select> (product selector)
-                this.fire('change', line.container.querySelector('select:first-child'))
+                InventoryMovement.fire('change', line.container.querySelector('select:first-child'))
             )
         );
         // capture warehouse change and redirect change to every line
@@ -28,7 +28,7 @@ export default class InventoryMovement extends Document {
             // foreach lines and fire change
             this.lines.forEach(line =>
                 // fire change on first <select> (product selector)
-                this.fire('change', line.container.querySelector('select:first-child'))
+                InventoryMovement.fire('change', line.container.querySelector('select:first-child'))
             )
         );
     }

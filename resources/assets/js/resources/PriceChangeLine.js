@@ -47,7 +47,7 @@ export default class PriceChangeLine extends DocumentLine {
                 this.container.querySelector('[name="lines[price][]"]').value = data.price ?? null;
                 this.container.querySelector('[name="lines[current_limit][]"]').value = data.limit ?? null;
                 this.container.querySelector('[name="lines[limit][]"]').value = data.limit ?? null;
-                this.container.querySelectorAll('[name^="lines"][thousand]').forEach(ele => this.fire('blur', ele));
+                this.container.querySelectorAll('[name^="lines"][thousand]').forEach(ele => PriceChangeLine.fire('blur', ele));
             },
         });
     }
