@@ -56,21 +56,21 @@ class MaterialReturn extends A_InOut {
             InvoiceLine::class, InvoiceLineOrderLine::class,
             OrderLine::class,
         ], [
-            'deleted_at',       // bypass (idk why adds an IS NULL comparison with this column)
+            null,       // bypass (idk why adds an IS NULL comparison with this column)
             'in_out_line_id',   // see (2) below
             'id',               // see (3) below
             'invoice_line_id',  // see (4) below
             'id',               // see (5) below
             'id',               // see (6) below
         ], [
-            '??',               // ignored (not used in query)
+            null,               // ignored (not used in query)
             'id',               // (2) InOutLine.id = InOutLineInvoiceLine.in_out_line_id
             'invoice_line_id',  // (3) InOutLineInvoiceLine.invoice_line_id = InvoiceLine.id
             'id',               // (4) InvoiceLine.id = InvoiceLineOrderLine.invoice_line_id
             'order_line_id',    // (5) InvoiceLineOrderLine.order_line_id = OrderLine.id
             'order_id',         // (6) OrderLine.order_id = Order.id
         // prevent columns overlap
-        ])->select('orders.*');
+        ])->select('orders.*')->groupBy('orders.id');
     }
 
     public function prepareIt():?string {
