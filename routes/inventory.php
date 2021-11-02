@@ -46,8 +46,8 @@ Route::group([
         ->name('backend.inventories.stock');
     Route::get('inventories/{resource}/import/{import}',    [ InventoryController::class, 'import'])
         ->name('backend.inventories.import');
-    Route::post('inventories/{resource}/import/{import}',   [ InventoryController::class, 'doImport' ])
-        ->name('backend.inventories.import');
+    Route::post('inventories/{resource}/import/{import}',   [ InventoryController::class, 'doImport' ]);
+        // ->name('backend.inventories.import');
     Route::post('inventories/{resource}/process',           [ InventoryController::class, 'processIt' ])
         ->name('backend.inventories.process');
 
@@ -64,8 +64,8 @@ Route::group([
         ->name('backend.price_changes.price');
     Route::get('price_changes/{resource}/import/{import}',  [ PriceChangeController::class, 'import'])
         ->name('backend.price_changes.import');
-    Route::post('price_changes/{resource}/import/{import}', [ PriceChangeController::class, 'doImport'])
-        ->name('backend.price_changes.import');
+    Route::post('price_changes/{resource}/import/{import}', [ PriceChangeController::class, 'doImport']);
+        // ->name('backend.price_changes.import');
     Route::post('price_changes/{resource}/process',         [ PriceChangeController::class, 'processIt'])
         ->name('backend.price_changes.process');
 
