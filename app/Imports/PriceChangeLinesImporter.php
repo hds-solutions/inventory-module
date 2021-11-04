@@ -71,12 +71,12 @@ class PriceChangeLinesImporter implements ToModel, WithChunkReading, WithHeading
             // link to pricechange
             'price_change_id'   => $this->resource->id,
             // set current prices
-            'current_cost'      => $current_price->cost,
-            'current_price'     => $current_price->price,
-            'current_limit'     => $current_price->limit,
+            'current_cost'      => $current_price?->cost ?? 0,
+            'current_price'     => $current_price?->price ?? 0,
+            'current_limit'     => $current_price?->limit ?? 0,
             // copy cost and limit
-            'cost'              => $current_price->cost,
-            'limit'             => $current_price->limit,
+            'cost'              => $current_price?->cost ?? 0,
+            'limit'             => $current_price?->limit ?? 0,
             // set price from excel
             'price'             => $row[ $this->headers['price'] ],
         ]);
