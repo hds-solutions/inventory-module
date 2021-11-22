@@ -3,14 +3,14 @@
 namespace HDSSolutions\Laravel\DataTables;
 
 use HDSSolutions\Laravel\Models\InOut as Resource;
-use HDSSolutions\Laravel\Traits\DatatableAsDocument;
 use HDSSolutions\Laravel\Traits\DatatableWithPartnerable;
+use HDSSolutions\Laravel\Traits\DatatableAsDocument;
 use Illuminate\Database\Eloquent\Builder;
 use Yajra\DataTables\Html\Column;
 
 class InOutDataTable extends Base\DataTable {
-    use DatatableAsDocument;
     use DatatableWithPartnerable;
+    use DatatableAsDocument;
 
     protected array $with = [
         'order.currency',

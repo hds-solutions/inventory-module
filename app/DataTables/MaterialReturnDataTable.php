@@ -3,14 +3,14 @@
 namespace HDSSolutions\Laravel\DataTables;
 
 use HDSSolutions\Laravel\Models\MaterialReturn as Resource;
-use HDSSolutions\Laravel\Traits\DatatableAsDocument;
 use HDSSolutions\Laravel\Traits\DatatableWithPartnerable;
+use HDSSolutions\Laravel\Traits\DatatableAsDocument;
 use Illuminate\Database\Eloquent\Builder;
 use Yajra\DataTables\Html\Column;
 
 class MaterialReturnDataTable extends Base\DataTable {
-    use DatatableAsDocument;
     use DatatableWithPartnerable;
+    use DatatableAsDocument;
 
     protected array $with = [
         'invoice.currency',

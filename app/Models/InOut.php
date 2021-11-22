@@ -17,6 +17,8 @@ class InOut extends A_InOut {
             // force material_return=false
             'is_material_return'    => false,
         ]);
+        // allow void this document
+        $this->document_enableVoidIt = true;
     }
 
     protected static function booted() {
@@ -31,7 +33,7 @@ class InOut extends A_InOut {
         return $this->hasMany(InOutLine::class);
     }
 
-    protected function updateStorage(Storage $storage, int &$quantityToMove):bool {
+    protected function completeIt_updateStorage(Storage $storage, int &$quantityToMove):bool {
         logger("Storage $storage");
 
         // if document is_sale, substract stock from Storage
@@ -40,7 +42,7 @@ class InOut extends A_InOut {
             $available = $storage->reserved > $quantityToMove ? $quantityToMove : $storage->reserved;
             // check if no qty available on this storage
             if (!$available) return true;
-            //
+
             logger("Substracting $available from $storage");
             // update stock on storage
             $storage->fill([
@@ -60,22 +62,112 @@ class InOut extends A_InOut {
             $received = $storage->pending > $quantityToMove ? $quantityToMove : $storage->pending;
             // check if no qty available on this storage
             if (!$received) return true;
-            //
+
             logger("Adding $received to $storage");
-            // update stock on storage
+            // move pending to onhand stock on storage
             $storage->fill([
-                // add movement quantity to storage.onHand
-                'onhand'    => $storage->onhand + $received,
                 // substract movement quantity from storage.pending
                 'pending'   => $storage->pending - $received,
+                // add movement quantity to storage.onHand
+                'onhand'    => $storage->onhand + $received,
             ]);
 
-            // set quantity to move to 0 (zero), all movement when to first location found
+            // substract received quantity from total quantity to move
             $quantityToMove -= $received;
         }
 
         // save storage changes, and document error if failed
-        return !$storage->save() ? $this->documentError( $storage->errors()->first() ) : true;
+        return $storage->save() || $this->documentError( $storage->errors()->first() ) === null;
+    }
+
+    public function voidIt():bool {
+        // check if document wasn't completed
+        // if so, no extra process needed
+        if (!$this->wasCompleted())
+            // not completed InOut didn't do anything yet
+            // we are safe to complete the voidIt process
+            return true;
+
+        // if document was completed and is sale
+        // reject it, stock must return through MaterialReturn document
+        if ($this->is_sale)
+            // reject process
+            return $this->documentError('inventory::in_outs.voidIt.already-completed') === null;
+
+        // document is purchase, process lines reverting received stock
+        foreach ($this->lines as $line) {
+            logger(__('Reverting line #:line of '.class_basename(static::class).' #:id: :product :variant', [
+                'line'  => $line->id,
+                'id'    => $this->id,
+                'product'   => $line->product->name,
+                'variant'   => $line->variant?->sku,
+            ]));
+
+            // save total quantity to revert
+            $quantityToRevert = $line->quantity_movement;
+
+            // get Variant|Product locators
+            foreach (($line->variant ?? $line->product)->locators as $locator) {
+                // check if locator belongs to current branch
+                if ($locator->warehouse->branch_id !== $this->branch_id) continue;
+                // revert storage
+                if (!$this->voidIt_updateStorage(Storage::getFromProductOnLocator($line->product, $line->variant, $locator), $quantityToRevert))
+                    // stop process and return error
+                    return false;
+                // check if all movement quantity was already reverted and exit loop
+                if ($quantityToRevert == 0) break;
+            }
+
+            // revert stock for Variant|Product on existing Storages
+            foreach (Storage::getFromProduct($line->product, $line->variant, $this->branch) as $storage) {
+                // revert existing storage
+                if (!$this->voidIt_updateStorage($storage, $quantityToRevert))
+                    // stop process and return error
+                    return false;
+                // check if all movement quantity was already reverted and exit loop
+                if ($quantityToRevert == 0) break;
+            }
+
+            // if not all movement quantity can be reverted, reject process
+            if ($quantityToRevert > 0)
+                // return document error
+                return $this->documentError('inventory::in_outs.voidIt.lines.no-stock', [
+                    'product'   => $line->product->name,
+                    'variant'   => $line->variant?->sku,
+                ]) === null;
+
+            // revert InvoiceLine.quantity_received
+            if (!$line->invoiceLine->update([ 'quantity_received' => null ]))
+                // return document error
+                return $this->documentError( $line->invoiceLine->errors()->first() ) === null;
+        }
+
+        // document voided
+        return true;
+    }
+
+    private function voidIt_updateStorage(Storage $storage, int &$quantityToMove):bool {
+        logger("Storage $storage");
+
+        // get available onhand stock on current storage
+        $onhandToRevent = $storage->onhand > $quantityToMove ? $quantityToMove : $storage->onhand;
+        // check if no qty available on this storage
+        if (!$onhandToRevent) return true;
+
+        logger("Reverting $onhandToRevent to $storage");
+        // move onhand to pending stock on storage
+        $storage->fill([
+            // revert movement quantity from storage.onHand
+            'onhand'    => $storage->onhand - $onhandToRevent,
+            // add movement quantity to storage.pending
+            'pending'   => $storage->pending + $onhandToRevent,
+        ]);
+
+        // substract reverted quantity from total quantity to move
+        $quantityToMove -= $onhandToRevent;
+
+        // save storage changes, and document error if failed
+        return $storage->save() || $this->documentError( $storage->errors()->first() ) === null;
     }
 
     public function scopeOfOrder(Builder $query, int|Order $order) {

@@ -58,6 +58,7 @@
             <div class="table-responsive">
                 {{ $dataTable->table() }}
                 @include('backend::components.datatable-actions', [
+                    'resource'  => 'in_outs',
                     'actions'   => [ 'show', 'update', 'delete' ],
                     'label'     => '{resource.document_number}',
                 ])
@@ -65,13 +66,13 @@
         @else
             <div class="text-center m-t-30 m-b-30 p-b-10">
                 <h2><i class="fas fa-table text-custom"></i></h2>
-                <h3>@lang('inventory::in_outs.title')</h3>
-                <p class="text-muted">
-                    @lang('inventory::in_outs.description')
+                <h3>@lang('backend.empty.title')</h3>
+                {{-- <p class="text-muted">
+                    @lang('backend.empty.description')
                     <a href="{{ route('backend.in_outs.create') }}" class="text-custom">
                         <ins>@lang('inventory::in_outs.create')</ins>
                     </a>
-                </p>
+                </p> --}}
             </div>
         @endif
     </div>

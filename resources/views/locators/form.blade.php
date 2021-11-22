@@ -43,7 +43,8 @@
 <x-backend-form-boolean :resource="$resource ?? null"
     name="default"
     label="inventory::locator.default.0"
-    placeholder="inventory::locator.default._" />
+    placeholder="inventory::locator.default._"
+    helper="inventory::locator.default.?" />
 
 <x-backend-form-controls
     submit="inventory::locators.save"

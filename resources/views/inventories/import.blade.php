@@ -82,7 +82,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">@lang('inventory::inventory.import.'.$field)</span>
                             </div>
-                            <select name="headers[{{ $field }}]" required
+                            <select name="headers[{{ $field }}]"
                                 class="form-control selectpicker">
                                 <option value="" selected disabled hidden></option>
                                 @foreach ($headers as $idx => $header)

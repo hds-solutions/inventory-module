@@ -5,6 +5,7 @@ namespace HDSSolutions\Laravel\Http\Controllers;
 use App\Http\Controllers\Controller;
 use HDSSolutions\Laravel\DataTables\InventoryDataTable as DataTable;
 use HDSSolutions\Laravel\Http\Request;
+use HDSSolutions\Laravel\Jobs\InventoryLinesImportJob;
 use HDSSolutions\Laravel\Models\Branch;
 use HDSSolutions\Laravel\Models\File;
 use HDSSolutions\Laravel\Models\Inventory as Resource;
@@ -47,10 +48,16 @@ class InventoryController extends Controller {
         if ($request->ajax()) return $dataTable->ajax();
 
         // return view with dataTable
-        return $dataTable->render('inventory::inventories.index', [ 'count' => Resource::count() ]);
+        return $dataTable->render('inventory::inventories.index', [
+            'count'                 => Resource::count(),
+            'show_company_selector' => !backend()->companyScoped(),
+        ]);
     }
 
     public function create(Request $request) {
+        // force company selection
+        if (!backend()->companyScoped()) return view('backend::layouts.master', [ 'force_company_selector' => true ]);
+
         // get branches with warehouses
         $branches = Branch::with([ 'warehouses.locators' ])->get();
         // get products
@@ -141,8 +148,7 @@ class InventoryController extends Controller {
         // check if selected headers are different from each other
         if (count( array_unique($request->input('headers')) ) !== count($request->input('headers')))
             // return back with errors
-            return back()
-                ->withInput()
+            return back()->withInput()
                 ->withErrors([ 'headers' => 'Selected headers must be different from each other' ]);
 
         // get excel headers
@@ -154,7 +160,7 @@ class InventoryController extends Controller {
             $matches->put($field, $headers->get($header));
 
         // register event to create inventory lines
-        InventoryLinesImport::dispatch($resource, $matches, $import, $request->diff == 'true');
+        InventoryLinesImportJob::dispatch($resource, $matches, $import, $request->diff == 'true');
 
         // return to inventory
         return redirect()->route('backend.inventories.show', $resource);

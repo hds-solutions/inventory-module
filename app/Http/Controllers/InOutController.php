@@ -47,7 +47,10 @@ class InOutController extends Controller {
         $customers = Customer::all();
 
         // return view with dataTable
-        return $dataTable->render('inventory::in_outs.index', compact('customers') + [ 'count' => Resource::count() ]);
+        return $dataTable->render('inventory::in_outs.index', compact('customers') + [
+            'count'                 => Resource::count(),
+            'show_company_selector' => !backend()->companyScoped(),
+        ]);
     }
 
     public function show(Request $request, Resource $resource) {

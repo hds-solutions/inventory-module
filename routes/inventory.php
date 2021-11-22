@@ -9,6 +9,8 @@ use HDSSolutions\Laravel\Http\Controllers\{
     InventoryController,
     InventoryMovementController,
     PriceChangeController,
+
+    ReportController,
 };
 
 Route::group([
@@ -68,5 +70,8 @@ Route::group([
         // ->name('backend.price_changes.import');
     Route::post('price_changes/{resource}/process',         [ PriceChangeController::class, 'processIt'])
         ->name('backend.price_changes.process');
+
+    Route::get('reports/intentory/stock',   [ ReportController::class, 'stock' ],  $name_prefix)
+        ->name('backend.reports.inventory.stock');
 
 });

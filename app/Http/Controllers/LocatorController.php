@@ -25,10 +25,16 @@ class LocatorController extends Controller {
         if ($request->ajax()) return $dataTable->ajax();
 
         // return view with dataTable
-        return $dataTable->render('inventory::locators.index', [ 'count' => Resource::count() ]);
+        return $dataTable->render('inventory::locators.index', [
+            'count'                 => Resource::count(),
+            'show_company_selector' => !backend()->companyScoped(),
+        ]);
     }
 
     public function create(Request $request) {
+        // force company selection
+        if (!backend()->companyScoped()) return view('backend::layouts.master', [ 'force_company_selector' => true ]);
+
         // get warehouses
         $warehouses = Warehouse::all();
 

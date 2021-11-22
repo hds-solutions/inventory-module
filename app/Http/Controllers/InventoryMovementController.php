@@ -44,10 +44,16 @@ class InventoryMovementController extends Controller {
         if ($request->ajax()) return $dataTable->ajax();
 
         // return view with dataTable
-        return $dataTable->render('inventory::inventory_movements.index', [ 'count' => Resource::count() ]);
+        return $dataTable->render('inventory::inventory_movements.index', [
+            'count'                 => Resource::count(),
+            'show_company_selector' => !backend()->companyScoped(),
+        ]);
     }
 
     public function create(Request $request) {
+        // force company selection
+        if (!backend()->companyScoped()) return view('backend::layouts.master', [ 'force_company_selector' => true ]);
+
         // get branches with warehouses
         $branches = Branch::with([ 'warehouses.locators' ])->get();
         // get products

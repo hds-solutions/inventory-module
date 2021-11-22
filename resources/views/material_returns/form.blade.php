@@ -17,7 +17,7 @@
 <x-backend-form-foreign :resource="$resource ?? null" name="branch_id" required
     :values="$branches" :default="backend()->branch()?->id"
 
-    foreign="branches" foreign-add-label="inventory::branches.add"
+    foreign="branches" foreign-add-label="backend::branches.add"
 
     label="inventory::material_return.branch_id.0"
     placeholder="inventory::material_return.branch_id._"
@@ -38,7 +38,7 @@
 <x-backend-form-foreign name="employee_id" required
     :values="$employees" :resource="$resource ?? null" show="full_name"
 
-    foreign="employees" foreign-add-label="sales::employees.add"
+    foreign="employees" foreign-add-label="customers::employees.add"
 
     label="inventory::material_return.employee_id.0"
     placeholder="inventory::material_return.employee_id._"
@@ -46,7 +46,7 @@
 
 <x-backend-form-foreign :resource="$resource ?? null" name="partnerable_id" required :disabled="isset($resource)"
     show="business_name"
-    foreign="customers" :values="$customers" foreign-add-label="inventory::customers.add"
+    foreign="customers" :values="$customers" foreign-add-label="customers::customers.add"
 
 
     label="inventory::material_return.partnerable_id.0"
@@ -76,7 +76,7 @@
 
     label="inventory::material_return.invoice_id.0"
     placeholder="inventory::material_return.invoice_id._"
-    {{-- helper="inventory::material_return.invoice_id.?" --}} />
+    helper="inventory::material_return.invoice_id.?" />
 
 @if ($resource ?? false)
 <x-backend-form-multiple name="lines" contents-view="inventory::material_returns.form.line"

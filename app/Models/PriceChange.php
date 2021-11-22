@@ -8,9 +8,9 @@ use HDSSolutions\Laravel\Traits\HasDocumentActions;
 class PriceChange extends X_PriceChange implements Document {
     use HasDocumentActions;
 
-    public static function nextDocumentNumber():string {
+    public static function nextDocumentNumber():?string {
         // return next document number for specified stamping
-        return str_increment(self::withTrashed()->max('document_number') ?? null);
+        return str_increment(self::withTrashed()->max('document_number'));
     }
 
     public function lines() {

@@ -51,6 +51,7 @@
             <div class="table-responsive">
                 {{ $dataTable->table() }}
                 @include('backend::components.datatable-actions', [
+                    'resource'  => 'inventories',
                     'actions'   => [ 'show', 'update', 'delete' ],
                     'label'     => '{resource.description}',
                 ])

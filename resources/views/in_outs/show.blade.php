@@ -98,9 +98,19 @@
                                             ) }}" class="img-fluid mh-50px">
                                         </div>
                                     </td>
-                                    <td class="align-middle pl-3">{{ $line->product->name }}</td>
                                     <td class="align-middle pl-3">
-                                        <div>{{ $line->variant->sku ?? '--' }}</div>
+                                        <a href="{{ route('backend.products.edit', $line->product) }}"
+                                            class="font-weight-bold text-decoration-none">{{ $line->product->name }}</a>
+                                    </td>
+                                    <td class="align-middle pl-3">
+                                        <div>
+                                            @if ($line->variant)
+                                            <a href="{{ route('backend.variants.edit', $line->variant) }}"
+                                                class="font-weight-bold text-decoration-none">{{ $line->variant->sku }}</a>
+                                            @else
+                                                --
+                                            @endif
+                                        </div>
                                         @if ($line->variant && $line->variant->values->count())
                                         <div class="small pl-2">
                                             @foreach($line->variant->values as $value)

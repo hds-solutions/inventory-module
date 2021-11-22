@@ -8,7 +8,7 @@
     {{-- helper="inventory::inventory.document_number.?" --}} />
 
 <x-backend-form-text :resource="$resource ?? null" name="description" required
-    default="{{ __('inventory::inventory.nav').' @ '.now() }}"
+    default="{{ __('inventory::inventories.nav').' @ '.now() }}"
     label="inventory::inventory.description.0"
     placeholder="inventory::inventory.description._"
     {{-- helper="inventory::inventory.description.?" --}} />

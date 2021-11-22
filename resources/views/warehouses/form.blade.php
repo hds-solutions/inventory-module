@@ -2,8 +2,9 @@
 
 <x-backend-form-foreign :resource="$resource ?? null" name="branch_id" required
     :values="$branches" request="branch" :readonly="request()->has('branch')"
+    :default="backend()->branch()?->id"
 
-    foreign="branches" foreign-add-label="inventory::branches.add"
+    foreign="branches" foreign-add-label="backend::branches.add"
 
     label="inventory::warehouse.branch_id.0"
     placeholder="inventory::warehouse.branch_id._"

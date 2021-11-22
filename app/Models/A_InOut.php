@@ -12,9 +12,9 @@ abstract class A_InOut extends X_InOut implements Document {
     use HasDocumentActions,
         HasPartnerable;
 
-    public final static function nextDocumentNumber(bool $is_purchase = false):string {
+    public final static function nextDocumentNumber(bool $is_purchase = false):?string {
         // return next document number for specified stamping
-        return str_increment(self::withTrashed()->where('is_purchase', $is_purchase)->max('document_number') ?? null);
+        return str_increment(self::withTrashed()->where('is_purchase', $is_purchase)->max('document_number'));
     }
 
     protected final static function fromResource(Order|Invoice $resource, string $relation):array {
@@ -70,8 +70,8 @@ abstract class A_InOut extends X_InOut implements Document {
 
         // check if new record and no document number is set
         if (!$this->exists && !$this->document_number)
-            // set document number incrementing by 10
-            $this->document_number = self::nextDocumentNumber();
+            // set document number
+            $this->document_number = self::nextDocumentNumber() ?? '000001';
     }
 
     public function prepareIt():?string {
@@ -82,7 +82,7 @@ abstract class A_InOut extends X_InOut implements Document {
     public final function completeIt():?string {
         // process lines, updating stock based on document type
         foreach ($this->lines as $line) {
-            logger(__('Processing line #:line of '.class_basename(statis::class).' #:id: :product :variant', [
+            logger(__('Processing line #:line of '.class_basename(static::class).' #:id: :product :variant', [
                 'line'  => $line->id,
                 'id'    => $this->id,
                 'product'   => $line->product->name,
@@ -97,7 +97,7 @@ abstract class A_InOut extends X_InOut implements Document {
                 // check if locator belongs to current branch
                 if ($locator->warehouse->branch_id !== $this->branch_id) continue;
                 // update storage
-                if (!$this->updateStorage(Storage::getFromProductOnLocator($line->product, $line->variant, $locator), $quantityToMove))
+                if (!$this->completeIt_updateStorage(Storage::getFromProductOnLocator($line->product, $line->variant, $locator), $quantityToMove))
                     // stop process and return error
                     return false;
                 // check if all movement quantity was already moved and exit loop
@@ -107,7 +107,7 @@ abstract class A_InOut extends X_InOut implements Document {
             // update stock for Variant|Product on existing Storages
             foreach (Storage::getFromProduct($line->product, $line->variant, $this->branch) as $storage) {
                 // update existing storage
-                if (!$this->updateStorage($storage, $quantityToMove))
+                if (!$this->completeIt_updateStorage($storage, $quantityToMove))
                     // stop process and return error
                     return false;
                 // check if all movement quantity was already moved and exit loop
@@ -148,6 +148,6 @@ abstract class A_InOut extends X_InOut implements Document {
         return Document::STATUS_Completed;
     }
 
-    protected abstract function updateStorage(Storage $storage, int &$quantityToMove):bool;
+    protected abstract function completeIt_updateStorage(Storage $storage, int &$quantityToMove):bool;
 
 }

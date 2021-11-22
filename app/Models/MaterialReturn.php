@@ -126,7 +126,7 @@ class MaterialReturn extends A_InOut {
         return Document::STATUS_InProgress;
     }
 
-    protected function updateStorage(Storage $storage, int &$quantityToMove):bool {
+    protected function completeIt_updateStorage(Storage $storage, int &$quantityToMove):bool {
         // update stock on storage
         $storage->fill([
             // add movement quantity to storage.onHand

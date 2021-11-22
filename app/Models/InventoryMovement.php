@@ -55,7 +55,7 @@ class InventoryMovement extends X_InventoryMovement implements Document {
             // check if line has toLocator set
             if ($line->toLocator === null)
                 // return error
-                return $this->documentError( __('inventory::inventory_movement.lines.empty-toLocator', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku ]) );
+                return $this->documentError( __('inventory::inventory_movement.lines.empty-toLocator', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku ]) ) === null;
 
             // get origin Storage for product+variant+locator
             $storage = Storage::getFromProductOnLocator($line->product, $line->variant, $line->locator);

@@ -10,7 +10,7 @@ class InventoryMenu extends Base\Menu {
     public function handle($request, Closure $next) {
         // create a submenu
         $sub = backend()->menu()
-            ->add(__('inventory::inventories.nav'), [
+            ->add(__('inventory::inventories.module'), [
                 'nickname'  => 'inventory',
                 'icon'      => 'laptop-house',
             ])->data('priority', 800);
@@ -23,14 +23,16 @@ class InventoryMenu extends Base\Menu {
             ->material_returns($sub)
             ->inventories($sub)
             ->inventory_movements($sub)
-            ->price_changes($sub);
+            ->price_changes($sub)
+
+            ->reports($sub);
 
         // continue witn next middleware
         return $next($request);
     }
 
     private function warehouses(&$menu) {
-        if (Route::has('backend.warehouses') && $this->can('warehouses'))
+        if (Route::has('backend.warehouses') && $this->can('warehouses.crud.index'))
             $menu->add(__('inventory::warehouses.nav'), [
                 'route'     => 'backend.warehouses',
                 'icon'      => 'warehouse'
@@ -40,7 +42,7 @@ class InventoryMenu extends Base\Menu {
     }
 
     private function locators(&$menu) {
-        if (Route::has('backend.locators') && $this->can('locators'))
+        if (Route::has('backend.locators') && $this->can('locators.crud.index'))
             $menu->add(__('inventory::locators.nav'), [
                 'route'     => 'backend.locators',
                 'icon'      => 'crosshairs'
@@ -50,7 +52,7 @@ class InventoryMenu extends Base\Menu {
     }
 
     private function in_outs(&$menu) {
-        if (Route::has('backend.in_outs') && $this->can('in_outs'))
+        if (Route::has('backend.in_outs') && $this->can('in_outs.crud.index'))
             $menu->add(__('inventory::in_outs.nav'), [
                 'route'     => 'backend.in_outs',
                 'icon'      => 'dolly-flatbed'
@@ -60,7 +62,7 @@ class InventoryMenu extends Base\Menu {
     }
 
     private function material_returns(&$menu) {
-        if (Route::has('backend.material_returns') && $this->can('material_returns'))
+        if (Route::has('backend.material_returns') && $this->can('material_returns.crud.index'))
             $menu->add(__('inventory::material_returns.nav'), [
                 'route'     => 'backend.material_returns',
                 'icon'      => 'recycle'
@@ -70,7 +72,7 @@ class InventoryMenu extends Base\Menu {
     }
 
     private function inventories(&$menu) {
-        if (Route::has('backend.inventories') && $this->can('inventories'))
+        if (Route::has('backend.inventories') && $this->can('inventories.crud.index'))
             $menu->add(__('inventory::inventories.nav'), [
                 'route'     => 'backend.inventories',
                 'icon'      => 'clipboard-list'
@@ -80,7 +82,7 @@ class InventoryMenu extends Base\Menu {
     }
 
     private function inventory_movements(&$menu) {
-        if (Route::has('backend.inventory_movements') && $this->can('inventory_movements'))
+        if (Route::has('backend.inventory_movements') && $this->can('inventory_movements.crud.index'))
             $menu->add(__('inventory::inventory_movements.nav'), [
                 'route'     => 'backend.inventory_movements',
                 'icon'      => 'shipping-fast'
@@ -90,9 +92,19 @@ class InventoryMenu extends Base\Menu {
     }
 
     private function price_changes(&$menu) {
-        if (Route::has('backend.price_changes') && $this->can('price_changes'))
+        if (Route::has('backend.price_changes') && $this->can('price_changes.crud.index'))
             $menu->add(__('inventory::price_changes.nav'), [
                 'route'     => 'backend.price_changes',
+                'icon'      => 'money-bill'
+            ]);
+
+        return $this;
+    }
+
+    private function reports(&$menu) {
+        if (Route::has('backend.reports.inventory.stock') && $this->can('reports.inventory.stock'))
+            $menu->add(__('inventory::reports.stock.0'), [
+                'route'     => 'backend.reports.inventory.stock',
                 'icon'      => 'chart-line'
             ]);
 

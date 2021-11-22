@@ -47,10 +47,16 @@ class MaterialReturnController extends Controller {
         $customers = Customer::all();
 
         // return view with dataTable
-        return $dataTable->render('inventory::material_returns.index', compact('customers') + [ 'count' => Resource::count() ]);
+        return $dataTable->render('inventory::material_returns.index', compact('customers') + [
+            'count'                 => Resource::count(),
+            'show_company_selector' => !backend()->companyScoped(),
+        ]);
     }
 
     public function create(Request $request) {
+        // force company selection
+        if (!backend()->companyScoped()) return view('backend::layouts.master', [ 'force_company_selector' => true ]);
+
         // load customers
         $customers = Customer::with([
             // 'addresses', // TODO: Customer.addresses
@@ -88,7 +94,7 @@ class MaterialReturnController extends Controller {
         );
 
         $highs = [
-            'document_number'   => Resource::nextDocumentNumber(),
+            'document_number'   => Resource::nextDocumentNumber() ?? '00000001',
         ];
 
         // show create form
@@ -257,6 +263,7 @@ class MaterialReturnController extends Controller {
             // update line values
             $materialReturnLine->fill([
                 'quantity_movement'  => $line['quantity_movement'],
+                'locator_id'         => $line['locator_id'] ?? null,
             ]);
             // save resource line
             if (!$materialReturnLine->save())

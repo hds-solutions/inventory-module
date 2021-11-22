@@ -1,34 +1,39 @@
 @include('backend::components.errors')
 
 <x-backend-form-foreign :resource="$resource ?? null" name="branch_id" required
-    foreign="branches" :values="$branches" foreign-add-label="inventory::branches.add"
-
-    label="inventory::inventory_movement.branch_id.0"
-    placeholder="inventory::inventory_movement.branch_id._"
-    {{-- helper="inventory::inventory_movement.branch_id.?" --}} />
-
-<x-backend-form-foreign :resource="$resource ?? null" name="warehouse_id" required
-    filtered-by="[name=branch_id]" filtered-using="branch"
-    foreign="warehouses" :values="$branches->pluck('warehouses')->flatten()" foreign-add-label="inventory::warehouses.add"
+    foreign="branches" :values="$branches" foreign-add-label="backend::branches.add"
 
     label="inventory::inventory_movement.warehouse_id.0"
-    placeholder="inventory::inventory_movement.warehouse_id._"
-    {{-- helper="inventory::product.warehouse_id.?" --}} />
+    placeholder="inventory::inventory_movement.branch_id._"
+    {{-- helper="inventory::inventory_movement.branch_id.?" --}}>
+
+    <x-backend-form-foreign :resource="$resource ?? null" name="warehouse_id" required secondary
+        filtered-by="[name=branch_id]" filtered-using="branch"
+        foreign="warehouses" :values="$branches->pluck('warehouses')->flatten()" foreign-add-label="inventory::warehouses.add"
+
+        label="inventory::inventory_movement.warehouse_id.0"
+        placeholder="inventory::inventory_movement.warehouse_id._"
+        {{-- helper="inventory::product.warehouse_id.?" --}} />
+
+</x-backend-form-foreign>
+
 
 <x-backend-form-foreign :resource="$resource ?? null" name="to_branch_id" required
-    foreign="branches" :values="$branches" foreign-add-label="inventory::branches.add"
+    foreign="branches" :values="$branches" foreign-add-label="backend::branches.add"
 
     label="inventory::inventory_movement.to_branch_id.0"
     placeholder="inventory::inventory_movement.to_branch_id._"
-    {{-- helper="inventory::inventory_movement.to_branch_id.?" --}} />
+    {{-- helper="inventory::inventory_movement.to_branch_id.?" --}}>
 
-<x-backend-form-foreign :resource="$resource ?? null" name="to_warehouse_id" required
-    filtered-by="[name=to_branch_id]" filtered-using="branch"
-    foreign="warehouses" :values="$branches->pluck('warehouses')->flatten()" foreign-add-label="inventory::warehouses.add"
+    <x-backend-form-foreign :resource="$resource ?? null" name="to_warehouse_id" required secondary
+        filtered-by="[name=to_branch_id]" filtered-using="branch"
+        foreign="warehouses" :values="$branches->pluck('warehouses')->flatten()" foreign-add-label="inventory::warehouses.add"
 
-    label="inventory::inventory_movement.to_warehouse_id.0"
-    placeholder="inventory::inventory_movement.to_warehouse_id._"
-    {{-- helper="inventory::product.to_warehouse_id.?" --}} />
+        label="inventory::inventory_movement.to_warehouse_id.0"
+        placeholder="inventory::inventory_movement.to_warehouse_id._"
+        {{-- helper="inventory::product.to_warehouse_id.?" --}} />
+
+</x-backend-form-foreign>
 
 <x-backend-form-text :resource="$resource ?? null" name="description" required
     default="{{ __('inventory::inventory_movement.nav').' @ '.now() }}"

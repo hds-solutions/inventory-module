@@ -20,6 +20,9 @@ class InventoryPermissionsSeeder extends Base\PermissionsSeeder {
             $this->document('inventory_movements'),
             $this->resource('pricechanges'),
             $this->document('pricechanges'),
+
+            'reports.inventory.*'       => 'inventory::reports.*',
+            'reports.inventory.stock'   => 'inventory::reports.stock',
         ];
     }
 
