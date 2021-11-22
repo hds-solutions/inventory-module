@@ -1,15 +1,15 @@
 <?php return [
 
-    'nav'           => 'In/Outs',
+    'nav'           => 'Stock In/Outs',
 
-    'title'         => 'In/Outs',
-    'description'   => 'In/Outs description',
+    'title'         => 'Stock In/Outs',
+    'description'   => '',
 
-    'index'         => 'In/Outs List',
-    'create'        => 'Create new In/Out',
-    'add'           => 'Add new In/Out ...',
-    'show'          => 'In/Out Details',
-    'edit'          => 'Edit In/Out',
+    'index'         => 'Stock In/Outs List',
+    'create'        => 'Create new Stock In/Out',
+    'add'           => 'Add new Stock In/Out ...',
+    'show'          => 'Stock In/Out Details',
+    'edit'          => 'Edit Stock In/Out',
 
     'save'          => 'Save',
     'cancel'        => 'Cancel',

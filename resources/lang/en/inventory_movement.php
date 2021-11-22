@@ -7,27 +7,27 @@
     ],
 
     'branch_id'  => [
-        'Branch',
+        'Send from Branch',
         '_' => 'Branch',
         '?' => 'Branch help text',
     ],
 
     'to_branch_id'  => [
-        'To Branch',
-        '_' => 'To Branch',
-        '?' => 'To Branch help text',
+        'Send to Branch',
+        '_' => 'Branch',
+        '?' => 'Branch help text',
     ],
 
     'warehouse_id'  => [
-        'Warehouse',
+        'Send from Warehouse',
         '_' => 'Warehouse',
         '?' => 'Warehouse help text',
     ],
 
     'to_warehouse_id'  => [
-        'To Warehouse',
-        '_' => 'To Warehouse',
-        '?' => 'To Warehouse help text',
+        'Send to Warehouse',
+        '_' => 'Warehouse',
+        '?' => 'Warehouse help text',
     ],
 
     'description'  => [
@@ -53,50 +53,14 @@
         '_' => 'Lines',
         '?' => 'Lines help text',
 
-        'image'         => [
-            'Image',
-            '_' => 'Image',
-            '?' => '',
-        ],
-
-        'product_id'    => [
-            'Product',
-            '_' => 'Product',
-            '?' => 'Product help text',
-        ],
-
-        'variant_id'    => [
-            'Variant',
-            '_' => 'Variant',
-            '?' => 'Variant help text',
-        ],
-
-        'locator_id'    => [
-            'Locator',
-            '_' => 'Locator',
-            '?' => 'Locator help text',
-        ],
-
-        'to_locator_id'    => [
-            'To Locator',
-            '_' => 'To Locator',
-            '?' => 'To Locator help text',
-        ],
-
-        'quantity'       => [
-            'Quantity',
-            '_' => 'Quantity',
-            '?' => 'Quantity help text',
-        ],
-
         'empty-quantity'        => 'The product :product :variant doesn\'t has quantity set.',
         'empty-toLocator'       => 'The product :product :variant doesn\'t has destination locator set.',
         'has-open-inventories'  => 'The product :product :variant has pending inventories on branch :branch.',
         'no-enough-stock'       => 'The product :product :variant hasn\'t enough stock, only :available available.',
 
-    ],
+    ] + __('inventory::inventory_movement_line'),
 
-    'no-lines'      => 'The Inventory has no lines',
-    'not-approved'  => 'The Inventory isn\'t approved',
+    'no-lines'      => 'The Inventory Movement has no lines',
+    'not-approved'  => 'The Inventory Movement isn\'t approved',
 
 ];

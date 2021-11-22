@@ -3,7 +3,7 @@
     'nav'           => 'Material Returns',
 
     'title'         => 'Material Returns',
-    'description'   => 'Material Returns description',
+    'description'   => '',
 
     'index'         => 'Material Returns List',
     'create'        => 'Create new Material Return',

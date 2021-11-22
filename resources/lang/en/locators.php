@@ -1,18 +1,17 @@
 <?php return [
 
-    'nav'           => 'Locators',
+    'nav'           => 'Physical Locators',
 
-    'title'         => 'Locators',
-    'description'   => 'Locators description',
+    'title'         => 'Physical Locators',
+    'description'   => '',
 
-    'index'         => 'Locators list',
-    'create'        => 'Create new Locator',
-    'add'           => 'Add new Locator ...',
-    'show'          => 'Locator Details',
-    'edit'          => 'Edit Locator',
+    'index'         => 'Physical Locators list',
+    'create'        => 'Create new Physical Locator',
+    'add'           => 'Add new Physical Locator ...',
+    'show'          => 'Physical Locator Details',
+    'edit'          => 'Edit Physical Locator',
 
     'save'          => 'Save',
-    'save-create'   => 'Save & Import Lines',
     'cancel'        => 'Cancel',
 
 ];

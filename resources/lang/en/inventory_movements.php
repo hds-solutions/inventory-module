@@ -3,7 +3,7 @@
     'nav'           => 'Inventory Movements',
 
     'title'         => 'Inventory Movements',
-    'description'   => 'Inventory Movements description',
+    'description'   => '',
 
     'index'         => 'Inventory Movements list',
     'create'        => 'Create new Inventory Movement',
@@ -12,7 +12,6 @@
     'edit'          => 'Edit Inventory Movement',
 
     'save'          => 'Save',
-    'save-create'   => 'Save & Import Lines',
     'cancel'        => 'Cancel',
 
 ];

@@ -3,7 +3,7 @@
     'nav'           => 'Price Changes',
 
     'title'         => 'Price Changes',
-    'description'   => 'Price Changes description',
+    'description'   => '',
 
     'index'         => 'Price Changes list',
     'create'        => 'Create new Price Change',
