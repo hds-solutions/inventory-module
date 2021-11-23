@@ -59,7 +59,7 @@ abstract class A_InOut extends X_InOut implements Document {
         return $lines->count() > 0;
     }
 
-    public final function beforeSave(Validator $validator) {
+    public function beforeSave(Validator $validator) {
         // TODO: set employee from session
         if (!$this->exists && $this->employee_id === null) $this->employee()->associate( auth()->user() );
 

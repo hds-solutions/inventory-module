@@ -73,7 +73,7 @@ class MaterialReturn extends A_InOut {
         ])->select('orders.*')->groupBy('orders.id');
     }
 
-    protected function beforeSave(Validator $validator) {
+    public function beforeSave(Validator $validator) {
         // execute A_InOut validations
         parent::beforeSave($validator);
 
