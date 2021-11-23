@@ -4,7 +4,6 @@ namespace HDSSolutions\Laravel\Models;
 
 use HDSSolutions\Laravel\Interfaces\Document;
 use HDSSolutions\Laravel\Traits\HasDocumentActions;
-use Illuminate\Support\Facades\DB;
 
 class InventoryMovement extends X_InventoryMovement implements Document {
     use HasDocumentActions;
@@ -23,30 +22,45 @@ class InventoryMovement extends X_InventoryMovement implements Document {
 
     public function prepareIt():?string {
         // check if document has lines
-        if (!$this->lines()->count()) return $this->documentError( __('inventory::inventory_movement.no-lines') );
+        if (!$this->lines()->count()) return $this->documentError( __('inventory::inventory_movement.prepareIt.no-lines') );
         // foreach lines
         foreach ($this->lines as $line) {
             // check if line has quantity set
             if ($line->quantity === null || $line->quantity == 0)
                 // return error
-                return $this->documentError( __('inventory::inventory_movement.lines.empty-quantity', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku ]) );
+                return $this->documentError( __('inventory::inventory_movement.prepareIt.empty-quantity', [
+                    'product'   => $line->product->name,
+                    'variant'   => $line->variant?->sku,
+                ]) );
 
             // check if product has open inventories in origin branch
             if (Inventory::hasOpenForProduct( $line->product, $line->variant, $this->warehouse->branch ))
                 // return error
-                return $this->documentError( __('inventory::inventory_movement.lines.has-open-inventories', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku, 'branch' => $this->warehouse->branch->name ]) );
+                return $this->documentError( __('inventory::inventory_movement.prepareIt.has-open-inventories', [
+                    'product'   => $line->product->name,
+                    'variant'   => $line->variant?->sku,
+                    'branch'    => $this->warehouse->branch->name,
+                ]) );
             // check if product has open inventories in destination branch
             if (Inventory::hasOpenForProduct( $line->product, $line->variant, $this->toWarehouse->branch ))
                 // return error
-                return $this->documentError( __('inventory::inventory_movement.lines.has-open-inventories', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku, 'branch' => $this->toWarehouse->branch->name ]) );
+                return $this->documentError( __('inventory::inventory_movement.prepareIt.has-open-inventories', [
+                    'product'   => $line->product->name,
+                    'variant'   => $line->variant?->sku,
+                    'branch'    => $this->toWarehouse->branch->name,
+                ]) );
 
             // check if product has enough stock
             if ($line->quantity > ($available = Storage::getQtyAvailable( $line->product, $line->variant, $this->warehouse->branch, with_reserved: true )))
                 // return error
-                return $this->documentError( __('inventory::inventory_movement.lines.no-enough-stock', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku, 'available' => $available ]) );
+                return $this->documentError( __('inventory::inventory_movement.prepareIt.no-enough-stock', [
+                    'product'   => $line->product->name,
+                    'variant'   => $line->variant?->sku,
+                    'available' => $available,
+                ]) );
         }
         // return status InProgress
-        return Document::STATUS_InProgress;
+        return self::STATUS_InProgress;
     }
 
     public function approveIt():bool {
@@ -55,7 +69,10 @@ class InventoryMovement extends X_InventoryMovement implements Document {
             // check if line has toLocator set
             if ($line->toLocator === null)
                 // return error
-                return $this->documentError( __('inventory::inventory_movement.lines.empty-toLocator', [ 'product' => $line->product->name, 'variant' => $line->variant?->sku ]) ) === null;
+                return $this->documentError( __('inventory::inventory_movement.approveIt.empty-toLocator', [
+                    'product'   => $line->product->name,
+                    'variant'   => $line->variant?->sku
+                ]) ) === null;
 
             // get origin Storage for product+variant+locator
             $storage = Storage::getFromProductOnLocator($line->product, $line->variant, $line->locator);
@@ -97,10 +114,7 @@ class InventoryMovement extends X_InventoryMovement implements Document {
 
     public function completeIt():?string {
         // check if the document is approved
-        if (!$this->isApproved()) return $this->documentError( __('inventory::inventory_movement.not-approved') );
-
-        // wrap process into transaction
-        DB::beginTransaction();
+        if (!$this->isApproved()) return $this->documentError( __('inventory::inventory_movement.completeIt.not-approved') );
 
         // foreach lines
         foreach ($this->lines as $line) {
@@ -123,11 +137,8 @@ class InventoryMovement extends X_InventoryMovement implements Document {
                 return $this->documentError( $destination->errors()->first() );
         }
 
-        // process finished
-        DB::commit();
-
         // return completed status
-        return Document::STATUS_Completed;
+        return self::STATUS_Completed;
     }
 
     public function createInventoryMovementLines():bool {

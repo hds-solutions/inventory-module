@@ -19,15 +19,18 @@ class PriceChange extends X_PriceChange implements Document {
 
     public function prepareIt():?string {
         // check if document has lines
-        if (!$this->lines->count()) return $this->documentError( __('inventory::pricechange.no-lines') );
+        if (!$this->lines->count()) return $this->documentError( __('inventory::price_change.no-lines') );
         // foreach lines
         foreach ($this->lines as $line)
             // check if line has current qty set
             if ($line->price === null)
                 // return error
-                return $this->documentError( __('inventory::pricechange.line.empty-price') );
+                return $this->documentError( __('inventory::price_change.empty-price', [
+                    'product'   => $line->product->name,
+                    'variant'   => $line->variant?->sku,
+                ]) );
         // return status InProgress
-        return Document::STATUS_InProgress;
+        return self::STATUS_InProgress;
     }
 
     public function approveIt():bool {
@@ -42,7 +45,7 @@ class PriceChange extends X_PriceChange implements Document {
 
     public function completeIt():?string {
         // check if the document is approved
-        if (!$this->isApproved()) return $this->documentError( __('inventory::pricechange.not-approved') );
+        if (!$this->isApproved()) return $this->documentError( __('inventory::price_change.completeIt.not-approved') );
 
         // foreach lines
         foreach ($this->lines as $line) {
@@ -66,7 +69,7 @@ class PriceChange extends X_PriceChange implements Document {
         }
 
         // return completed status
-        return Document::STATUS_Completed;
+        return self::STATUS_Completed;
     }
 
 }

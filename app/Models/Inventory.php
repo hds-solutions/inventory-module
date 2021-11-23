@@ -43,19 +43,20 @@ class Inventory extends X_Inventory implements Document {
 
     public function prepareIt():?string {
         // check if document has lines
-        if (!$this->lines()->count()) return $this->documentError( __('inventory::inventory.no-lines') );
+        if (!$this->lines()->count()) return $this->documentError( __('inventory::inventory.prepareIt.no-lines') );
         // foreach lines
         foreach ($this->lines as $line)
             // check if line has current qty set
             if ($line->counted === null)
                 // return error
-                return $this->documentError(__('inventory::inventory.line.empty-counted', [
+                return $this->documentError(__('inventory::inventory.prepareIt.empty-counted', [
                     'product'   => $line->product->name,
                     'variant'   => $line->variant?->sku,
+                    'product'   => $line->locator->name,
                 ]));
 
         // return status InProgress
-        return Document::STATUS_InProgress;
+        return self::STATUS_InProgress;
     }
 
     public function approveIt():bool {
@@ -70,7 +71,7 @@ class Inventory extends X_Inventory implements Document {
 
     public function completeIt():?string {
         // check if the document is approved
-        if (!$this->isApproved()) return $this->documentError( __('inventory::inventory.not-approved') );
+        if (!$this->isApproved()) return $this->documentError( __('inventory::inventory.completeIt.not-approved') );
         // foreach lines
         foreach ($this->lines as $line) {
             // get Storage for product+variant+locator
@@ -91,7 +92,7 @@ class Inventory extends X_Inventory implements Document {
         }
 
         // return completed status
-        return Document::STATUS_Completed;
+        return self::STATUS_Completed;
     }
 
     public function createInventoryLines():bool {

@@ -71,4 +71,19 @@
 
     ] + __('inventory::material_return_line'),
 
+    'beforeSave'    => [
+        'no-invoice'    => 'Se debe especificar la factura desde la cual se devolverá material',
+    ],
+
+    'prepareIt'     => [
+        'order-has-pending-in_outs' => 'El pedido :order tiene documentos de Entrada/Salida pendientes que deben ser completados',
+        'lines-with-qty-zero'       => 'No se asignó cantidad a devolver para el producto :product :variant (eliminar la linea si no se devuelve el producto)',
+        'returning-gt-available'    => 'La cantidad a retornar del producto :product :variant es mayor que la cantidad disponible para devolver (disponible: :available)',
+        'no-locator'                => 'No se asignó la ubicación de retorno para el producto :product :variant',
+    ],
+
+    'completeIt'    => [
+        'remaining-sale'    => 'No se encontraron ubicaciones para devolver el producto :product :variant',
+    ],
+
 ];

@@ -76,4 +76,17 @@
         '?' => 'Lines help text',
     ] + __('inventory::in_out_line'),
 
+    'beforeSave'    => [
+    ],
+
+    'completeIt'    => [
+        'remaining-sale'        => 'No stock left to deliver of product :product :variant',
+        'remaining-purchase'    => 'No storages found to receive product :product :variant',
+    ],
+
+    'voidIt'        => [
+        'already-completed'     => 'The merchandise was already delivered. Use MaterialReturn document to return merchandise.',
+        'no-storage'            => 'No storages found to return product :product :variant',
+    ],
+
 ];

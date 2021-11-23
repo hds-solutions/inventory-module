@@ -73,13 +73,23 @@ class MaterialReturn extends A_InOut {
         ])->select('orders.*')->groupBy('orders.id');
     }
 
+    protected function beforeSave(Validator $validator) {
+        // execute A_InOut validations
+        parent::beforeSave($validator);
+
+        // if document don't have invoice set
+        if ($this->invoice === null)
+            // reject it, Invoice must be specified when returning material
+            $validator->errors()->add('invoice_id', __('inventory::material_return.beforeSave.no-invoice'));
+    }
+
     public function prepareIt():?string {
         // get orders through far orders relationship (see this.orders() method)
         foreach ($this->orders()->get() as $order)
             // InOut's of Order must be completed
             if (InOut::ofOrder( $order )->open()->count())
                 // return process error
-                return $this->documentError('inventory::material_return.order-has-pending-in_outs', [
+                return $this->documentError('inventory::material_return.prepareIt.order-has-pending-in_outs', [
                     'order' => $this->order,
                 ]);
 
@@ -90,7 +100,7 @@ class MaterialReturn extends A_InOut {
             // check that line movement quantity isn't 0 (zero)
             if ($line->quantity_movement === 0)
                 // reject with process error
-                return $this->documentError('inventory::material_return.lines.qty-zero', [
+                return $this->documentError('inventory::material_return.prepareIt.lines-with-qty-zero', [
                     'product'   => $line->product->name,
                     'variant'   => $line->variant?->sku,
                 ]);
@@ -107,7 +117,7 @@ class MaterialReturn extends A_InOut {
             // check if returning quantity > quantity available to return
             if ($line->quantity_movement > ($available = $quantity_invoiced - $already_returned))
                 // reject with error
-                return $this->documentError('inventory::material_return.lines.returning-gt-available', [
+                return $this->documentError('inventory::material_return.prepareIt.returning-gt-available', [
                     'product'   => $line->product->name,
                     'variant'   => $line->variant?->sku,
                     'available' => $available,
@@ -116,7 +126,7 @@ class MaterialReturn extends A_InOut {
             // check that line has locator assigned
             if ($line->locator === null)
                 // reject with error
-                return $this->documentError('inventory::material_return.lines.no-locator', [
+                return $this->documentError('inventory::material_return.prepareIt.no-locator', [
                     'product'   => $line->product->name,
                     'variant'   => $line->variant?->sku,
                 ]);

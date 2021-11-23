@@ -53,14 +53,21 @@
         '_' => 'Líneas',
         '?' => 'Líneas help text',
 
-        'empty-quantity'        => 'The product :product :variant doesn\'t has quantity set.',
-        'empty-toLocator'       => 'The product :product :variant doesn\'t has destination locator set.',
-        'has-open-inventories'  => 'The product :product :variant has pending inventories on branch :branch.',
-        'no-enough-stock'       => 'The product :product :variant hasn\'t enough stock, only :available available.',
-
     ] + __('inventory::inventory_movement_line'),
 
-    'no-lines'      => 'El Movimiento de Inventario no tiene lineas',
-    'not-approved'  => 'El Movimiento de Inventario no fue aprobado',
+    'prepareIt'     => [
+        'no-lines'              => 'El documento no tiene lineas',
+        'empty-quantity'        => 'No se asignó la cantidad para el producto :product :variant',
+        'has-open-inventories'  => 'Existen inventarios pendientes en la sucursal :branch para el producto :product :variant',
+        'no-enough-stock'       => 'No hay stock disponible para el producto :product :variant, solo :available disponible',
+    ],
+
+    'approveIt'     => [
+        'empty-toLocator'       => 'No se asignó la ubicación destino para el producto :product :variant',
+    ],
+
+    'completeIt'    => [
+        'not-approved'  => 'El documento debe ser aprobado',
+    ],
 
 ];

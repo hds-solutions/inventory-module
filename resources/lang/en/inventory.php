@@ -60,4 +60,13 @@
         'success'       => 'Excel was sucessfully imported',
     ],
 
+    'beforeSave'    => [
+        'no-lines'      => 'Document without lines',
+        'empty-counted' => 'No counted quantity set for product :product :variant on locator :locator',
+    ],
+
+    'completeIt'    => [
+        'not-approved'  => 'The document must be approved first',
+    ],
+
 ];

@@ -76,4 +76,17 @@
         '?' => 'Líneas help text',
     ] + __('inventory::in_out_line'),
 
+    'beforeSave'    => [
+    ],
+
+    'completeIt'    => [
+        'remaining-sale'        => 'No hay stock disponible para entregar del producto :product :variant',
+        'remaining-purchase'    => 'No se encontraron ubicaciones para recibir el producto :product :variant',
+    ],
+
+    'voidIt'        => [
+        'already-completed'     => 'La mercadería ya fue entregada. Utilice el documento de Devolución de Material para retornar mercadería.',
+        'no-storage'            => 'No se encontraron ubicacionespara retornar el producto :product :variant',
+    ],
+
 ];

@@ -60,4 +60,13 @@
         'success'       => 'El documento Excel se importo exitósamente',
     ],
 
+    'beforeSave'    => [
+        'no-lines'      => 'El documento no tiene lineas',
+        'empty-counted' => 'No se asigno la cantidad contada para el producto :product :variant en la ubicación :locator',
+    ],
+
+    'completeIt'    => [
+        'not-approved'  => 'El documento debe ser aprobado',
+    ],
+
 ];

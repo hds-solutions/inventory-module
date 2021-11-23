@@ -131,7 +131,7 @@ class InOut extends A_InOut {
             // if not all movement quantity can be reverted, reject process
             if ($quantityToRevert > 0)
                 // return document error
-                return $this->documentError('inventory::in_outs.voidIt.lines.no-stock', [
+                return $this->documentError('inventory::in_outs.voidIt.no-storage', [
                     'product'   => $line->product->name,
                     'variant'   => $line->variant?->sku,
                 ]) === null;

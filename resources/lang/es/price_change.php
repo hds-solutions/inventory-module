@@ -50,4 +50,13 @@
         'success'       => 'El documento Excel fue importado exitosamente',
     ],
 
+    'prepareIt'     => [
+        'no-lines'      => 'El documento no tiene lineas',
+        'empty-price'   => 'No se asigno el precio para el producto :product :variant',
+    ],
+
+    'completeIt'    => [
+        'not-approved'  => 'El documento debe ser aprobado',
+    ],
+
 ];

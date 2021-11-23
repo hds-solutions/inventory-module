@@ -71,4 +71,19 @@
 
     ] + __('inventory::material_return_line'),
 
+    'beforeSave'    => [
+        'no-invoice'    => 'Invoice must be especified when returning material',
+    ],
+
+    'prepareIt'     => [
+        'order-has-pending-in_outs' => 'The order :order has pending InOut documents that must completed first',
+        'lines-with-qty-zero'       => 'The product :product :variant has no returning quantity set (delete line if not returning this product)',
+        'returning-gt-available'    => 'The returning quantity of product :product :variant is greater than available to return (available: :available)',
+        'no-locator'                => 'No returning locator set for product :product :variant',
+    ],
+
+    'completeIt'    => [
+        'remaining-sale'    => 'No storages found to return product :product :variant',
+    ],
+
 ];

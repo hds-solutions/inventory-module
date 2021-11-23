@@ -63,20 +63,15 @@ abstract class A_InOut extends X_InOut implements Document {
         // TODO: set employee from session
         if (!$this->exists && $this->employee_id === null) $this->employee()->associate( auth()->user() );
 
-        // if document is material return and invoice not set
-        if ($this->is_material_return && $this->invoice === null)
-            // reject it, Invoice must be specified when returning
-            $validator->errors()->add('invoice_id', __('inventory::inout.material-return-invoice'));
-
         // check if new record and no document number is set
         if (!$this->exists && !$this->document_number)
             // set document number
-            $this->document_number = self::nextDocumentNumber() ?? '000001';
+            $this->document_number = self::nextDocumentNumber() ?? '00000001';
     }
 
     public function prepareIt():?string {
         // return status InProgress
-        return Document::STATUS_InProgress;
+        return self::STATUS_InProgress;
     }
 
     public final function completeIt():?string {
@@ -117,7 +112,7 @@ abstract class A_InOut extends X_InOut implements Document {
             // if not all movement quantity can be moved, reject process
             if ($quantityToMove > 0)
                 // return document error
-                return $this->documentError('inventory::in_out.lines.'.($this->is_material_return ? 'no-storage-found' : 'no-stock'), [
+                return $this->documentError('inventory::'.($this->is_material_return ? 'material_return' : 'in_out').'.remaining-'.($this->is_sale ? 'sale' : 'purchase'), [
                     'product'   => $line->product->name,
                     'variant'   => $line->variant?->sku,
                 ]);
@@ -145,7 +140,7 @@ abstract class A_InOut extends X_InOut implements Document {
         }
 
         // return completed status
-        return Document::STATUS_Completed;
+        return self::STATUS_Completed;
     }
 
     protected abstract function completeIt_updateStorage(Storage $storage, int &$quantityToMove):bool;

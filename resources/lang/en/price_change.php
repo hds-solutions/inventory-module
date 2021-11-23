@@ -50,4 +50,13 @@
         'success'       => 'Excel was sucessfully imported',
     ],
 
+    'prepareIt'     => [
+        'no-lines'      => 'Document without lines',
+        'empty-price'   => 'No price set for product :product :variant',
+    ],
+
+    'completeIt'    => [
+        'not-approved'  => 'The document must be approved first',
+    ],
+
 ];

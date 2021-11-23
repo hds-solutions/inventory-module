@@ -53,14 +53,21 @@
         '_' => 'Lines',
         '?' => 'Lines help text',
 
-        'empty-quantity'        => 'The product :product :variant doesn\'t has quantity set.',
-        'empty-toLocator'       => 'The product :product :variant doesn\'t has destination locator set.',
-        'has-open-inventories'  => 'The product :product :variant has pending inventories on branch :branch.',
-        'no-enough-stock'       => 'The product :product :variant hasn\'t enough stock, only :available available.',
-
     ] + __('inventory::inventory_movement_line'),
 
-    'no-lines'      => 'The Inventory Movement has no lines',
-    'not-approved'  => 'The Inventory Movement isn\'t approved',
+    'prepareIt'     => [
+        'no-lines'              => 'Document without lines',
+        'empty-quantity'        => 'No quantity set fot product :product :variant',
+        'has-open-inventories'  => 'There is pending inventories on branch :branch for the product :product :variant',
+        'no-enough-stock'       => 'No enough stock available for product :product :variant, only :available available',
+    ],
+
+    'approveIt'     => [
+        'empty-toLocator'       => 'No destination locator set for product :product :variant',
+    ],
+
+    'completeIt'    => [
+        'not-approved'  => 'The document must be approved first',
+    ],
 
 ];
