@@ -92,7 +92,7 @@ class InOut extends A_InOut {
         // reject it, stock must return through MaterialReturn document
         if ($this->is_sale)
             // reject process
-            return $this->documentError('inventory::in_outs.voidIt.already-completed') === null;
+            return $this->documentError('inventory::in_out.voidIt.already-completed') === null;
 
         // document is purchase, process lines reverting received stock
         foreach ($this->lines as $line) {
@@ -131,7 +131,7 @@ class InOut extends A_InOut {
             // if not all movement quantity can be reverted, reject process
             if ($quantityToRevert > 0)
                 // return document error
-                return $this->documentError('inventory::in_outs.voidIt.no-storage', [
+                return $this->documentError('inventory::in_out.voidIt.no-storage', [
                     'product'   => $line->product->name,
                     'variant'   => $line->variant?->sku,
                 ]) === null;
