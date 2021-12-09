@@ -22,8 +22,8 @@ class StockReport extends DataTable {
     ];
 
     protected array $orderBy = [
-        'name' => 'asc',
-        'sku'   => 'asc',
+        'name'          => 'asc',
+        'sku'           => 'asc',
         'locator.name'  => 'asc',
     ];
 
@@ -67,7 +67,7 @@ class StockReport extends DataTable {
                 // 'sale_currency.decimals AS sale_decimals',
                 // 'sale_price.price AS sale_price',
 
-                'inventory_lines.expire_at',
+                // 'inventory_lines.expire_at',
             );
     }
 
@@ -99,14 +99,14 @@ class StockReport extends DataTable {
                     // JOIN to Branch
                     ->leftJoin('branches', 'branches.id', 'warehouses.branch_id')
 
-            // JOIN to InventoryLines
-            ->leftJoin('inventory_lines', fn($join) => $join
-                ->on('inventory_lines.product_id', '=', 'products.id')
-                ->on('inventory_lines.variant_id', '=', 'variants.id')
-                ->whereNotNull('inventory_lines.expire_at')
-            )
-                // JOIN to Inventories
-                ->leftJoin('inventories', 'inventories.id', 'inventory_lines.inventory_id')
+            // // JOIN to InventoryLines
+            // ->leftJoin('inventory_lines', fn($join) => $join
+            //     ->on('inventory_lines.product_id', '=', 'products.id')
+            //     ->on('inventory_lines.variant_id', '=', 'variants.id')
+            //     ->whereNotNull('inventory_lines.expire_at')
+            // )
+            //     // JOIN to Inventories
+            //     ->leftJoin('inventories', 'inventories.id', 'inventory_lines.inventory_id')
         ;
     }
 
@@ -118,11 +118,21 @@ class StockReport extends DataTable {
         // load variants sale prices
         $sale_prices = $this->variantPrices($variants->get(), 'sale_price_list');
 
+        // get latest inventory
+        $inventory_lines = $variants->get()->load([
+            'inventories'   => fn($inventory) => $inventory
+                ->with([ 'lines' ])
+                ->whereHas('lines', fn($line) => $line->whereNotNull('expire_at'))
+                ->latest()->first(),
+        ]);
+
         // transform results, append prices
-        return $results->transform(function($variant) use ($purchase_prices, $sale_prices) {
+        return $results->transform(function($variant) use ($purchase_prices, $sale_prices, $inventory_lines) {
             // get prices
             $purchase_price = $purchase_prices->firstWhere('id', $variant->variant_id)?->prices->first();
             $sale_price = $sale_prices->firstWhere('id', $variant->variant_id)?->prices->first();
+            // get inventory
+            $inventory = $inventory_lines->firstWhere('id', $variant->variant_id)->inventories->first();
 
             // add prices
             $variant->purchase_code = $purchase_price?->priceList->currency->code;
@@ -132,6 +142,9 @@ class StockReport extends DataTable {
             $variant->sale_code = $sale_price?->priceList->currency->code;
             $variant->sale_decimals = $sale_price?->priceList->currency->decimals;
             $variant->sale_price = $sale_price?->price->price;
+
+            // add inventory expire_at
+            $variant->expire_at = $inventory?->lines->firstWhere('variant_id', $variant->variant_id)?->expire_at;
 
             // return variant with prices
             return $variant;
