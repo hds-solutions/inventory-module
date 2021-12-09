@@ -4,13 +4,16 @@ use Illuminate\Support\Facades\Route;
 use HDSSolutions\Laravel\Http\Controllers\{
     WarehouseController,
     LocatorController,
-    InOutController,
+
+    PurchaseInOutController,
+    SaleInOutController,
+
     MaterialReturnController,
     InventoryController,
     InventoryMovementController,
     PriceChangeController,
 
-    ReportController,
+    InventoryReportsController,
 };
 
 Route::group([
@@ -28,12 +31,19 @@ Route::group([
         ->parameters([ 'locators' => 'resource' ])
         ->name('index', 'backend.locators');
 
-    Route::resource('in_outs',                  InOutController::class,     $name_prefix)
+    Route::resource('purchases/in_outs',                PurchaseInOutController::class, [ 'as' => 'backend.purchases' ])
         ->parameters([ 'in_outs' => 'resource' ])
-        ->name('index', 'backend.in_outs')
+        ->name('index', 'backend.purchases.in_outs')
         ->except([ 'create', 'store' ]);
-    Route::post('in_outs/{resource}/process',   [ InOutController::class, 'processIt'])
-        ->name('backend.in_outs.process');
+    Route::post('purchases/in_outs/{resource}/process', [ PurchaseInOutController::class, 'processIt'])
+        ->name('backend.purchases.in_outs.process');
+
+    Route::resource('sales/in_outs',                    SaleInOutController::class, [ 'as' => 'backend.sales' ])
+        ->parameters([ 'in_outs' => 'resource' ])
+        ->name('index', 'backend.sales.in_outs')
+        ->except([ 'create', 'store' ]);
+    Route::post('sales/in_outs/{resource}/process',     [ SaleInOutController::class, 'processIt'])
+        ->name('backend.sales.in_outs.process');
 
     Route::resource('material_returns',         MaterialReturnController::class,    $name_prefix)
         ->parameters([ 'material_returns' => 'resource' ])
@@ -71,7 +81,7 @@ Route::group([
     Route::post('price_changes/{resource}/process',         [ PriceChangeController::class, 'processIt'])
         ->name('backend.price_changes.process');
 
-    Route::get('reports/intentory/stock',   [ ReportController::class, 'stock' ],  $name_prefix)
+    Route::get('reports/intentory/stock',   [ InventoryReportsController::class, 'stock' ],  $name_prefix)
         ->name('backend.reports.inventory.stock');
 
 });

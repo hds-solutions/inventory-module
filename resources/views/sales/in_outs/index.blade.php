@@ -1,7 +1,7 @@
 @extends('backend::layouts.master')
 
-@section('page-name', __('inventory::in_outs.title'))
-@section('description', __('inventory::in_outs.description'))
+@section('page-name', __('inventory::in_outs.sales.title'))
+@section('description', __('inventory::in_outs.sales.description'))
 
 @section('content')
 
@@ -11,15 +11,15 @@
             <div class="col-6 d-flex align-items-center cursor-pointer"
                 data-toggle="collapse" data-target="#filters">
                 <i class="fas fa-table mr-2"></i>
-                @lang('inventory::in_outs.index')
+                @lang('inventory::in_outs.sales.index')
             </div>
             <div class="col-6 d-flex justify-content-end">
-                {{-- <a href="{{ route('backend.in_outs.create') }}"
-                   class="btn btn-sm btn-primary">@lang('inventory::in_outs.create')</a> --}}
+                {{-- <a href="{{ route('backend.sales.in_outs.create') }}"
+                   class="btn btn-sm btn-primary">@lang('inventory::in_outs.sales.create')</a> --}}
             </div>
         </div>
         <div class="row collapse @if (request()->has('filters')) show @endif" id="filters">
-            <form action="{{ route('backend.in_outs') }}"
+            <form action="{{ route('backend.sales.in_outs') }}"
                 class="col mt-2 pt-3 pb-2 border-top">
 
                 <x-backend-form-foreign name="filters[branch]" id="filter-branch"
@@ -41,9 +41,9 @@
                 <x-backend-form-foreign name="filters[partnerable]"
                     :values="$customers" show="full_name" default="{{ request('filters.partnerable') }}"
 
-                    label="inventory::in_out.partnerable_id.0"
-                    placeholder="inventory::in_out.partnerable_id._"
-                    {{-- helper="inventory::in_out.partnerable_id.?" --}} />
+                    label="inventory::in_out.customer_id.0"
+                    placeholder="inventory::in_out.customer_id._"
+                    {{-- helper="inventory::in_out.customer_id.?" --}} />
 
                 <button type="submit"
                     class="btn btn-sm btn-outline-primary">Filtrar</button>
@@ -69,8 +69,8 @@
                 <h3>@lang('backend.empty.title')</h3>
                 {{-- <p class="text-muted">
                     @lang('backend.empty.description')
-                    <a href="{{ route('backend.in_outs.create') }}" class="text-custom">
-                        <ins>@lang('inventory::in_outs.create')</ins>
+                    <a href="{{ route('backend.sales.in_outs.create') }}" class="text-custom">
+                        <ins>@lang('inventory::in_outs.sales.create')</ins>
                     </a>
                 </p> --}}
             </div>

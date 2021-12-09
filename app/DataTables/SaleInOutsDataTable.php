@@ -8,7 +8,7 @@ use HDSSolutions\Laravel\Traits\DatatableAsDocument;
 use Illuminate\Database\Eloquent\Builder;
 use Yajra\DataTables\Html\Column;
 
-class InOutDataTable extends Base\DataTable {
+class SaleInOutsDataTable extends Base\DataTable {
     use DatatableWithPartnerable;
     use DatatableAsDocument;
 
@@ -26,7 +26,7 @@ class InOutDataTable extends Base\DataTable {
     public function __construct() {
         parent::__construct(
             Resource::class,
-            route('backend.in_outs'),
+            route('backend.sales.in_outs'),
         );
     }
 
@@ -63,8 +63,9 @@ class InOutDataTable extends Base\DataTable {
     }
 
     protected function joins(Builder $query):Builder {
+        // load Sales InOuts only
         // add custom JOIN to customers + people for Partnerable
-        return $query
+        return $query->isSale()
             // join to partnerable
             ->leftJoin('customers', 'customers.id', 'in_outs.partnerable_id')
             // join to people

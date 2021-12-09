@@ -66,7 +66,7 @@ abstract class A_InOut extends X_InOut implements Document {
         // check if new record and no document number is set
         if (!$this->exists && !$this->document_number)
             // set document number
-            $this->document_number = self::nextDocumentNumber() ?? '00000001';
+            $this->document_number = self::nextDocumentNumber( $this->is_purchase ) ?? '00000001';
     }
 
     public function prepareIt():?string {

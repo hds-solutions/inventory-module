@@ -3,20 +3,17 @@
 namespace HDSSolutions\Laravel\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use HDSSolutions\Laravel\DataTables\InOutDataTable as DataTable;
 use HDSSolutions\Laravel\Http\Request;
 use HDSSolutions\Laravel\Models\InOut as Resource;
-use HDSSolutions\Laravel\Models\Branch;
 use HDSSolutions\Laravel\Models\Currency;
-use HDSSolutions\Laravel\Models\Customer;
-use HDSSolutions\Laravel\Models\Employee;
 use HDSSolutions\Laravel\Models\InOutLine;
 use HDSSolutions\Laravel\Models\Product;
 use HDSSolutions\Laravel\Models\Variant;
 use HDSSolutions\Laravel\Traits\CanProcessDocument;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
-class InOutController extends Controller {
+abstract class InOutController extends Controller {
     use CanProcessDocument;
 
     public function __construct() {
@@ -31,30 +28,21 @@ class InOutController extends Controller {
 
     protected function redirectTo():string {
         // go to resource view
-        return 'backend.in_outs.show';
+        return 'backend.'.$this->prefix().'.in_outs.show';
     }
 
-    public function index(Request $request, DataTable $dataTable) {
-        // check only-form flag
-        if ($request->has('only-form'))
-            // redirect to popup callback
-            return view('backend::components.popup-callback', [ 'resource' => new Resource ]);
+    protected abstract function documentType():string;
 
-        // load resources
-        if ($request->ajax()) return $dataTable->ajax();
+    protected final function isPurchaseDocument():bool { return $this->documentType() === 'purchase'; }
+    protected final function isSaleDocument():bool { return $this->documentType() === 'sale'; }
+    protected final function prefix():string { return Str::plural($this->documentType()); }
 
-        // load customers
-        $customers = Customer::all();
+    // public abstract function index(Request $request, DataTableContract $dataTable);
 
-        // return view with dataTable
-        return $dataTable->render('inventory::in_outs.index', compact('customers') + [
-            'count'                 => Resource::count(),
-            'show_company_selector' => !backend()->companyScoped(),
-        ]);
-    }
+    protected abstract function getPartnerable($partnerable);
 
-    public function show(Request $request, Resource $resource) {
-        // load inventory data
+    public final function show(Request $request, Resource $resource) {
+        // load inOut data
         $resource->load([
             'branch',
             'partnerable',
@@ -68,71 +56,18 @@ class InOutController extends Controller {
         ]);
 
         // redirect to list
-        return view('inventory::in_outs.show', compact('resource'));
+        return view('inventory::'.$this->prefix().'.in_outs.show', compact('resource'));
     }
 
-    public function edit(Request $request, Resource $resource) {
-        // check if document is already approved or processed
-        if ($resource->isApproved() || $resource->isProcessed())
-            // redirect to show route
-            return redirect()->route('backend.in_outs.show', $resource);
-
-        // load resource relations
-        $resource->load([
-            'order',
-            'lines' => fn($line) => $line->with([
-                'product',
-            ]),
-        ]);
-
-        // load customers
-        $customers = Customer::with([
-            // 'addresses', // TODO: Customer.addresses
-        ])->get();
-        // load current company branches with warehouses
-        $branches = backend()->company()->branches()->with([
-            'warehouses'    => fn($warehouse) => $warehouse->with([
-                'locators',
-            ]),
-        ])->get()->transform(fn($branch) => $branch
-            // override loaded warehouses, add relation to parent manually
-            ->setRelation('warehouses', $branch->warehouses->transform(fn($warehouse) => $warehouse
-                // set Warehouse.branch relation manually to avoid more queries
-                ->setRelation('branch', $branch)
-                // override loaded locators, add relation to parent manually
-                ->setRelation('locators', $warehouse->locators->transform(fn($locator) => $locator
-                    // set Locator.warehouse relation manuallty to avoid more queries
-                    ->setRelation('warehouse', $warehouse)
-                ))
-            ))
-        );
-        // load employees
-        $employees = Employee::all();
-        // load products
-        $products = Product::with([
-            'images',
-            'variants',
-        ])->get()->transform(fn($product) => $product
-            // override loaded variants, add relation to parent manually
-            ->setRelation('variants', $product->variants->transform(fn($variant) => $variant
-                // set Variant.product relation manually to avoid more queries
-                ->setRelation('product', $product)
-            ))
-        );
-
-        // show edit form
-        return view('inventory::in_outs.edit', compact('customers', 'branches', 'employees', 'products', 'resource'));
-    }
-
-    public function update(Request $request, Resource $resource) {
-        // cast values to boolean
-        if ($request->has('is_purchase'))   $request->merge([ 'is_purchase' => $request->is_purchase == 'true' ]);
+    public final function update(Request $request, Resource $resource) {
+        // set is_purchase flag
+        $request->merge([ 'is_purchase' => $this->isPurchaseDocument() ]);
 
         // start a transaction
         DB::beginTransaction();
 
         // associate Partner
-        $resource->partnerable()->associate( Customer::findOrFail($request->get('partnerable_id')) );
+        $resource->partnerable()->associate( $this->getPartnerable($request->partnerable_id) );
 
         // save resource
         if (!$resource->update( $request->input() ))
@@ -140,7 +75,7 @@ class InOutController extends Controller {
             return back()->withInput()
                 ->withErrors( $resource->errors() );
 
-        // sync inventory lines
+        // sync inOut lines
         if (($redirect = $this->syncLines($resource, $request->get('lines'))) !== true)
             // return redirection
             return $redirect;
@@ -149,10 +84,10 @@ class InOutController extends Controller {
         DB::commit();
 
         // redirect to resource details
-        return redirect()->route('backend.in_outs.show', $resource);
+        return redirect()->route('backend.'.$this->prefix().'.in_outs.show', $resource);
     }
 
-    public function destroy(Request $request, Resource $resource) {
+    public final function destroy(Request $request, Resource $resource) {
         // delete resource
         if (!$resource->delete())
             // redirect with errors
@@ -163,54 +98,42 @@ class InOutController extends Controller {
         return redirect()->route('backend.in_outs');
     }
 
-    public function price(Request $request) {
-        // get resources
-        $product = $request->has('product') ? Product::findOrFail($request->product) : null;
-        $variant = $request->has('variant') ? Variant::findOrFail($request->variant) : null;
-        $currency = $request->has('currency') ? Currency::findOrFail($request->currency) : null;
-
-        // return price for requested product
-        return response()->json($variant?->price($currency)?->pivot ?? $product?->price($currency)?->pivot);
-    }
-
     private function syncLines(Resource $resource, array $lines) {
-        // load inventory lines
+        // load inOut lines
         $resource->load(['lines']);
 
         // foreach new/updated lines
         foreach (($lines = array_group( $lines )) as $line) {
             // ignore line if product wasn't specified
-            if (!isset($line['product_id']) || is_null($line['price']) || is_null($line['quantity'])) continue;
+            if (!isset($line['product_id']) || is_null($line['locator_id']) || is_null($line['quantity_movement'])) continue;
             // load product
             $product = Product::find($line['product_id']);
             // load variant, if was specified
             $variant = isset($line['variant_id']) ? $product->variants->firstWhere('id', $line['variant_id']) : null;
 
             // find existing line
-            $orderLine = $resource->lines->first(function($iLine) use ($product, $variant) {
+            $inOutLine = $resource->lines->first(function($iLine) use ($product, $variant) {
                 return $iLine->product_id == $product->id &&
                     $iLine->variant_id == ($variant->id ?? null);
             // create a new line
             }) ?? InOutLine::make([
-                'order_id'      => $resource->id,
-                'currency_id'   => $resource->currency_id,
+                'in_out_id'     => $resource->id,
                 'product_id'    => $product->id,
                 'variant_id'    => $variant->id ?? null,
             ]);
 
             // update line values
-            $orderLine->fill([
-                'price'     => $line['price'],
-                'quantity'  => $line['quantity'],
-                'total'     => $line['total'],
+            $inOutLine->fill([
+                'locator_id'        => $line['locator_id'],
+                'quantity_movement' => $line['quantity_movement'],
             ]);
-            // save inventory line
-            if (!$orderLine->save())
+            // save inOut line
+            if (!$inOutLine->save())
                 return back()->withInput()
-                    ->withErrors( $orderLine->errors() );
+                    ->withErrors( $inOutLine->errors() );
         }
 
-        // find removed inventory lines
+        // find removed inOut lines
         foreach ($resource->lines as $line) {
             // deleted flag
             $deleted = true;

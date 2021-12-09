@@ -1,7 +1,7 @@
 @extends('backend::layouts.master')
 
-@section('page-name', __('inventory::in_outs.title'))
-@section('description', __('inventory::in_outs.description'))
+@section('page-name', __('inventory::in_outs.purchases.title'))
+@section('description', __('inventory::in_outs.purchases.description'))
 
 @section('content')
 
@@ -10,15 +10,15 @@
         <div class="row">
             <div class="col-6 d-flex align-items-center">
                 <i class="fas fa-user-plus mr-2"></i>
-                @lang('inventory::in_outs.show')
+                @lang('inventory::in_outs.purchases.show')
             </div>
             <div class="col-6 d-flex justify-content-end">
                 @if (!$resource->isCompleted())
-                <a href="{{ route('backend.in_outs.edit', $resource) }}"
-                    class="btn btn-sm ml-2 btn-outline-info">@lang('inventory::in_outs.edit')</a>
+                <a href="{{ route('backend.purchases.in_outs.edit', $resource) }}"
+                    class="btn btn-sm ml-2 btn-outline-info">@lang('inventory::in_outs.purchases.edit')</a>
                 @endif
-                {{-- <a href="{{ route('backend.in_outs.create') }}"
-                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::in_outs.create')</a> --}}
+                {{-- <a href="{{ route('backend.purchases.in_outs.create') }}"
+                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::in_outs.purchases.create')</a> --}}
             </div>
         </div>
     </div>
@@ -33,22 +33,28 @@
         </div>
 
         <div class="row">
-            <div class="col-12">
+            <div class="col-12 col-xl-6">
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::in_out.branch_id.0'):</div>
-                    <div class="col-8 col-lg-6 h4">{{ $resource->branch->name }}</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::in_out.document_number.0'):</div>
+                    <div class="col-8 col-lg-6 h4 font-weight-bold">{{ $resource->document_number }}</div>
                 </div>
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::in_out.partnerable_id.0'):</div>
-                    <div class="col-8 col-lg-6 h4">{{ $resource->partnerable->fullname }}</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::in_out.warehouse_id.0'):</div>
+                    <div class="col-8 col-lg-6 h4">{{ $resource->warehouse->name }} <small class="font-weight-light">[{{ $resource->branch->name }}]</small></div>
                 </div>
 
-                {{-- <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::in_out.description.0'):</div>
-                    <div class="col-8 col-lg-6 h4">{{ $resource->description }}</div>
-                </div> --}}
+                <div class="row">
+                    <div class="col-4 col-lg-4">@lang('inventory::in_out.provider_id.0'):</div>
+                    <div class="col-8 col-lg-6 h4 font-weight-bold">{{ $resource->partnerable->fullname }} <small class="font-weight-light">[{{ $resource->partnerable->ftid }}]</small></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-4 col-lg-4">@lang('inventory::in_out.invoice_id.0'):</div>
+                    <div class="col-8 col-lg-6 h4"><a href="{{ route('backend.purchases.invoices.show', $resource->invoice) }}"
+                        class="text-decoration-none text-muted">{{ $resource->invoice?->document_number }}</a></div>
+                </div>
 
                 <div class="row">
                     <div class="col-4 col-lg-4">@lang('inventory::in_out.transacted_at.0'):</div>
@@ -85,7 +91,7 @@
 
                         <tbody>
                             @foreach ($resource->lines as $line)
-                                <tr>
+                                <tr data-toggle="collapse" data-target=".line-{{ $line->id }}-details">
                                     <td>
                                         <div class="d-flex justify-content-center">
                                             <img src="{{ asset(
@@ -122,6 +128,17 @@
                                     </td>
                                     <td class="align-middle text-center h4 font-weight-bold">{{ $line->quantity_movement }}</td>
                                 </tr>
+
+                                <tr class="d-none"></tr>
+                                <tr class="collapse line-{{ $line->id }}-details">
+                                    <td class="py-0"></td>
+                                    <td class="py-0 pl-3" colspan="2">
+                                        <a href="{{ route('backend.purchases.invoices.show', $line->invoiceLine->invoice) }}"
+                                            class="text-dark font-weight-bold text-decoration-none">{{ $line->invoiceLine->invoice->document_number }} <small class="ml-1">{{ $line->invoiceLine->invoice->transacted_at_pretty }}</small></a>
+                                    </td>
+                                    <td class="py-0 text-center">{{ $line->invoiceLine->quantity_ordered }}</td>
+                                </tr>
+
                             @endforeach
                         </tbody>
                     </table>
@@ -131,7 +148,7 @@
         </div>
 
         @include('backend::components.document-actions', [
-            'route'     => 'backend.in_outs.process',
+            'route'     => 'backend.purchases.in_outs.process',
             'resource'  => $resource,
         ])
 

@@ -12,14 +12,17 @@ class InventoryMenu extends Base\Menu {
         $sub = backend()->menu()
             ->add(__('inventory::inventories.module'), [
                 'nickname'  => 'inventory',
-                'icon'      => 'laptop-house',
+                'icon'      => 'dolly',
             ])->data('priority', 800);
 
         $this
             // append items to submenu
             ->warehouses($sub)
             ->locators($sub)
-            ->in_outs($sub)
+
+            ->purchase_in_outs($sub)
+            ->sale_in_outs($sub)
+
             ->material_returns($sub)
             ->inventories($sub)
             ->inventory_movements($sub)
@@ -51,10 +54,20 @@ class InventoryMenu extends Base\Menu {
         return $this;
     }
 
-    private function in_outs(&$menu) {
-        if (Route::has('backend.in_outs') && $this->can('in_outs.crud.index'))
-            $menu->add(__('inventory::in_outs.nav'), [
-                'route'     => 'backend.in_outs',
+    private function purchase_in_outs(&$menu) {
+        if (Route::has('backend.purchases.in_outs') && $this->can('in_outs.crud.index'))
+            $menu->add(__('inventory::in_outs.purchases.nav'), [
+                'route'     => 'backend.purchases.in_outs',
+                'icon'      => 'dolly-flatbed'
+            ]);
+
+        return $this;
+    }
+
+    private function sale_in_outs(&$menu) {
+        if (Route::has('backend.sales.in_outs') && $this->can('in_outs.crud.index'))
+            $menu->add(__('inventory::in_outs.sales.nav'), [
+                'route'     => 'backend.sales.in_outs',
                 'icon'      => 'dolly-flatbed'
             ]);
 

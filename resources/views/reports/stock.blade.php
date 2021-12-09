@@ -90,6 +90,20 @@
 
                 </x-backend-form-foreign>
 
+                <x-backend-form-foreign name="filters[purchase_price_list]" required
+                    :values="$purchase_price_lists" default="{{ $purchase_price_lists->firstWhere('is_default')->id }}"
+
+                    label="inventory::reports.stock.purchase_price_list_id.0"
+                    placeholder="inventory::reports.stock.purchase_price_list_id._"
+                    {{-- helper="inventory::reports.stock.purchase_price_list_id.?" --}} />
+
+                <x-backend-form-foreign name="filters[sale_price_list]" required
+                    :values="$sale_price_lists" default="{{ $sale_price_lists->firstWhere('is_default')->id }}"
+
+                    label="inventory::reports.stock.sale_price_list_id.0"
+                    placeholder="inventory::reports.stock.sale_price_list_id._"
+                    {{-- helper="inventory::reports.stock.sale_price_list_id.?" --}} />
+
                 <button type="submit"
                     class="btn btn-sm btn-outline-primary">Filtrar</button>
 
@@ -101,18 +115,18 @@
     <div class="card-body p-0">
         @if ($count)
             <div class="table-responsive">
-                {{ $dataTable->table([ 'class' => 'table table-bordered table-sm table-hover border-0 m-0' ]) }}
+                {{ $dataTable->table([ 'class' => 'table table-sm table-bordered table-hover table-striped border-0 m-0' ]) }}
             </div>
         @else
             <div class="text-center m-t-30 m-b-30 p-b-10">
                 <h2><i class="fas fa-table text-custom"></i></h2>
                 <h3>@lang('backend.empty.title')</h3>
-                <p class="text-muted">
+                {{-- <p class="text-muted">
                     @lang('backend.empty.description')
                     <a href="{{ route('backend.inventories.create') }}" class="text-custom">
                         <ins>@lang('inventory::inventories.create')</ins>
                     </a>
-                </p>
+                </p> --}}
             </div>
         @endif
     </div>

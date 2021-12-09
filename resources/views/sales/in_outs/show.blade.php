@@ -1,7 +1,7 @@
 @extends('backend::layouts.master')
 
-@section('page-name', __('inventory::material_returns.title'))
-@section('description', __('inventory::material_returns.description'))
+@section('page-name', __('inventory::in_outs.sales.title'))
+@section('description', __('inventory::in_outs.sales.description'))
 
 @section('content')
 
@@ -10,15 +10,15 @@
         <div class="row">
             <div class="col-6 d-flex align-items-center">
                 <i class="fas fa-user-plus mr-2"></i>
-                @lang('inventory::material_returns.show')
+                @lang('inventory::in_outs.sales.show')
             </div>
             <div class="col-6 d-flex justify-content-end">
                 @if (!$resource->isCompleted())
-                <a href="{{ route('backend.material_returns.edit', $resource) }}"
-                    class="btn btn-sm ml-2 btn-outline-primary btn-hover-info">@lang('inventory::material_returns.edit')</a>
+                <a href="{{ route('backend.sales.in_outs.edit', $resource) }}"
+                    class="btn btn-sm ml-2 btn-outline-info">@lang('inventory::in_outs.sales.edit')</a>
                 @endif
-                <a href="{{ route('backend.material_returns.create') }}"
-                    class="btn btn-sm ml-2 btn-outline-primary">@lang('inventory::material_returns.create')</a>
+                {{-- <a href="{{ route('backend.sales.in_outs.create') }}"
+                    class="btn btn-sm ml-2 btn-primary">@lang('inventory::in_outs.sales.create')</a> --}}
             </div>
         </div>
     </div>
@@ -28,35 +28,41 @@
 
         <div class="row">
             <div class="col">
-                <h2>@lang('inventory::material_return.details.0')</h2>
+                <h2>@lang('inventory::in_out.details.0')</h2>
             </div>
         </div>
 
         <div class="row">
-            <div class="col-12">
+            <div class="col-12 col-xl-6">
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::material_return.branch_id.0'):</div>
-                    <div class="col-8 col-lg-6 h4">{{ $resource->branch->name }}</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::in_out.document_number.0'):</div>
+                    <div class="col-8 col-lg-6 h4 font-weight-bold">{{ $resource->document_number }}</div>
                 </div>
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::material_return.partnerable_id.0'):</div>
-                    <div class="col-8 col-lg-6 h4">{{ $resource->partnerable->fullname }}</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::in_out.warehouse_id.0'):</div>
+                    <div class="col-8 col-lg-6  h4">{{ $resource->warehouse->name }} <small class="font-weight-light">[{{ $resource->branch->name }}]</small></div>
                 </div>
 
-                {{-- <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::material_return.description.0'):</div>
-                    <div class="col-8 col-lg-6 h4">{{ $resource->description }}</div>
-                </div> --}}
+                <div class="row">
+                    <div class="col-4 col-lg-4">@lang('inventory::in_out.customer_id.0'):</div>
+                    <div class="col-8 col-lg-6 h4 font-weight-bold">{{ $resource->partnerable->fullname }} <small class="font-weight-light">[{{ $resource->partnerable->ftid }}]</small></div>
+                </div>
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::material_return.transacted_at.0'):</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::in_out.order_id.0'):</div>
+                    <div class="col-8 col-lg-6 h4"><a href="{{ route('backend.sales.orders.show', $resource->order) }}"
+                        class="text-decoration-none text-muted">{{ $resource->order?->document_number }}</a></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-4 col-lg-4">@lang('inventory::in_out.transacted_at.0'):</div>
                     <div class="col-8 col-lg-6 h4">{{ pretty_date($resource->transacted_at, true) }}</div>
                 </div>
 
                 <div class="row">
-                    <div class="col-4 col-lg-4">@lang('inventory::material_return.document_status.0'):</div>
+                    <div class="col-4 col-lg-4">@lang('inventory::in_out.document_status.0'):</div>
                     <div class="col-8 col-lg-6 h4">{{ Document::__($resource->document_status) }}</div>
                 </div>
 
@@ -65,7 +71,7 @@
 
         <div class="row">
             <div class="col">
-                <h2>@lang('inventory::material_return.lines.0')</h2>
+                <h2>@lang('inventory::in_out.lines.0')</h2>
             </div>
         </div>
 
@@ -76,11 +82,10 @@
                     <table class="table table-sm table-striped table-borderless table-hover" width="100%" cellspacing="0">
                         <thead>
                             <tr>
-                                <th class="w-150px">@lang('inventory::material_return.lines.image.0')</th>
-                                <th>@lang('inventory::material_return.lines.product_id.0')</th>
-                                <th>@lang('inventory::material_return.lines.variant_id.0')</th>
-                                <th class="w-200px text-center">@lang('inventory::material_return.lines.locator_id.0')</th>
-                                <th class="w-250px text-center">@lang('inventory::material_return.lines.quantity_movement.0')</th>
+                                <th class="w-150px">@lang('inventory::in_out.lines.image.0')</th>
+                                <th>@lang('inventory::in_out.lines.product_id.0')</th>
+                                <th>@lang('inventory::in_out.lines.variant_id.0')</th>
+                                <th class="w-150px text-center">@lang('inventory::in_out.lines.quantity_movement.0')</th>
                             </tr>
                         </thead>
 
@@ -101,13 +106,13 @@
                                     </td>
                                     <td class="align-middle pl-3">
                                         <a href="{{ route('backend.products.edit', $line->product) }}"
-                                            class="text-primary text-decoration-none">{{ $line->product->name }}</a>
+                                            class="font-weight-bold text-decoration-none">{{ $line->product->name }}</a>
                                     </td>
                                     <td class="align-middle pl-3">
                                         <div>
                                             @if ($line->variant)
                                             <a href="{{ route('backend.variants.edit', $line->variant) }}"
-                                                class="text-primary text-decoration-none">{{ $line->variant->sku }}</a>
+                                                class="font-weight-bold text-decoration-none">{{ $line->variant->sku }}</a>
                                             @else
                                                 --
                                             @endif
@@ -121,18 +126,17 @@
                                         </div>
                                         @endif
                                     </td>
-                                    <td class="align-middle text-center">{{ $line->locator?->name ?? '--' }}</td>
                                     <td class="align-middle text-center h4 font-weight-bold">{{ $line->quantity_movement }}</td>
                                 </tr>
+
                                 <tr class="d-none"></tr>
                                 <tr class="collapse line-{{ $line->id }}-details">
                                     <td class="py-0"></td>
-                                    <td class="py-0 pl-3" colspan="3">
-                                        <a href="{{ route('backend.sales.invoices.show', $line->invoiceLine->invoice) }}"
-                                            class="text-secondary text-decoration-none">{{ $line->invoiceLine->invoice->document_number }}</a> <small class="ml-1">{{ $line->invoiceLine->invoice->transacted_at_pretty }}</small>
+                                    <td class="py-0 pl-3" colspan="2">
+                                        <a href="{{ route('backend.sales.orders.show', $line->orderLine->order) }}"
+                                            class="text-dark font-weight-bold text-decoration-none">{{ $line->orderLine->order->document_number }} <small class="ml-1">{{ $line->orderLine->order->transacted_at_pretty }}</small></a>
                                     </td>
-                                    <td class="py-0 text-center">{{ $line->quantity_ordered }}</td>
-                                    {{-- <td class="py-0"></td> --}}
+                                    <td class="py-0 text-center">{{ $line->orderLine->quantity_ordered }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -143,9 +147,8 @@
         </div>
 
         @include('backend::components.document-actions', [
-            'route'     => 'backend.material_returns.process',
+            'route'     => 'backend.sales.in_outs.process',
             'resource'  => $resource,
-            'title'     => $resource->document_number,
         ])
 
     </div>

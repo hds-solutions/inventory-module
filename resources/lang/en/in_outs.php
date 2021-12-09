@@ -1,15 +1,30 @@
 <?php return [
 
-    'nav'           => 'Stock In/Outs',
+    'purchases' => [
+        'nav'           => 'Egress documents',
 
-    'title'         => 'Stock In/Outs',
-    'description'   => '',
+        'title'         => 'Egress documents',
+        'description'   => '',
 
-    'index'         => 'Stock In/Outs List',
-    'create'        => 'Create new Stock In/Out',
-    'add'           => 'Add new Stock In/Out ...',
-    'show'          => 'Stock In/Out Details',
-    'edit'          => 'Edit Stock In/Out',
+        'index'         => 'Egress documents List',
+        'create'        => 'Create new Egress document',
+        'add'           => 'Add new Egress document ...',
+        'show'          => 'Egress document Details',
+        'edit'          => 'Edit Egress document',
+    ],
+
+    'sales'     => [
+        'nav'           => 'Ingress documents',
+
+        'title'         => 'Ingress documents',
+        'description'   => '',
+
+        'index'         => 'Ingress documents List',
+        'create'        => 'Create new Ingress document',
+        'add'           => 'Add new Ingress document ...',
+        'show'          => 'Ingress document Details',
+        'edit'          => 'Edit Ingress document',
+    ],
 
     'save'          => 'Save',
     'cancel'        => 'Cancel',

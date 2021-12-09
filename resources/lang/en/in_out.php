@@ -34,10 +34,28 @@
         '?' => 'Partner help text',
     ],
 
+    'customer_id'   => [
+        'Customer',
+        '_' => 'Customer',
+        '?' => 'Customer help text',
+    ],
+
+    'provider_id'   => [
+        'Provider',
+        '_' => 'Provider',
+        '?' => 'Provider help text',
+    ],
+
     'order_id'      => [
         'Order',
         '_' => 'Order',
         '?' => 'Order help text',
+    ],
+
+    'invoice_id'    => [
+        'Invoice',
+        '_' => 'Invoice',
+        '?' => 'Invoice help text',
     ],
 
     'transacted_at' => [

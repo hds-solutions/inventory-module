@@ -29,6 +29,10 @@ class InOut extends A_InOut {
         return $this->belongsTo(Order::class);
     }
 
+    public function invoice() {
+        return $this->belongsTo(Invoice::class);
+    }
+
     public function lines() {
         return $this->hasMany(InOutLine::class);
     }
@@ -173,6 +177,14 @@ class InOut extends A_InOut {
     public function scopeOfOrder(Builder $query, int|Order $order) {
         // return InOut's from order
         return $query->where('order_id', $order instanceof Order ? $order->id : $order);
+    }
+
+    public function scopeIsPurchase(Builder $query, bool $is_purchase = true) {
+        return $query->where('is_purchase', $is_purchase);
+    }
+
+    public function scopeIsSale(Builder $query, bool $is_sale = true) {
+        return $this->scopeIsPurchase($query, !$is_sale);
     }
 
     public static function createFromOrder(int|Order $order, array $attributes = []):self {

@@ -1,15 +1,30 @@
 <?php return [
 
-    'nav'           => 'Entradas/Salidas de Stock',
+    'purchases' => [
+        'nav'           => 'Entradas de Stock',
 
-    'title'         => 'Entradas/Salidas de Stock',
-    'description'   => '',
+        'title'         => 'Entradas de Stock',
+        'description'   => '',
 
-    'index'         => 'Listado de Entradas/Salidas de Stock',
-    'create'        => 'Crear nueva Entrada/Salida stock',
-    'add'           => 'Agregar nueva Entrada/Salida stock ...',
-    'show'          => 'Detalles de la Entrada/Salida stock',
-    'edit'          => 'Editar Entrada/Salida stock',
+        'index'         => 'Listado de Entradas de Stock',
+        'create'        => 'Crear nueva Entrada de Stock',
+        'add'           => 'Agregar nueva Entrada de Stock ...',
+        'show'          => 'Detalles de la Entrada de Stock',
+        'edit'          => 'Editar Entrada de Stock',
+    ],
+
+    'sales'     => [
+        'nav'           => 'Salidas de Stock',
+
+        'title'         => 'Salidas de Stock',
+        'description'   => '',
+
+        'index'         => 'Listado de Salidas de Stock',
+        'create'        => 'Crear nueva Salida de Stock',
+        'add'           => 'Agregar nueva Salida de Stock ...',
+        'show'          => 'Detalles de la Salida de Stock',
+        'edit'          => 'Editar Salida de Stock',
+    ],
 
     'save'          => 'Guardar',
     'cancel'        => 'Cancelar',
