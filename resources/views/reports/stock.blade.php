@@ -38,6 +38,7 @@
 
                 <x-backend-form-foreign name="filters[brand]"
                     :values="$brands" default="{{ request('filters.brand') }}"
+                    data-live-search="true"
 
                     label="products-catalog::product.brand_id.0"
                     placeholder="products-catalog::product.brand_id._"
@@ -47,6 +48,7 @@
                         :values="$brands->pluck('models')->flatten()" default="{{ request('filters.model') }}"
 
                         filtered-by='[name="filters[brand]"]' filtered-using="brand"
+                        data-live-search="true"
 
                         label="products-catalog::product.model_id.0"
                         placeholder="products-catalog::product.model_id._"
@@ -56,6 +58,7 @@
 
                 <x-backend-form-foreign name="filters[family]"
                     :values="$families" default="{{ request('filters.family') }}"
+                    data-live-search="true"
 
                     label="products-catalog::product.family_id.0"
                     placeholder="products-catalog::product.family_id._"
@@ -65,6 +68,7 @@
                         :values="$families->pluck('subFamilies')->flatten()" default="{{ request('filters.sub_family') }}"
 
                         filtered-by='[name="filters[family]"]' filtered-using="family"
+                        data-live-search="true"
 
                         label="products-catalog::product.sub_family_id.0"
                         placeholder="products-catalog::product.sub_family_id._"
@@ -74,6 +78,7 @@
 
                 <x-backend-form-foreign name="filters[line]"
                     :values="$lines" default="{{ request('filters.line') }}"
+                    data-live-search="true"
 
                     label="products-catalog::product.line_id.0"
                     placeholder="products-catalog::product.line_id._"
@@ -83,6 +88,7 @@
                         :values="$lines->pluck('gamas')->flatten()" default="{{ request('filters.gama') }}"
 
                         filtered-by='[name="filters[line]"]' filtered-using="line"
+                        data-live-search="true"
 
                         label="products-catalog::product.gama_id.0"
                         placeholder="products-catalog::product.gama_id._"
