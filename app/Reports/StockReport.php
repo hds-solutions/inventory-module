@@ -132,7 +132,7 @@ class StockReport extends DataTable {
             $purchase_price = $purchase_prices->firstWhere('id', $variant->variant_id)?->prices->first();
             $sale_price = $sale_prices->firstWhere('id', $variant->variant_id)?->prices->first();
             // get inventory
-            $inventory = $inventory_lines->firstWhere('id', $variant->variant_id)->inventories->first();
+            $inventory = $inventory_lines->firstWhere('id', $variant->variant_id)?->inventories->first();
 
             // add prices
             $variant->purchase_code = $purchase_price?->priceList->currency->code;
